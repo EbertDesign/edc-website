@@ -1,0 +1,35 @@
+---
+/**
+ * Rich text from Sanity, rendered into the export's `.rich-text-block` so the
+ * existing `site.css` rules for headings, lists, quotes and figures inside a
+ * post keep applying unchanged. Images and links are the two node types the
+ * imported content actually contains; each has its own component.
+ *
+ * Pass 2 folds this into `Typography/RichText` once that component's styles
+ * are the ones doing the work.
+ */
+import { PortableText as Renderer } from "astro-portabletext";
+import type { HTMLAttributes } from "astro/types";
+import ImageBlock from "./PortableTextImage.astro";
+import Link from "./PortableTextLink.astro";
+
+type Props = HTMLAttributes<"div"> & {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** The Portable Text array, as projected by the site's queries. */
+  value: unknown[] | null | undefined;
+};
+
+const { render = true, value, class: className, ...rest } = Astro.props;
+---
+
+{
+  render && Array.isArray(value) && value.length > 0 && (
+    <div class:list={["rich-text-block", "w-richtext", className]} {...rest}>
+      <Renderer
+        value={value as never}
+        components={{ type: { image: ImageBlock }, mark: { link: Link } }}
+      />
+    </div>
+  )
+}

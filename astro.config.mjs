@@ -10,12 +10,6 @@ import sanity from "@sanity/astro";
 // display scale and links, Inter the headings and UI, and Switzer is the
 // body face everything inherits. ClashDisplay and Spectral shipped in the
 // Webflow export with 0 uses between them and are deliberately absent.
-const switzer = (weight, style, file) => ({
-  weight,
-  style,
-  src: [`./src/assets/fonts/${file}`],
-});
-
 export default defineConfig({
   site: SITE_URL,
   integrations: [
@@ -55,11 +49,11 @@ export default defineConfig({
       fallbacks: ["sans-serif"],
       options: {
         variants: [
-          switzer(400, "normal", "Switzer-Regular.woff2"),
-          switzer(400, "italic", "Switzer-Italic.woff2"),
-          switzer(500, "normal", "Switzer-Medium.woff2"),
-          switzer(600, "normal", "Switzer-Semibold.woff2"),
-          switzer(700, "normal", "Switzer-Bold.woff2"),
+          { weight: 400, style: "normal", src: ["./src/assets/fonts/Switzer-Regular.woff2"] },
+          { weight: 400, style: "italic", src: ["./src/assets/fonts/Switzer-Italic.woff2"] },
+          { weight: 500, style: "normal", src: ["./src/assets/fonts/Switzer-Medium.woff2"] },
+          { weight: 600, style: "normal", src: ["./src/assets/fonts/Switzer-Semibold.woff2"] },
+          { weight: 700, style: "normal", src: ["./src/assets/fonts/Switzer-Bold.woff2"] },
         ],
       },
     },

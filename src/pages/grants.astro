@@ -1,0 +1,153 @@
+---
+/**
+ * PASS 1 — /grants, as Webflow exported it, with only the shared substitutions
+ * applied: paths rewritten, the nine colliding class names prefixed `wf-`,
+ * `data-w-id` stripped (IX2 is gone; `.fade-in-bottom` plays through
+ * `Utility/Reveal`), and the chrome supplied by `BaseLayout`.
+ * Every other class is still the template's own and every rule still lives in
+ * `styles/webflow/site.css`. Becomes Lumos components in pass 2, one block at a
+ * time, against this baseline.
+ *
+ * Webflow widgets still in this markup, non-functional until pass 2: w-form.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Grants Program"
+>
+  <div class="wf-section subpage-hero-section">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid">
+          <div id="w-node-_8fbd3dcc-fa3e-6813-474c-125f8b4765b3-4efe135b">
+            <h1 class="margin-bottom-16 fade-in-bottom">Grant-Funded Projects </h1>
+            <p class="text-large fade-in-bottom-100ms">Transform Your Nonprofit&#x27;s Brand Without Burdening Your Budget.</p>
+          </div>
+          <p id="w-node-_8fbd3dcc-fa3e-6813-474c-125f8b4765b8-4efe135b" class="light-grey-text text-s fade-in-bottom-100ms">Grant Funded Marketing Services.</p>
+        </div>
+      </div>
+    </div>
+
+  <section class="wf-section">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid margin-top-80 fade-in-bottom">
+          <p id="w-node-_0b6d86bf-965f-099f-adc5-d33ffb8abc4e-4efe135b" class="text-2xl">None of the Risk, All the Reward.</p>
+          <p id="w-node-_0b6d86bf-965f-099f-adc5-d33ffb8abc50-4efe135b" class="light-grey-text text-2-columns">Your mission deserves powerful design that moves people to action. But when every dollar counts, investing in professional branding often takes a backseat to program delivery. What if you could secure grant funding specifically for the brand and marketing your nonprofit needs? Introducing our Grant-Funded Design Program where we pair our purpose-driven design expertise with specialized grant writing to help nonprofits like yours access foundation funding for communication projects.</p>
+        </div>
+      </div>
+    </section>
+
+  <div class="wf-section">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid margin-bottom-64 fade-in-bottom">
+          <p id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d62d-4efe135b" class="text-4xl">How It Works.</p>
+          <div id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d631-4efe135b" class="section-heading-container no-margin-bottom">
+            <div class="section-heading-content">
+              <div class="dot"></div>
+              <h2 class="text-s">Application Processs</h2>
+            </div>
+          </div>
+        </div>
+        <div class="list-container fade-in-bottom">
+          <div class="list-item-container">
+            <p>01</p>
+            <div id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d63a-4efe135b">
+              <h3>Evaluate Needs.</h3>
+              <p id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d63d-4efe135b" class="light-grey-text">Complete our quick interest form below to get started. After you fill out the form a team member will reach out to set up a brief screening call.</p>
+            </div>
+          </div>
+          <div class="list-item-container">
+            <p>02</p>
+            <div id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d642-4efe135b">
+              <h3>Find Funding.</h3>
+              <p id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d645-4efe135b" class="light-grey-text">After a brief screening call, our team matches your project with relevant grant opportunities from our continually updated funding calendar.</p>
+            </div>
+          </div>
+          <div class="list-item-container">
+            <p>03</p>
+            <div id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d64a-4efe135b">
+              <h3>Secure Professional Support.</h3>
+              <p id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d64d-4efe135b" class="light-grey-text">Our grant writing partners prepare compelling applications while Ebert Design scopes your project for maximum impact. </p>
+            </div>
+          </div>
+          <div class="list-item-container">
+            <p>04</p>
+            <div id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d652-4efe135b">
+              <h3>Create Meaningful Design.</h3>
+              <p id="w-node-_55e80e1b-cee2-ede3-7605-8af019d1d655-4efe135b" class="light-grey-text">Once funding is secured, our team of nonprofit design specialists brings your vision to life with purpose-driven brand solutions, brand strategy, and more.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section subpage-hero-section">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid hero-grid fade-in-bottom">
+          <div id="w-node-_9e961965-b3d4-c979-158b-6b368a77fef4-4efe135b">
+            <p class="text-5xl margin-bottom-16">Get Started Today.</p>
+            <p class="text-large">Complete our brief interest form below, and a member of our team will reach out to discuss your nonprofit&#x27;s needs and potential grant opportunities.</p>
+          </div>
+          <div id="w-node-_9e961965-b3d4-c979-158b-6b368a77fef9-4efe135b" class="section-heading-container no-margin-bottom">
+            <div class="section-heading-content">
+              <div class="dot"></div>
+              <h1 class="text-s">Interest Form</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid">
+          <div id="w-node-e59bf35f-85b5-1810-e6c2-bd74ff696572-4efe135b" class="from-block w-form">
+            <form id="wf-form-Grant-Funded-Project-Form" name="wf-form-Grant-Funded-Project-Form" data-name="Grant Funded Project Form" method="get" class="form" data-wf-page-id="67d9aa72ac50e70b4efe135b" data-wf-element-id="e59bf35f-85b5-1810-e6c2-bd74ff696573"><label for="First-Name-2" class="wf-field-label">First Name</label><input class="text-field w-input" maxlength="256" name="First-Name" data-name="First Name" placeholder="First Name" type="text" id="First-Name-3" required="" /><label for="Last-Name-2" class="wf-field-label">Last Name</label><input class="text-field w-input" maxlength="256" name="Last-Name" data-name="Last Name" placeholder="Last Name" type="text" id="Last-Name-3" required="" /><label for="Email-4" class="wf-field-label">Email</label><input class="text-field w-input" maxlength="256" name="Email" data-name="Email" placeholder="Your email" type="email" id="Email-5" required="" /><label for="Organization" class="wf-field-label">Organization Name</label><input class="text-field w-input" maxlength="256" name="Organization" data-name="Organization" placeholder="Your Organization" type="text" id="Organization" required="" /><label for="Website" class="wf-field-label">Organization Website</label><input class="text-field w-input" maxlength="256" name="Website" data-name="Website" placeholder="Your Organization" type="url" id="Website" required="" /><label for="Operating-Budget" class="wf-field-label">Annual Operating Budget</label><select id="Operating-Budget" name="Operating-Budget" data-name="Operating Budget" required="" class="drop-down-field w-select">
+                <option value="">Select one...</option>
+                <option value="Under $100,000">Under $100,000</option>
+                <option value="$100,000 - $250,000">$100,000 - $250,000</option>
+                <option value="$250,001 - $500,000">$250,001 - $500,000</option>
+                <option value="$500,001 - $1 million">$500,001 - $1 million</option>
+                <option value="$1 million - $2.5 million">$1 million - $2.5 million</option>
+                <option value="$2.5 million - $5 million">$2.5 million - $5 million</option>
+                <option value="Over $5 million">Over $5 million</option>
+                <option value="Prefer not to disclose">Prefer not to disclose</option>
+              </select><label for="Primary-Interest-In-Services" class="wf-field-label">Primary Interest In Services</label><select id="Primary-Interest-In-Services" name="Primary-Interest-In-Services" data-name="Primary Interest In Services" required="" class="drop-down-field w-select">
+                <option value="">Select one...</option>
+                <option value="Branding">Branding</option>
+                <option value="Web">Web Design &amp; Development</option>
+                <option value="Marketig">Marketing Campigns</option>
+                <option value="Other">Other (Expand Below)</option>
+              </select><label for="Timeline" class="wf-field-label">Timeline For Projects</label><select id="Timeline" name="Timeline" data-name="Timeline" class="drop-down-field w-select">
+                <option value="">Select one...</option>
+                <option value="Immediate">Immediate</option>
+                <option value="3-6 months">3-6 months</option>
+                <option value="6-12 months">6-12 months</option>
+                <option value="No Current Timeline">No Current Timeline</option>
+              </select><label for="Referral-Source" class="wf-field-label">How did you hear about us?</label><input class="text-field w-input" maxlength="256" name="Referral-Source" data-name="Referral Source" placeholder="Type Here." type="text" id="Referral-Source" /><label for="Project-2" class="wf-field-label">Tell Us About The Project (Project Details, Scope, Timeline)</label><textarea id="Project-3" name="Project" maxlength="5000" data-name="Project" placeholder="Tell us about your project" required="" class="text-field text-area w-input"></textarea><input type="submit" data-wait="Please wait..." class="submit-button w-button" value="Submit your Project" /></form>
+            <div class="w-form-done">
+              <div>Thank you! Your submission has been received!</div>
+            </div>
+            <div class="w-form-fail">
+              <div>Oops! Something went wrong while submitting the form.</div>
+            </div>
+          </div>
+          <div id="w-node-e59bf35f-85b5-1810-e6c2-bd74ff696587-4efe135b">
+            <div class="margin-bottom-16">
+              <p>Address</p>
+              <p class="light-grey-text">Montgomery,<br />Alabama</p>
+            </div>
+            <div class="margin-bottom-16">
+              <p>Contact</p>
+              <p class="light-grey-text">info@ebertdesign.co<br /></p>
+            </div>
+            <div>
+              <p>Grant Writer?</p>
+              <p class="light-grey-text text-s margin-bottom-16">are you a grant writer looking to partner with us? Send us an email using the address below.</p>
+              <p class="light-grey-text">zach@ebertdesign.co<br /></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</BaseLayout>

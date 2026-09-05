@@ -1,0 +1,86 @@
+---
+/**
+ * An image stored in Sanity, served from its CDN at the sizes the layout
+ * needs. The counterpart of `Media/Img` for content images: `Img` optimises
+ * files in `src/assets` at build time, this one asks Sanity's image pipeline
+ * for each width in `widths` and lets the browser pick.
+ *
+ * Takes the projection every query in `utils/sanity.ts` returns for an image
+ * (`asset->{url, metadata{lqip, dimensions}}, alt, hotspot, crop`), so the
+ * intrinsic size is known and the layout does not shift while it loads.
+ */
+import type { HTMLAttributes } from "astro/types";
+import { urlFor } from "@/utils/sanity.ts";
+
+type SanityImage = {
+  _key?: string;
+  asset?: {
+    _id?: string | null;
+    url?: string | null;
+    metadata?: {
+      lqip?: string | null;
+      dimensions?: { width?: number | null; height?: number | null } | null;
+    } | null;
+  } | null;
+  alt?: string | null;
+  hotspot?: unknown;
+  crop?: unknown;
+} | null;
+
+type Props = Omit<HTMLAttributes<"img">, "src" | "srcset" | "alt" | "width" | "height"> & {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** The image as projected by the site's queries. Nothing is output without an asset. */
+  image: SanityImage | undefined;
+  /** Overrides the alt text stored with the image. Leave unset on decorative images. */
+  alt?: string;
+  /** Candidate widths for the `srcset`. Defaults to a spread that suits full-width art. */
+  widths?: number[];
+  /** How much of the viewport the image covers. Defaults to the full width. */
+  sizes?: string;
+  /** Defer loading until the image nears the viewport. Set `eager` for anything above the fold. */
+  loading?: "lazy" | "eager";
+};
+
+const {
+  render = true,
+  image,
+  alt,
+  widths = [480, 800, 1200, 1600, 2000],
+  sizes = "100vw",
+  loading = "lazy",
+  ...rest
+} = Astro.props;
+
+const asset = image?.asset ?? null;
+const dims = asset?.metadata?.dimensions;
+const naturalWidth = dims?.width ?? undefined;
+const naturalHeight = dims?.height ?? undefined;
+
+// Never ask for more pixels than the original has.
+const candidates = naturalWidth
+  ? widths.filter((w) => w <= naturalWidth).concat(naturalWidth)
+  : widths;
+const unique = [...new Set(candidates)].sort((a, b) => a - b);
+
+const src = asset ? urlFor(image!).width(unique[unique.length - 1]).url() : undefined;
+const srcset = asset
+  ? unique.map((w) => `${urlFor(image!).width(w).url()} ${w}w`).join(", ")
+  : undefined;
+---
+
+{
+  render && asset && (
+    <img
+      src={src}
+      srcset={srcset}
+      sizes={sizes}
+      width={naturalWidth}
+      height={naturalHeight}
+      alt={alt ?? image?.alt ?? ""}
+      loading={loading}
+      decoding="async"
+      {...rest}
+    />
+  )
+}

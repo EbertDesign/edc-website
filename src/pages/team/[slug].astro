@@ -1,0 +1,43 @@
+---
+/**
+ * PASS 3 — a team member, from Sanity. The export's `detail_team.html` with
+ * its placeholders bound to the `teamMember` document. Same shared
+ * substitutions as every pass-1 page. Becomes Lumos components in pass 2.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SanityImg from "@/components/Media/SanityImg.astro";
+import { sanityClient, TEAM_DETAIL_QUERY } from "@/utils/sanity.ts";
+
+export async function getStaticPaths() {
+  const { sanityClient, TEAM_SLUGS_QUERY } = await import("@/utils/sanity.ts");
+  const slugs = await sanityClient.fetch(TEAM_SLUGS_QUERY);
+  return slugs.map(({ slug }) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const m = await sanityClient.fetch(TEAM_DETAIL_QUERY, { slug });
+if (!m) throw new Error(`No document for /${Astro.url.pathname}`);
+---
+
+<BaseLayout title={m.name} description={m.bio ?? undefined}>
+  <div class="wf-section subpage-hero-section margin-top-48">
+    <div class="wf-container">
+      <div class="w-layout-grid _12-column-grid">
+        <div class="team-member-text-container cell-team-text">
+          <div class="section-heading-container margin-bottom-16">
+            <div class="section-heading-content">
+              <div class="dot"></div>
+              <p class="text-s">Team member</p>
+            </div>
+          </div>
+          <h1>{m.name}</h1>
+          <p>{m.jobTitle}</p>
+        </div>
+        <div class="team-member-image-container profile-page-image-container cell-team-image">
+          <SanityImg image={m.photo} loading="eager" class="team-member-image" sizes="(min-width: 62rem) 40vw, 100vw" />
+        </div>
+        <p class="text-large margin-top-48 fade-in-bottom cell-team-bio">{m.bio}</p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

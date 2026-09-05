@@ -283,7 +283,7 @@
   --section-space-nav-overlap-max: 224;
 }
 
-/* Carried across from the export's trailing <style> block — the one rule in
+/* Carried across from the export's trailing \3c style> block — the one rule in
    it that was genuinely global. */
 body {
   -webkit-font-smoothing: antialiased;
@@ -521,7 +521,6 @@ ol {
   list-style-type: "";
 }
 
-p,
 h1,
 h2,
 h3,
@@ -529,6 +528,11 @@ h4,
 h5,
 h6 {
   overflow-wrap: break-word;
+}
+
+p {
+  overflow-wrap: break-word;
+  margin-bottom: 20;
 }
 
 p {

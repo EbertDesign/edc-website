@@ -1,0 +1,72 @@
+---
+/**
+ * PASS 1 — /journal, as Webflow exported it, with only the shared substitutions
+ * applied: paths rewritten, the nine colliding class names prefixed `wf-`,
+ * `data-w-id` stripped (IX2 is gone; `.fade-in-bottom` plays through
+ * `Utility/Reveal`), and the chrome supplied by `BaseLayout`.
+ * PASS 3 — the collection lists are bound to Sanity (see `utils/sanity.ts`).
+ * Every other class is still the template's own and every rule still lives in
+ * `styles/webflow/site.css`. Becomes Lumos components in pass 2, one block at a
+ * time, against this baseline.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SanityImg from "@/components/Media/SanityImg.astro";
+import { sanityClient, POSTS_LIST_QUERY } from "@/utils/sanity.ts";
+const posts = await sanityClient.fetch(POSTS_LIST_QUERY);
+---
+
+<BaseLayout
+  title="Journal"
+>
+  <div class="wf-section subpage-hero-section">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid fade-in-bottom">
+          <div id="w-node-_7e2df456-056c-c30b-ccc3-318453d4a487-08125e5a">
+            <h1 class="margin-bottom-16">Our journal</h1>
+            <p class="text-large">Our thoughts on purpose, process, and the power of an agency that works for good.</p>
+          </div>
+          <p id="w-node-_7e2df456-056c-c30b-ccc3-318453d4a48c-08125e5a" class="light-grey-text text-s">News and insights</p>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section">
+      <div class="wf-container">
+        <div class="w-dyn-list">
+          <div role="list" class="journal-list w-dyn-items">
+            {posts.map((p) => (
+              <div role="listitem" class="w-dyn-item">
+                <a href={`/post/${p.slug}`} class="journal-post-container fade-in-bottom w-inline-block">
+                  <div class="journal-post-heading-container">
+                    <h2 class="wf-heading">{p.title}</h2>
+                    <p class="margin-top-16 light-grey-text">{p.topic}</p>
+                  </div>
+                  <SanityImg image={p.mainImage} loading="eager" class="journal-post-image" sizes="(min-width: 62rem) 40vw, 100vw" />
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section">
+      <div class="wf-container fade-in-bottom">
+        <div class="w-layout-grid _12-column-grid">
+          <div id="w-node-_65b5bba4-9c92-97d4-8cf2-1147ca561a3a-ca561a36" class="center-text">
+            <p class="text-5xl">Let&#x27;s<br />elevate your<br />‍<span class="primary-text">impact.</span> </p>
+            <a href="/contact" class="button w-inline-block">
+              <div class="button-content-wrapper">
+                <div class="button-background"></div>
+                <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                    <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                  </svg></div>
+                <p class="button-text">Get in touch</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+</BaseLayout>

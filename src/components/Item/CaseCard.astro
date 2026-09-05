@@ -1,0 +1,84 @@
+---
+/**
+ * One case in a list — the homepage, `/work`, a service page's related cases,
+ * and the "next case" on a case page. The export's `.case` item, verbatim,
+ * bound to the `caseCardFields` projection from `utils/sanity.ts`.
+ *
+ * The "View" circle was scaled to 0.6 and hidden by IX2, revealed on hover;
+ * it is a CSS transition here.
+ */
+import type { ComponentProps } from "astro/types";
+import SanityImg from "@/components/Media/SanityImg.astro";
+
+type Props = {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** A case, as projected by `CASES_LIST_QUERY` and friends. */
+  case: {
+    title?: string | null;
+    slug?: string | null;
+    thumbnail?: ComponentProps<typeof SanityImg>["image"];
+    service?: { title?: string | null } | null;
+  };
+  /**
+   * Where the list sits. The homepage grid fades each card in on scroll;
+   * the subpage grids animate the link instead, as the export did.
+   */
+  variant?: "home" | "subpage";
+};
+
+const { render = true, case: c, variant = "subpage" } = Astro.props;
+---
+
+{
+  render && c.slug && (
+    <div
+      role="listitem"
+      class:list={["case", "w-dyn-item", variant === "home" ? "fade-in-bottom" : "case-subpage"]}
+    >
+      <a
+        href={`/case/${c.slug}`}
+        class:list={["case-wrapper", "w-inline-block", variant === "subpage" && "fade-in-bottom"]}
+      >
+        <div class="project-thumbnail-wrapper">
+          <SanityImg
+            image={c.thumbnail}
+            class="project-thumbnail"
+            sizes="(min-width: 62rem) 40vw, 100vw"
+          />
+          <div class="case-overlay"></div>
+          <div class="view-circle"><div>View</div></div>
+        </div>
+        <div class="case-info-wrapper">
+          <div class="case-info-container">
+            <h3 class="text-3xl wf-margin-bottom-8">{c.title}</h3>
+            {c.service?.title && <p class="case-service">{c.service.title}</p>}
+          </div>
+        </div>
+      </a>
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .case .view-circle {
+      opacity: 0;
+      transform: scale(0.6);
+      transition:
+        opacity var(--hover-duration) var(--hover-ease),
+        transform var(--hover-duration) var(--hover-ease);
+    }
+    @media (hover: hover) {
+      .case-wrapper:hover .view-circle {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .case .view-circle {
+        transition: none;
+      }
+    }
+  }
+</style>

@@ -1,0 +1,18 @@
+---
+/**
+ * PASS 1 — /test, as Webflow exported it, with only the shared substitutions
+ * applied: paths rewritten, the nine colliding class names prefixed `wf-`,
+ * `data-w-id` stripped (IX2 is gone; `.fade-in-bottom` plays through
+ * `Utility/Reveal`), and the chrome supplied by `BaseLayout`.
+ * Every other class is still the template's own and every rule still lives in
+ * `styles/webflow/site.css`. Becomes Lumos components in pass 2, one block at a
+ * time, against this baseline.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Test"
+>
+  <div class="home-scroll_section"></div>
+</BaseLayout>

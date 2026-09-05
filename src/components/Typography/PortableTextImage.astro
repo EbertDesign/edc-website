@@ -1,0 +1,33 @@
+---
+/**
+ * An image block inside rich text — what Webflow wrote as
+ * `<figure data-rt-type="image">` and the import turned into an `image` node
+ * with `alt` and `caption`. Rendered as a figure so the export's figure
+ * rules still apply.
+ */
+import type { Props as PtProps } from "astro-portabletext/types";
+import SanityImg from "@/components/Media/SanityImg.astro";
+
+type ImageNode = {
+  _key: string;
+  _type: "image";
+  asset?: { url?: string; metadata?: { lqip?: string; dimensions?: { width?: number; height?: number } } } | null;
+  alt?: string | null;
+  caption?: string | null;
+  hotspot?: unknown;
+  crop?: unknown;
+};
+
+const { node } = Astro.props as PtProps<ImageNode>;
+---
+
+{
+  node.asset && (
+    <figure class="w-richtext-figure-type-image w-richtext-align-center">
+      <div>
+        <SanityImg image={node} sizes="(min-width: 62rem) 81vw, 100vw" />
+      </div>
+      {node.caption && <figcaption>{node.caption}</figcaption>}
+    </figure>
+  )
+}

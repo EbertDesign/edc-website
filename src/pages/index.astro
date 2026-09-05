@@ -10,6 +10,17 @@
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import SectionHeroHome from "@/components/SectionHeroHome.astro";
+import CaseCard from "@/components/Item/CaseCard.astro";
+import { sanityClient, CASES_LIST_QUERY, SERVICES_LIST_QUERY } from "@/utils/sanity.ts";
+
+const [cases, services] = await Promise.all([
+  sanityClient.fetch(CASES_LIST_QUERY),
+  sanityClient.fetch(SERVICES_LIST_QUERY),
+]);
+const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+  <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+</svg>`;
 
 ---
 
@@ -41,7 +52,7 @@ import SectionHeroHome from "@/components/SectionHeroHome.astro";
               <a href="/contact" class="button w-inline-block">
                 <div class="button-content-wrapper">
                   <div class="button-background"></div>
-                  <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
                       <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
                     </svg></div>
@@ -55,7 +66,7 @@ import SectionHeroHome from "@/components/SectionHeroHome.astro";
               <a href="/journal" class="button w-inline-block">
                 <div class="button-content-wrapper">
                   <div class="button-background"></div>
-                  <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
                       <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
                     </svg></div>
@@ -77,27 +88,9 @@ import SectionHeroHome from "@/components/SectionHeroHome.astro";
               <h2 class="text-s">Case Studies</h2>
             </div>
           </div>
-          <div id="w-node-_6b8f9c39-042a-1432-59bd-17ae3616a66c-08125e4c" class="projects w-dyn-list">
+          <div class="projects w-dyn-list cases-cell cases-cell-home">
             <div role="list" class="projects-list w-dyn-items">
-              <div role="listitem" class="case fade-in-bottom w-dyn-item">
-                <a href="#" class="case-wrapper w-inline-block">
-                  <div class="project-thumbnail-wrapper"><img src="" loading="eager" alt="" class="project-thumbnail w-dyn-bind-empty" />
-                    <div class="case-overlay"></div>
-                    <div style="-webkit-transform:translate3d(0, 0, 0) scale3d(0.6, 0.6, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0, 0) scale3d(0.6, 0.6, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0, 0) scale3d(0.6, 0.6, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0, 0) scale3d(0.6, 0.6, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="view-circle">
-                      <div>View</div>
-                    </div>
-                  </div>
-                  <div id="w-node-_6b8f9c39-042a-1432-59bd-17ae3616a671-08125e4c" class="case-info-wrapper">
-                    <div class="case-info-container">
-                      <h3 id="w-node-_6b8f9c39-042a-1432-59bd-17ae3616a673-08125e4c" class="text-3xl wf-margin-bottom-8 w-dyn-bind-empty"></h3>
-                      <p class="case-service w-dyn-bind-empty"></p>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            </div>
-            <div class="w-dyn-empty">
-              <div>No items found.</div>
+              {cases.map((c) => <CaseCard case={c} variant="home" />)}
             </div>
           </div>
         </div>
@@ -105,7 +98,7 @@ import SectionHeroHome from "@/components/SectionHeroHome.astro";
           <a id="w-node-_917f04f8-36b4-9205-5144-030db4b0909a-08125e4c" href="/work" class="button no-margin-top w-inline-block">
             <div class="button-content-wrapper">
               <div class="button-background"></div>
-              <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
                   <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
                 </svg></div>
@@ -169,23 +162,20 @@ import SectionHeroHome from "@/components/SectionHeroHome.astro";
         </div>
         <div class="services-list-container fade-in-bottom w-dyn-list">
           <div role="list" class="w-dyn-items">
-            <div role="listitem" class="service-container fade-in-bottom w-dyn-item">
-              <a href="#" class="service-list-item w-inline-block">
-                <div class="w-layout-grid _12-column-grid list-grid">
-                  <h3 id="w-node-_0d2f32d8-dd7a-1c22-9997-a4b1fffe347f-fffe3474" class="text-2xl text-regular w-dyn-bind-empty"></h3>
-                  <p id="w-node-_0d2f32d8-dd7a-1c22-9997-a4b1fffe3480-fffe3474" class="w-dyn-bind-empty"></p>
-                  <div id="w-node-_0d2f32d8-dd7a-1c22-9997-a4b1fffe3481-fffe3474" class="icon-button">
-                    <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                        <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                      </svg></div>
+            {services.map((s) => (
+              <div role="listitem" class="service-container fade-in-bottom w-dyn-item">
+                <a href={`/service/${s.slug}`} class="service-list-item w-inline-block">
+                  <div class="w-layout-grid _12-column-grid list-grid">
+                    <h3 class="text-2xl text-regular service-cell-title">{s.title}</h3>
+                    <p class="service-cell-label">{s.label}</p>
+                    <div class="icon-button service-cell-arrow">
+                      <div class="button-arrow second-arrow w-embed" set:html={arrow} />
+                      <div class="button-arrow w-embed" set:html={arrow} />
+                    </div>
                   </div>
-                </div>
-              </a>
-            </div>
-          </div>
-          <div class="w-dyn-empty">
-            <div>No items found.</div>
+                </a>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -199,7 +189,7 @@ import SectionHeroHome from "@/components/SectionHeroHome.astro";
             <a href="/contact" class="button w-inline-block">
               <div class="button-content-wrapper">
                 <div class="button-background"></div>
-                <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
                     <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
                   </svg></div>

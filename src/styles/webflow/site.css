@@ -146,6 +146,67 @@ figcaption {
 .wf-section.subpage-hero-section.margin-top-48 {
   margin-top: 48px;
 }
+/* Shared hero shell, verbatim from the export. Used by the subpage heroes
+   (about, case, deliverables, service) as well as the home hero, so it lives
+   here rather than only inside SectionHeroHome's own styles. The mesh
+   gradient is a 69.3%-wide panel pinned right; the hard edge is the design. */
+.wf-container.hero-top-container {
+  height: 68vh;
+  /* `.wf-container { position: static }` is declared later at equal
+     specificity and would win by source order, detaching the absolute image
+     panel from the hero. The compound selector outranks it. */
+  position: relative;
+}
+.hero-top-container {
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 70vh;
+  padding-left: 9.5vw;
+  padding-right: 9.5vw;
+  display: flex;
+  position: relative;
+}
+.hero-image-container {
+  z-index: -10;
+  opacity: 1;
+  justify-content: center;
+  align-items: center;
+  width: 69.3%;
+  height: 100%;
+  margin-top: 0%;
+  margin-bottom: 0;
+  margin-left: auto;
+  padding-bottom: 0;
+  display: flex;
+  position: absolute;
+  top: 0;
+  right: 0;
+  overflow: hidden;
+}
+.hero-image {
+  z-index: -1;
+  opacity: 0.8;
+  object-fit: cover;
+  height: 100%;
+  margin-top: 0%;
+  position: static;
+}
+@media screen and (max-width: 991px) {
+  .hero-image-container {
+    width: 100%;
+    position: relative;
+  }
+}
+@media screen and (max-width: 767px) {
+  .hero-image-container {
+    margin-top: 0%;
+  }
+}
+@media screen and (max-width: 479px) {
+  .hero-image-container {
+    margin-top: 0%;
+  }
+}
 .wf-section.black-800-background {
   background-color: #211e1e;
   padding-top: 200px;
@@ -428,6 +489,24 @@ figcaption {
 .projects {
   width: 100%;
 }
+/* The case lists are Sanity-bound, so the export's wrapper placements
+   (`#w-node-_0ce368af…3cf0` on /work, `#w-node-_6b8f9c39…a66c` on the
+   homepage, both still below) match nothing. As classes: the list spans the
+   full grid by default; on the homepage it starts at column 2 to leave
+   column 1 for the sticky rotated "Case Studies" heading. Below 992px both
+   fall to the single column. */
+.cases-cell {
+  grid-area: span 1 / span 12 / span 1 / span 12;
+}
+.cases-cell.cases-cell-home {
+  grid-area: 1 / 2 / 2 / 13;
+}
+@media screen and (max-width: 991px) {
+  .cases-cell,
+  .cases-cell.cases-cell-home {
+    grid-column: span 1 / span 1;
+  }
+}
 .margin-bottom-120 {
   margin-bottom: 120px;
 }
@@ -447,6 +526,35 @@ figcaption {
 }
 .service-container.fade-in-bottom {
   width: 100%;
+}
+/* The service rows are Sanity-bound, so the export's `#w-node-_0d2f32d8…`
+   grid placements (still below) no longer match any id. Same values, as
+   classes: title spans the left five columns, label sits in column 8, arrow
+   is pinned to the right edge; below 992px they stack with the label first. */
+.service-cell-title {
+  grid-area: span 1 / span 5 / span 1 / span 5;
+  align-self: center;
+}
+.service-cell-label {
+  grid-area: 1 / 8 / 2 / 9;
+  align-self: center;
+}
+.service-cell-arrow {
+  grid-area: 1 / 11 / 2 / 13;
+  place-self: center end;
+}
+@media screen and (max-width: 991px) {
+  .service-cell-title {
+    grid-column: span 1 / span 1;
+  }
+  .service-cell-label {
+    order: -9999;
+    grid-area: span 1 / span 1 / span 1 / span 1;
+  }
+  .service-cell-arrow {
+    grid-area: span 1 / span 1 / span 1 / span 1;
+    justify-self: start;
+  }
 }
 .margin-bottom-80 {
   margin-bottom: 80px;
@@ -849,6 +957,23 @@ figcaption {
 }
 .collection-list-wrapper {
   width: 100%;
+}
+/* The team list is Sanity-bound, so the export's `#w-node-d44e8878…6369c`
+   (wrapper) and `…6369e` (item) placements, still below, match nothing.
+   Same values as classes: the list spans the outer grid's 12 columns and
+   each member spans 4 of the inner grid, three to a row; below 992px both
+   fall to a single column and stack. */
+.team-cell {
+  grid-area: span 1 / span 12 / span 1 / span 12;
+}
+.team-cell .collection-item {
+  grid-area: span 1 / span 4 / span 1 / span 4;
+}
+@media screen and (max-width: 991px) {
+  .team-cell,
+  .team-cell .collection-item {
+    grid-column: span 1 / span 1;
+  }
 }
 .team-member-image-container {
   background-color: var(--black-800);

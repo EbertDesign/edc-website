@@ -1,0 +1,32 @@
+---
+/**
+ * PASS 1 — /info/changelog, as Webflow exported it, with only the shared substitutions
+ * applied: paths rewritten, the nine colliding class names prefixed `wf-`,
+ * `data-w-id` stripped (IX2 is gone; `.fade-in-bottom` plays through
+ * `Utility/Reveal`), and the chrome supplied by `BaseLayout`.
+ * Every other class is still the template's own and every rule still lives in
+ * `styles/webflow/site.css`. Becomes Lumos components in pass 2, one block at a
+ * time, against this baseline.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Changelog"
+>
+  <div class="wf-section margin-top-80">
+      <div class="wf-container">
+        <h1 class="styleguide-heading">Changelog</h1>
+        <div class="divider styleguide-bottom-divider"></div>
+      </div>
+    </div>
+
+  <div class="wf-section">
+      <div class="wf-container">
+        <div class="styleguide-heading-wrapper">
+          <h2 class="text-large wf-margin-bottom-8">Version 1.0</h2>
+          <p class="light-grey-text">Initial release</p>
+        </div>
+      </div>
+    </div>
+</BaseLayout>

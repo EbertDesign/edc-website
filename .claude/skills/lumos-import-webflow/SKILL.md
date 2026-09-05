@@ -31,10 +31,57 @@ gets unpublished and the answers stop being checkable.
 - **301 redirects** — `—` **NOT YET COLLECTED.** Site Settings → Publishing → export CSV.
   No API returns these; once the site is unpublished the record is gone for good.
 - **Webflow site ID** — `6371b7a118cd9c7456af0a71`
-- **CMS** — **Sanity** (confirmed 2026-09-04). Already wired: `@sanity/astro` in
-  `astro.config.mjs`, projectId `eanpp6me`, dataset `production`. `studio/` is scaffolded but
-  `schemaTypes/index.ts` is still empty — the 5 collections get modelled there in pass 3.
-  Chosen to keep an editor UI close to what Webflow gave the client.
+- **CMS** — **Sanity, built out and populated (2026-09-05).** projectId `eanpp6me`, dataset
+  `production` (public ACL), owner-authenticated via the Sanity MCP (OAuth) and the local CLI.
+  - **Schema** lives in `studio/schemaTypes/` (Studio-deployed with `npx sanity schema deploy`;
+    the MCP `deploy_schema` path is deliberately *not* used because a local Studio exists):
+    `caseStudy`, `service`, `post`, `teamMember`, `deliverable`, plus the shared `blockContent`
+    rich text (normal/h2/h3/blockquote, bullet/number, strong/em, `link{href,blank}`, image with
+    alt+caption). References: `caseStudy.service → service`, `caseStudy.deliverables[] →
+    deliverable`, `service.deliverables[] → deliverable`. `post.topic` is a fixed string list
+    (5 values, 6 posts, no topic pages) — promote to a document if topic listings are ever wanted.
+    Every type keeps `legacyId` = the Webflow item ID.
+  - **Import pipeline** is deterministic and re-runnable: `node migration/scripts/transform.mjs`
+    (CSV → NDJSON via `@portabletext/block-tools` + JSDOM; images as `_sanityAsset` `file://`
+    URIs into the local snapshot) then `cd studio && npx sanity dataset import
+    ../migration/transformed/import.ndjson -p eanpp6me -d production --replace`. Raw CSVs and
+    the asset snapshot are in `migration/extracted/` (gitignored).
+    **Document IDs are `wf-<Webflow item ID>`** — the Sanity rules prefer generated IDs, but an
+    NDJSON import needs every ID up front to write the references between documents in the
+    same file; the Webflow item ID is a real stable identity and is also stored as `legacyId`.
+  - **What went in:** 54 documents — 35 deliverables, 4 services, 3 team members, 6 posts,
+    6 case studies **of which 3 are Sanity drafts** (they were Webflow drafts/archived: `aers`
+    and two others — present in the Studio, absent from the site, as before). 82 image
+    references resolved to 63 uploaded assets (shared thumbnails dedupe). 0 unresolved
+    references, 0 missing assets. Validated by GROQ count/spot-check after import.
+  - **Asset snapshot:** every Webflow CDN URL in the CSVs (65, across *two* hosts —
+    `cdn.prod.website-files.com` and the legacy `uploads-ssl.webflow.com`) is downloaded to
+    `/Users/zachebert/Documents/EDC Website Redesign/cms-assets` (45 MB). Filenames are
+    percent-decoded and stripped of Unicode format chars (Webflow leaked left-to-right marks
+    into a few); the transform normalises the same way. Nothing in Sanity depends on Webflow.
+  - **Three conversion traps, all fixed in the transform:** Webflow's alt
+    `__wf_reserved_inherit` means "no alt" and is dropped; `@portabletext/block-tools` does
+    **not** key a `markDef` returned by a custom `__annotation` rule, so every link's spans
+    pointed at `null` until the rule supplied `_key` itself; and renumbering `markDefs` keys
+    afterwards must remap each span's `marks` too. Check `marks` resolve (the transform prints
+    "link marks resolving: N dangling: 0" logic in-session) before trusting any link.
+    On the render side, an astro-portabletext mark component receives the definition as
+    `node.markDef` (`Props<Mark<{href}>>`), not on `node` itself.
+  - **Deliverable pages on live were never bound.** `https://www.ebertdesign.co/deliverables/*`
+    shows the template's "Text / Lorem ipsum…" placeholder for every item; the rebuilt pages
+    show the real subtitle and description from the CMS. The −23% word count on that route in
+    `compare-pages` is the lorem, and is an improvement rather than a gap. Likewise the
+    deliverable list items link to `/deliverables/<slug>` where Webflow linked `#` to open an
+    IX2 pop-up — the pop-up content is rendered too, and becomes `Interactive/Modal` in pass 2,
+    with the page link kept as the no-JS fallback (this is the link +5/+8 on case/service pages).
+  - **Frontend:** `src/utils/sanity.ts` holds every query (`defineQuery`, TypeGen via
+    `npm run typegen` → `sanity.types.ts`); `Media/SanityImg` renders Sanity images with a
+    sized `srcset`; `Typography/PortableText` renders rich text into the export's
+    `.rich-text-block` with image and link components. Five dynamic routes: `/case/[slug]`,
+    `/service/[slug]`, `/post/[slug]`, `/team/[slug]`, `/deliverables/[slug]`.
+  - **Still Webflow-shaped on purpose (pass 2 work):** the deliverable pop-ups on case and
+    service pages carry the right content but were IX2-driven and do not open; the "View"
+    circle on case cards is a CSS hover now.
 - **Forms** — **provider deferred** (decided 2026-09-04). Rebuild the fields, honeypot and
   success/error states with `Form/*` and leave the submit handler stubbed until a provider is
   chosen. Standing recommendation: a Cloudflare Worker + Cloudflare Email Service, same platform
@@ -47,16 +94,38 @@ gets unpublished and the answers stop being checkable.
   min-width: base `< 30rem`, small `>= 30rem`, medium `>= 48rem`, large `>= 62rem`.
   The framework shipped `30rem / 48rem / 64rem`, so only the large tier changed:
   **64rem → 62rem**, applied to all 7 occurrences (now 30rem ×2, 48rem ×5, 62rem ×7).
-- **Collections** — 5, each with a detail template and therefore one dynamic route:
-  | Collection | Webflow ID | Template | Route |
+- **Collections** — 5, each with a detail template and therefore one dynamic route. Item
+  counts are from the CSVs (parsed properly — the multi-line rich-text fields defeat `wc -l`)
+  and confirmed against what the live pages render:
+  | Collection | Webflow ID | Template | Route | Items |
+  | --- | --- | --- | --- | --- |
+  | Cases | `64beea3c9843812b08125e81` | `detail_case.html` | `/case/[slug]` | **3 published, 3 draft/archived** |
+  | Services | `64beea3c9843812b08125ee0` | `detail_service.html` | `/service/[slug]` | 4 |
+  | Blog Posts | `64beea3c9843812b08125edf` | `detail_post.html` | `/post/[slug]` | 6 |
+  | Team Members | `64beea3c9843812b08125ea4` | `detail_team.html` | `/team/[slug]` | 3 |
+  | Deliverables | `64beea3c9843812b08125eba` | `detail_deliverables.html` | `/deliverables/[slug]` | 35 |
+  Published slugs — Cases: `ann-cooper`, `realtalk`, `tripoint-consulting`. Services:
+  `brand-strategy-and-culture`, `brand-culture`, `brand-identity`, `brand-application`.
+  Team: `zach-ebert`, `jessica-ebert`, `otis-theodore`. Posts: `introducing-ebert-design`,
+  `stick-it-to-the-brand`, `the-roi-on-brand-identity`, `treat-brand-strategy-like-a-crime-scene`,
+  `essentials-to-nonprofit-case-studies-that-will-actually-get-read`,
+  `how-to-build-a-super-donor-community-that-drives-real-impact`.
+- **List filters and sorts** — the page-level lists are now **inferred from live** via
+  `compare-pages.mjs` (headings/links present on live, absent locally). Every list renders
+  its collection in full — no filter hides anything:
+  | Page | List binds to | Live shows | Notes |
   | --- | --- | --- | --- |
-  | Cases | `64beea3c9843812b08125e81` | `detail_case.html` | `/case/[slug]` |
-  | Services | `64beea3c9843812b08125ee0` | `detail_service.html` | `/service/[slug]` |
-  | Blog Posts | `64beea3c9843812b08125edf` | `detail_post.html` | `/post/[slug]` |
-  | Team Members | `64beea3c9843812b08125ea4` | `detail_team.html` | `/team/[slug]` |
-  | Deliverables | `64beea3c9843812b08125eba` | `detail_deliverables.html` | `/deliverables/[slug]` |
-- **List filters and sorts** — `—` **UNRECORDED ANYWHERE BUT THE DESIGNER.** Lists to resolve:
-  `about` ×2, `detail_case` ×3, `detail_service` ×2, `index` ×2, `journal` ×1, `work` ×1.
+  | `/` | Cases; Services | 3; 4 | all published items |
+  | `/work` | Cases | 3 | **3 of 6 rows: the other 3 are drafts/archived, not a filter** |
+  | `/about` | Services; Team Members | 4; 3 | all |
+  | `/journal` | Blog Posts | 6 | all; **sort order is newest-first on live** (super-donor → introducing) — confirm against `Published On` |
+  Detail templates, resolved by diffing item pages against live: `/case/[slug]` lists the
+  case's own **deliverables** (in the stored order), its **gallery**, and the **next case**
+  (the next-newest by `publishedAt`); `/service/[slug]` lists the service's **deliverables** and
+  the **cases whose `service` references it** (newest first). Services order by `sortOrder`
+  (the export's "Custom Sort Order"). The case page's `.text-2xl` is **Project Subheading**
+  and the two-column body is **Project description**; the tagline (`heading`) appears on no
+  page today. Post pages show topic and a formatted `publishedAt`.
 - **Out of scope** — No Ecommerce, Memberships or Logic on this site, so nothing was traded away.
   **Page scope settled 2026-09-04**: build the 12 real pages/routes **plus** `/test`,
   `/info/changelog` and `/info/instructions`. **Dropped: `/info/style-guide` and `/401`.**
@@ -106,7 +175,8 @@ gets unpublished and the answers stop being checkable.
 - **Still open** —
   1. **The 301 redirect CSV** — the most time-critical item in the migration, and the only one
      that becomes unrecoverable the moment the Webflow site is unpublished.
-  2. Form provider and submission destination for `/contact` and `/grants`.
+  2. Form provider and submission destination for `/contact` and `/grants` (fields, honeypot
+     and states are rebuilt with `Form/*` in pass 2; the handler is stubbed until decided).
   3. `index.html` has 24 IX2-animated elements. Which motion is worth rebuilding?
   4. Keep or drop the Apollo.io website tracker.
   5. Domain cutover plan for ebertdesign.co onto Cloudflare.
@@ -164,9 +234,32 @@ gets unpublished and the answers stop being checkable.
       the two disagree.**
     - **`site.css` is down from 68 KB to 45 KB** — a third of the export's stylesheet still to
       relocate.
-  - **Next** — the remaining **6 sections** on the homepage (`grep -rn "wf-section" src/`),
-    then the gate, then pass 3: model the 5 collections in Sanity and bind the lists.
-    Do not start page two until the homepage clears the gate.
+  - **Owner's decision (2026-09-05): breadth before depth.** The skill's "gate before page
+    two" was consciously relaxed — the owner asked to get every page across first and touch
+    up details after, and, for the remaining sections, to **attempt the Lumos rebuild and fall
+    back to a verbatim revert only when it changes the look** (the hero being the precedent).
+  - **Pass 1, all remaining static pages — done and verified.** `/work`, `/about`, `/journal`,
+    `/contact`, `/grants`, `/404`, `/test`, `/info/changelog`, `/info/instructions` generated
+    by one extractor (`/tmp/gen_pages.py` in-session; logic in the scratchpad `wf.py`):
+    export markup verbatim with only the shared substitutions — paths, the `wf-` prefix,
+    `data-w-id` stripped, chrome from `BaseLayout`, `overlap` set where the export had
+    `.navbar.position-absolute`. 11 pages build. Parity against live: **static content is
+    complete on every page** — `/contact` 4/4 fields, `/grants` 7/7 headings and 10/10
+    fields — and every remaining gap is a CMS list (table above). Link −1 everywhere is the
+    copyright link → text; image −2 is the nav logo and footer mark now inline SVG.
+  - **Webflow widgets still non-functional, to become components in pass 2:** `w-slider` on
+    `/about` (→ `Interactive/Slider`), `w-form` on `/contact`, `/grants`, `/404` (→ `Form/*`,
+    provider still undecided).
+  - **Pass 3 — done (2026-09-05).** Sanity modelled, populated and bound (see **CMS**). Every
+    collection list on `/`, `/work`, `/about`, `/journal` is bound; five `[slug]` routes render
+    all 51 published items; the site builds **62 pages** and `astro check` is clean.
+    Parity against live (`compare-pages.mjs`): headings exact on every list page, word counts
+    within a few percent; the persistent link −1 is the copyright link → text and image −2 is
+    the nav logo + footer mark now inline SVG. Journal is newest-first, matching live.
+  - **Next** — pass 2 across the pages, block by block, Lumos-first with revert as fallback;
+    the homepage's remaining **5** `wf-section`s first, then the shared blocks that now exist
+    as pass-1 components (`ContentCtaContact`, `Item/CaseCard`, the deliverable pop-up →
+    `Interactive/Modal`, the `/about` `w-slider` → `Interactive/Slider`), then forms.
 
 - **Verification notes** *(learned the hard way; read before trusting a diff)*
   - `visual-check.mjs` was patched twice and both fixes matter. It gave Chrome no

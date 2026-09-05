@@ -1,0 +1,52 @@
+---
+/**
+ * "Let's elevate your impact." — the closing call to action that every
+ * content page and most static pages end on. Lifted once from the export
+ * rather than repeated per page; still the template's own classes and rules
+ * (`.center-text`, `.text-5xl`, `.button`), so it renders exactly as before.
+ * Becomes `Section` + `Heading` + `Button` in pass 2.
+ */
+interface Props {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+  <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+</svg>`;
+---
+
+{
+  render && (
+    <div class="wf-section">
+      <div class="wf-container fade-in-bottom">
+        <div class="w-layout-grid _12-column-grid">
+          <div class="center-text cta-cell">
+            <p class="text-5xl">
+              Let's<br />elevate your<br /><span class="primary-text">impact.</span>
+            </p>
+            <a href="/contact" class="button w-inline-block">
+              <div class="button-content-wrapper">
+                <div class="button-background"></div>
+                <div class="button-arrow w-embed" set:html={arrow} />
+                <p class="button-text">Get in touch</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* The export placed this with `#w-node-_65b5bba4…{ grid-area: 1 / 1 / 2 / 13 }`. */
+    .cta-cell {
+      grid-area: 1 / 1 / 2 / 13;
+    }
+  }
+</style>

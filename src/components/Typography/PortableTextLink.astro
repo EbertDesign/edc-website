@@ -1,0 +1,19 @@
+---
+/**
+ * A link annotation inside rich text. astro-portabletext hands a mark
+ * component the span's `markDef` (plus `markKey` and `markType`), so the
+ * href lives on `node.markDef`. External links open in a new tab only when
+ * the editor asked for it (`blank`), and then carry `rel="noopener"`.
+ */
+import type { Mark, Props as PtProps } from "astro-portabletext/types";
+
+type LinkDef = { href?: string; blank?: boolean };
+
+const { node } = Astro.props as PtProps<Mark<LinkDef>>;
+const href = node.markDef?.href ?? "#";
+const blank = Boolean(node.markDef?.blank);
+---
+
+<a href={href} target={blank ? "_blank" : undefined} rel={blank ? "noopener noreferrer" : undefined}>
+  <slot />
+</a>

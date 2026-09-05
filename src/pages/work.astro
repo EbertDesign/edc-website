@@ -1,0 +1,70 @@
+---
+/**
+ * PASS 1 — /work, as Webflow exported it, with only the shared substitutions
+ * applied: paths rewritten, the nine colliding class names prefixed `wf-`,
+ * `data-w-id` stripped (IX2 is gone; `.fade-in-bottom` plays through
+ * `Utility/Reveal`), and the chrome supplied by `BaseLayout`.
+ * PASS 3 — the collection lists are bound to Sanity (see `utils/sanity.ts`).
+ * Every other class is still the template's own and every rule still lives in
+ * `styles/webflow/site.css`. Becomes Lumos components in pass 2, one block at a
+ * time, against this baseline.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import CaseCard from "@/components/Item/CaseCard.astro";
+import { sanityClient, CASES_LIST_QUERY } from "@/utils/sanity.ts";
+const cases = await sanityClient.fetch(CASES_LIST_QUERY);
+---
+
+<BaseLayout
+  title="Cases"
+>
+  <div class="wf-section subpage-hero-section">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid">
+          <div id="w-node-f2af4ad2-83de-3ec5-1287-428a56799375-08125e5e">
+            <h1 class="margin-bottom-16 fade-in-bottom">Blood, Sweat &amp; Insights</h1>
+            <p class="text-large fade-in-bottom-100ms">Through our work, Ebert Design prepares your brand for cultural relevance and worldwide impact.</p>
+          </div>
+          <p id="w-node-aaa883df-d212-2a93-8f71-8384e5254948-08125e5e" class="light-grey-text text-s fade-in-bottom-100ms">2016-2025</p>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section">
+      <div class="wf-container">
+        <div class="section-heading-container">
+          <div class="section-heading-content">
+            <div class="dot"></div>
+            <h2 class="text-s">See all our cases</h2>
+          </div>
+        </div>
+        <div class="w-layout-grid _12-column-grid">
+          <div class="projects w-dyn-list cases-cell">
+            <div role="list" class="projects-list w-dyn-items">
+              {cases.map((c) => <CaseCard case={c} variant="subpage" />)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section">
+      <div class="wf-container fade-in-bottom">
+        <div class="w-layout-grid _12-column-grid">
+          <div id="w-node-_65b5bba4-9c92-97d4-8cf2-1147ca561a3a-ca561a36" class="center-text">
+            <p class="text-5xl">Let&#x27;s<br />elevate your<br />‍<span class="primary-text">impact.</span> </p>
+            <a href="/contact" class="button w-inline-block">
+              <div class="button-content-wrapper">
+                <div class="button-background"></div>
+                <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                    <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                  </svg></div>
+                <p class="button-text">Get in touch</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+</BaseLayout>

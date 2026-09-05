@@ -174,14 +174,18 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       overflow: hidden;
     }
 
-    .button-arrow {
+    /* Scoped to the icon button: this block sits in the `components` layer,
+       which outranks `webflow`, so a bare `.button-arrow` here would override
+       the pill buttons' hover colour in site.css on every page that renders
+       the hero. */
+    .icon-button .button-arrow {
       width: 28px;
       height: 28px;
       color: var(--accent);
       margin-top: 0;
     }
 
-    .button-arrow.second-arrow {
+    .icon-button .button-arrow.second-arrow {
       margin-top: 0;
       margin-right: 0;
       position: absolute;
