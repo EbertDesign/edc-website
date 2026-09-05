@@ -1,7 +1,18 @@
 /* Cascade order, lowest priority first */
 
-@layer base, patterns, components, utilities;
+/* `webflow` sits above the framework's base and patterns so pass-1 pages —
+   still wearing the export's own class names — render exactly as they did on
+   Webflow. It sits below `components` so every Lumos component swapped in
+   during pass 2 outranks whatever site rules have not been moved yet, and a
+   half-migrated page never has the old CSS fighting the new component.
+   The layer empties as blocks become components; when it is gone, so is this. */
+@layer base, patterns, webflow, components, utilities;
 
 @import "./base.css" layer(base);
 @import "./patterns.css" layer(patterns);
+
+@import "./webflow/normalize.css" layer(webflow);
+@import "./webflow/webflow.css" layer(webflow);
+@import "./webflow/site.css" layer(webflow);
+
 @import "./utilities.css" layer(utilities);

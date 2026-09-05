@@ -23,10 +23,12 @@ const socialImage = new URL(image, Astro.site);
 
 <meta charset="utf-8" />
 <style is:inline>
-  @layer base, patterns, components, utilities;
+  @layer base, patterns, webflow, components, utilities;
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<Font cssVariable="--font-syne" preload />
 <Font cssVariable="--font-inter" preload />
+<Font cssVariable="--font-switzer" preload />
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />

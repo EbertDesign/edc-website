@@ -19,22 +19,117 @@ it is answered, not at the end** — the end is exactly when the Webflow site
 gets unpublished and the answers stop being checkable.
 
 ```markdown
-- **Live URL** — what every page is compared against, until cutover
-- **Provenance** — Lumos for Webflow, or hand-built
-- **Code export** — path to the unzipped folder
-- **Collection CSVs** — path
-- **301 redirects** — path to the CSV from Site Settings → Publishing
-- **Webflow site ID** — `data-wf-site`, how every MCP call addresses the site
-- **CMS** — content collections, a headless CMS, or Webflow headless; and why
-- **Forms** — provider, and where submissions go
-- **Search** — what replaced Webflow's, or that the site has none
-- **Hosting** — where it deploys, and the domain cutover plan
-- **Breakpoints** — the site's own, in rem, replacing the framework's
-- **Collections** — each one, and the route or component it landed in
-- **List filters and sorts** — per list, since nothing but the Designer records them
-- **Out of scope** — Ecommerce, Memberships, Logic, and what was agreed instead
-- **Decisions** — anything the site's owner chose that the code cannot explain
-- **Still open** — questions waiting on an answer
+- **Live URL** — **https://www.ebertdesign.co** — every page is compared against this until
+  cutover. The apex redirects 301 to `www`; compare against `www` or the tooling follows a
+  redirect and reports the wrong thing.
+- **Provenance** — **Hand-built**, on the purchased Webflow template `agency-template-814e02`.
+  Zero `u-` classes and zero `data-wf--*` attributes in the export, so there is **no Lumos for
+  Webflow lookup**: pass 1's "classes that already name a component" table does not apply, and
+  every component swap in pass 2 is a judgement call made against the pass-1 baseline.
+- **Code export** — `/Users/zachebert/Documents/EDC Website Redesign/ebert-design-code-export`
+- **Collection CSVs** — `/Users/zachebert/Documents/EDC Website Redesign/cms-csv` (5 files, named by collection ID)
+- **301 redirects** — `—` **NOT YET COLLECTED.** Site Settings → Publishing → export CSV.
+  No API returns these; once the site is unpublished the record is gone for good.
+- **Webflow site ID** — `6371b7a118cd9c7456af0a71`
+- **CMS** — **Sanity** (confirmed 2026-09-04). Already wired: `@sanity/astro` in
+  `astro.config.mjs`, projectId `eanpp6me`, dataset `production`. `studio/` is scaffolded but
+  `schemaTypes/index.ts` is still empty — the 5 collections get modelled there in pass 3.
+  Chosen to keep an editor UI close to what Webflow gave the client.
+- **Forms** — **provider deferred** (decided 2026-09-04). Rebuild the fields, honeypot and
+  success/error states with `Form/*` and leave the submit handler stubbed until a provider is
+  chosen. Standing recommendation: a Cloudflare Worker + Cloudflare Email Service, same platform
+  as the hosting. Two real forms: `/contact` (First-Name*, Last-Name*, Email*, Project*) and
+  `/grants` (10 fields). The `/401` and `/info/style-guide` forms are out of scope with their pages.
+- **Search** — **None.** No search widget or `type="search"` input anywhere in the export.
+- **Hosting** — Cloudflare Workers, already configured (`wrangler.jsonc`, assets-only, no `main`).
+  Domain cutover plan `—`.
+- **Breakpoints** — **DONE.** Webflow defaults (`max-width` 991 / 767 / 479) inverted to
+  min-width: base `< 30rem`, small `>= 30rem`, medium `>= 48rem`, large `>= 62rem`.
+  The framework shipped `30rem / 48rem / 64rem`, so only the large tier changed:
+  **64rem → 62rem**, applied to all 7 occurrences (now 30rem ×2, 48rem ×5, 62rem ×7).
+- **Collections** — 5, each with a detail template and therefore one dynamic route:
+  | Collection | Webflow ID | Template | Route |
+  | --- | --- | --- | --- |
+  | Cases | `64beea3c9843812b08125e81` | `detail_case.html` | `/case/[slug]` |
+  | Services | `64beea3c9843812b08125ee0` | `detail_service.html` | `/service/[slug]` |
+  | Blog Posts | `64beea3c9843812b08125edf` | `detail_post.html` | `/post/[slug]` |
+  | Team Members | `64beea3c9843812b08125ea4` | `detail_team.html` | `/team/[slug]` |
+  | Deliverables | `64beea3c9843812b08125eba` | `detail_deliverables.html` | `/deliverables/[slug]` |
+- **List filters and sorts** — `—` **UNRECORDED ANYWHERE BUT THE DESIGNER.** Lists to resolve:
+  `about` ×2, `detail_case` ×3, `detail_service` ×2, `index` ×2, `journal` ×1, `work` ×1.
+- **Out of scope** — No Ecommerce, Memberships or Logic on this site, so nothing was traded away.
+  **Page scope settled 2026-09-04**: build the 12 real pages/routes **plus** `/test`,
+  `/info/changelog` and `/info/instructions`. **Dropped: `/info/style-guide` and `/401`.**
+  Dropping `/401` also drops the Webflow password gate, which has no Cloudflare equivalent —
+  if the site ever needs gating again it needs a new mechanism. Dropping `/info/style-guide`
+  disposes of the one asset still served from `uploads-ssl.webflow.com`.
+  *(Worth a second look when those three pages come up: keeping `/test` and `/info/instructions`
+  while dropping the style guide is an unusual split — confirm it was intended before building them.)*
+- **Decisions** —
+  - **Every block becomes a Lumos component** (confirmed by the site owner, 2026-09-04). The
+    export uses none of them, so this is the substantive work of pass 2: sections, headings,
+    buttons, paragraphs, nav, footer, cards and lists are all rebuilt on `src/components/*`
+    and the template's own classes retire as each one lands. Pass 1 still brings the markup
+    across verbatim first — the baseline is what proves each swap changed nothing visible.
+  - **Fonts**: the export ships 75 files, and 46 `@font-face` blocks, for fonts the site does
+    not use. Real usage is **Syne** (18 rules — display, links, `text-xl`…`text-7xl`),
+    **Inter** (21 rules — `h2`–`h6`, form fields, `text-s`/`text-medium`) and **Switzer**
+    (1 rule — `body`, so it is the inherited body copy). **ClashDisplay (12 faces) and
+    Spectral (loaded from Google) are used zero times and are dropped.** Syne and Inter come
+    from Google; Switzer is local and has no variable `.woff2`, so it ships as static weights.
+  - Apollo.io website tracker (`appId 66e5a01be9ff4803d60fa333`) is in every page `<head>`; keep or drop `—`.
+  - jQuery loads on all 17 pages but only `webflow.js` uses it; it should leave with `webflow.js`.
+  - The template hardcodes its type scale and spacing — only **9** CSS variables exist, all
+    colours. So `map-variables` and `map-classes` both return nothing and the scale is
+    transcribed into `base.css` tokens by hand, off the raw rules.
+  - **Nine class names collide with Lumos's own** and are prefixed `wf-` on the way in:
+    `container`, `field-label`, `heading`, `margin-bottom-4`, `margin-bottom-8`,
+    `margin-top-4`, `position-absolute`, `secondary`, `section`. They had to be: the
+    framework's rules sit in a lower layer, so wherever the template's rule did not declare a
+    property the framework's value leaked in — `patterns.css`'s `.section` gave every section
+    a `background-color` the template never asked for, which hid the homepage's mesh gradient.
+    The other 184 template classes are unique and are left exactly as the export wrote them.
+    **`grep -rn "wf-" src/` is the pass-2 progress meter** — each name disappears as its block
+    becomes a real component, and the count should reach zero.
+  - **The root element must stay transparent.** `BaseLayout` puts `theme-*` on `<html>`, which
+    gave the root a background; that stops `<body>`'s background propagating to the canvas, so
+    `<body>` paints an opaque box of its own over every negative-z-index descendant. The
+    design leans on that idiom (the hero's mesh gradient is a `z-index: -10` child). `base.css`
+    now keeps the root transparent and paints the theme through `<body>`, matching Webflow.
+  - **Live screenshots are not a usable reference for animated sections.** The homepage's IX2
+    load animation never fires in a headless browser: `.hero-top-container` stays at
+    `opacity: 0` however long you wait or scroll, so a capture of live shows the gradient and
+    no text. Content parity (`compare-pages.mjs`) is still valid; pixel comparison is not.
+  - **The hero gradient is full-width on the real site.** Static CSS says
+    `.hero-image-container { width: 69.3% }`, but IX2 sets an inline `width: 100vw` on load.
+    The rebuilt hero should be full-width; the 69.3% is a pre-animation state, not the design.
+- **Still open** —
+  1. **The 301 redirect CSV** — the most time-critical item in the migration, and the only one
+     that becomes unrecoverable the moment the Webflow site is unpublished.
+  2. Form provider and submission destination for `/contact` and `/grants`.
+  3. `index.html` has 24 IX2-animated elements. Which motion is worth rebuilding?
+  4. Keep or drop the Apollo.io website tracker.
+  5. Domain cutover plan for ebertdesign.co onto Cloudflare.
+  6. The per-list filters and sorts, above — readable only from the Designer.
+
+- **Progress** *(2026-09-04)*
+  - **Groundwork — done.** Fonts (3 families wired through Astro; 75 export files reduced to 5
+    Switzer weights, ClashDisplay and Spectral dropped), images (56 into `public/images`, of
+    which 42 are Webflow `-p-NNN` srcset variants that retire in pass 2), colours ported to
+    the `base.css` swatches, breakpoints moved to the site's, the three Webflow stylesheets
+    imported into a `webflow` cascade layer between `patterns` and `components`, the 9
+    colliding class names prefixed, and the root-background rule corrected.
+  - **Pass 1, first slice — done and verified.** `BaseLayout` (dark by default, nav overlap,
+    jQuery + `webflow.js` for the widgets and IX2), `Global/Nav`, `Global/Footer` and the
+    homepage's 7 sections, all carried across verbatim with only paths rewritten.
+    `compare-pages.mjs` against live: word count within 6.1%, forms exact, and **every
+    remaining gap is CMS content** — the 3 Cases and 4 Services collection lists, which is
+    7 headings and 7 links, exactly the two lists the scanner found on this page. Nothing
+    static is missing. IX2 scroll animations replay correctly in the rebuild.
+  - **Next** — pass 2 on this same slice: componentise the nav, footer and the 7 sections onto
+    `src/components/*`, moving each block's CSS out of `styles/webflow/site.css` and into the
+    component, then retire `webflow.js` and jQuery. Then pass 3: model the 5 collections in
+    Sanity and bind the lists. Do not start page two until the homepage clears the gate.
 ```
 
 **This section belongs to the project, not to the framework.** In a fresh

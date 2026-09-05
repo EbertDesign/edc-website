@@ -1,14 +1,17 @@
 /* 1. Design tokens */
 :root {
-  /* Swatches */
-  --light-100: #ffffff;
-  --light-200: #ebebeb;
-  --light-300: #d9d9d9;
-  --dark-700: #453e42;
-  --dark-800: #2f2b2d;
-  --dark-900: #1f1d1e;
-  --brand-500: #c6fb50;
-  --brand-text: var(--dark-900);
+  /* Swatches — ported from the Webflow site's 9 variables.
+     --light-grey (#fff9) is not a swatch: it is white at 60%, which the
+     themes below already express as --text-2. --black-801 was a duplicate
+     of --black and is gone. */
+  --light-100: #ffffff; /* --white */
+  --light-200: #fff9f4; /* --tan */
+  --light-300: #f4cfcc; /* --secondary */
+  --dark-700: #333333; /* --dark-grey */
+  --dark-800: #211e1e; /* --black-800 */
+  --dark-900: #0e0e0f; /* --black */
+  --brand-500: #ef4e1c; /* --accent */
+  --brand-text: var(--light-100);
 
   /* Typography primitives */
   --primary-family: var(--font-inter, system-ui, sans-serif);
@@ -251,6 +254,12 @@
   --section-space-nav-overlap-max: 224;
 }
 
+/* Carried across from the export's trailing <style> block — the one rule in
+   it that was genuinely global. */
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
 /* 2. Color themes */
 :root,
 .theme-light,
@@ -286,7 +295,7 @@
 
   --link-text: var(--text);
   --link-border: var(--border);
-  --link-text-hover: var(--text);
+  --link-text-hover: var(--brand-500);
   --link-border-hover: var(--brand-500);
 }
 
@@ -322,7 +331,7 @@
 
   --link-text: var(--text);
   --link-border: var(--border);
-  --link-text-hover: var(--text);
+  --link-text-hover: var(--brand-500);
   --link-border-hover: var(--text);
 }
 
@@ -357,12 +366,31 @@
 
   --link-text: var(--text);
   --link-border: var(--border);
-  --link-text-hover: var(--text);
+  --link-text-hover: var(--brand-500);
   --link-border-hover: var(--text);
 }
 
 :root,
 [class*="theme-"] {
+  background-color: var(--background);
+  color: var(--text);
+}
+
+/* When the root element is transparent the canvas takes its colour from
+   <body> instead — and a body whose background has been propagated that way
+   does not paint a second box of its own. That box is the problem: it sits
+   above every negative-z-index descendant in the root stacking context, so a
+   `z-index: -10` backdrop disappears behind it.
+
+   The imported design relies on exactly that idiom (the homepage's mesh
+   gradient is a z-index:-10 child of the hero), and on Webflow it worked
+   because only <body> carried a background. Keep that arrangement: the root
+   carries `color-scheme` and the page theme paints through <body>. */
+html[class*="theme-"] {
+  background-color: transparent;
+}
+
+html[class*="theme-"] > body {
   background-color: var(--background);
   color: var(--text);
 }

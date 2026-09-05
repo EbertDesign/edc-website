@@ -1,125 +1,36 @@
 ---
-import Icon from "@/components/Media/Icon.astro";
-import logo from "@/assets/logo/logo.svg";
-import { SITE_NAME } from "@/consts.ts";
-
-interface Props {
-  /** Set to `false` to skip rendering this component and its children. */
-  render?: boolean;
-}
-
-const { render = true } = Astro.props;
+/**
+ * PASS 1 — the export's footer markup, verbatim. Becomes Lumos components in
+ * pass 2; the badge images still carry Webflow's `-p-NNN` srcsets and become
+ * `Media/Img` then.
+ */
 ---
 
-{
-  render && (
-    <footer class="footer_wrap">
-      <div class="footer_inner">
-        <div class="footer_top">
-          <a class="footer_logo" href="/" aria-label={SITE_NAME}>
-            <Icon src={logo} variant="full-width" />
-          </a>
-          <nav aria-label="Footer">
-            <ul class="footer_links">
-              <li>
-                <a class="footer_link" href="/">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a class="footer_link" href="/example-components">
-                  Example Components
-                </a>
-              </li>
-            </ul>
-          </nav>
+<div class="footer">
+    <div class="wf-container">
+      <div class="divider"></div>
+      <div class="footer-content-container">
+        <p class="light-grey-text footer-text">We are a fluid branding agency working with purpose-driven brands and nonprofits all over the world.</p>
+        <div class="footer-nav-links-container">
+          <a href="/work" class="footer-navlink">Work</a>
+          <a href="/about" class="footer-navlink">About</a>
+          <a href="/journal" class="footer-navlink">Journal</a>
+          <a href="/contact" class="footer-navlink">Contact</a>
         </div>
-        <div class="footer_bottom">
-          <p class="footer_copyright text-style-small">
-            &copy; <span id="year">{new Date().getFullYear()}</span>&#160;
-            {SITE_NAME}
-          </p>
+        <div class="footer-nav-badges-container">
+          <a href="https://cleancreatives.org/" target="_blank" class="footer-badge-link w-inline-block"><img src="/images/Clean-Creatives-SealTRANSPARENT-OFF-WHITE1080.png" loading="lazy" sizes="100vw" srcset="/images/Clean-Creatives-SealTRANSPARENT-OFF-WHITE1080-p-500.png 500w, /images/Clean-Creatives-SealTRANSPARENT-OFF-WHITE1080.png 1080w" alt="" class="footer-badge-image" /></a>
+          <a href="https://www.makerdivision.com/" target="_blank" class="footer-badge-link w-inline-block"><img src="/images/Maker_Division_Affiliate_Badge_Dark_Mode.png" loading="lazy" sizes="100vw" srcset="/images/Maker_Division_Affiliate_Badge_Dark_Mode-p-500.png 500w, /images/Maker_Division_Affiliate_Badge_Dark_Mode-p-800.png 800w, /images/Maker_Division_Affiliate_Badge_Dark_Mode-p-1080.png 1080w, /images/Maker_Division_Affiliate_Badge_Dark_Mode.png 1114w" alt="" class="footer-badge-image" /></a>
+        </div>
+        <div class="footer-links-container">
+          <div class="footer-link-list"><img src="/images/Asset-11-.svg" loading="lazy" width="27" height="27" alt="" class="subfooter-logo" />
+            <a href="https://www.instagram.com/ebertdesign/" target="_blank" class="subfooter-link">Instagram</a>
+            <a href="https://www.behance.net/jessicaebe8769" class="subfooter-link">Behance</a>
+            <a href="https://www.linkedin.com/in/zachary-ebert-422686a0/" target="_blank" class="subfooter-link last-subfooter-link">Linkedin</a>
+          </div>
+          <div class="footer-link-list-right">
+            <a href="/" aria-current="page" class="subfooter-link last-subfooter-link w--current">© Ebert Design Co.</a>
+          </div>
         </div>
       </div>
-    </footer>
-  )
-}
-
-<script>
-  const year = document.querySelector<HTMLSpanElement>("#year");
-
-  if (year) {
-    year.textContent = new Date().getFullYear().toString();
-  }
-</script>
-
-<style is:global>
-  @layer components {
-    .footer_wrap {
-      display: flex;
-      justify-content: center;
-      padding-block: var(--section-space-small);
-      padding-inline: var(--site-margin);
-      background-color: var(--background);
-      color: var(--text);
-      border-top: var(--border-width) solid var(--border);
-    }
-
-    .footer_inner {
-      width: 100%;
-      max-width: var(--max-width-main);
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-6);
-    }
-
-    .footer_top {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--space-4) var(--space-6);
-    }
-
-    .footer_logo {
-      display: block;
-      width: 7.5rem;
-      max-width: 100%;
-      transition: opacity var(--hover-duration) var(--hover-ease);
-      @media (hover: hover) {
-        &:hover {
-          opacity: 0.6;
-        }
-      }
-    }
-
-    .footer_links {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: var(--space-4);
-      font-size: var(--text-small);
-      font-weight: var(--primary-medium);
-    }
-
-    .footer_link {
-      color: var(--text-2);
-      text-decoration: none;
-      transition: color var(--hover-duration) var(--hover-ease);
-      @media (hover: hover) {
-        &:hover {
-          color: var(--text);
-        }
-      }
-    }
-
-    .footer_bottom {
-      padding-top: var(--space-4);
-      border-top: var(--border-width) solid var(--border);
-    }
-
-    .footer_copyright {
-      color: var(--text-2);
-    }
-  }
-</style>
+    </div>
+  </div>

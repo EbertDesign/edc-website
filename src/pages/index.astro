@@ -1,41 +1,253 @@
 ---
-import Layout from "@/layouts/BaseLayout.astro";
-import Section from "@/components/Wrapper/Section.astro";
-import Heading from "@/components/Typography/Heading.astro";
-import Eyebrow from "@/components/Typography/Eyebrow.astro";
-import Img from "@/components/Media/Img.astro";
-import lumos_background from "@/assets/graphics/lumos-background.svg";
-import Icon from "@/components/Media/Icon.astro";
-import logo_icon from "@/assets/logo/logo-icon.svg";
-import ContentWrapper from "@/components/Wrapper/ContentWrapper.astro";
+/**
+ * PASS 1 — the homepage exactly as Webflow exported it: the seven sections
+ * that sat between the nav and the footer, with only paths rewritten
+ * (`images/` -> `/images/`, `*.html` -> routes). Every class is still the
+ * template's own and every rule still comes from `styles/webflow/site.css`.
+ *
+ * This file is the baseline the pass-2 component swaps are measured against,
+ * so nothing here is tidied until that comparison has been made.
+ */
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+/**
+ * Webflow IX2 initial states, lifted from the exported page's <head>. They
+ * hide the animated elements until webflow.js plays them, so this block and
+ * that script are a pair — they leave together in pass 2.
+ */
+const ixInitialState = `@media (min-width:992px) {html.w-mod-js:not(.w-mod-ix) [data-w-id="9200f362-e52a-c667-3503-5cae3c218963"] {width:100vw;height:100vh;opacity:0;}html.w-mod-js:not(.w-mod-ix) [data-w-id="5330ff04-2d9e-2483-3791-b77e01915797"] {opacity:0;}html.w-mod-js:not(.w-mod-ix) [data-w-id="41d1980a-7328-a581-4937-1507294be0e9"] {opacity:0;-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="62f42900-a895-56fd-1eb7-f36b1e8320a5"] {opacity:0;-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="0d63e369-9bf2-30e8-2491-b31230731ee6"] {opacity:0;-webkit-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 40px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="b5c999ab-fad3-cdf6-6265-b136a433b0b1"] {opacity:0;-webkit-transform:translate3d(0, 104px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 104px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 104px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 104px, 0) scale3d(1, 1, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);}html.w-mod-js:not(.w-mod-ix) [data-w-id="ecdf15b6-14a7-61d9-1778-a0d2e4f22588"] {width:100vw;height:100%;}}`;
 ---
 
-<Layout theme="dark">
-  <Section
-    paddingBottom="even"
-    containerClass="flex-grow"
-    paddingTop="even"
-    class="flex-grow"
-    style="min-height: calc(100svh - var(--nav-height));"
-  >
-    <ContentWrapper
-      class="flex-grow theme-brand"
-      variant="card"
-      mediaOpacity={100}
-    >
-      <Icon src={logo_icon} variant="large" />
-      <Heading variant="display" tag="h1" class="margin-block-8"
-        >Style Guide</Heading
-      >
-      <Eyebrow variant="tag">v0.0.3</Eyebrow>
-      <Img
-        slot="column2"
-        src={lumos_background}
-        width={1920}
-        height={1080}
-        loading="eager"
-        fetchPriority="high"
-      />
-    </ContentWrapper>
-  </Section>
-</Layout>
+<BaseLayout
+  title="A Branding Agency Here For Good"
+  description="Ebert Design is a fluid brand identity design agency helping Nonprofits, B Corps, and Purpose-Driven Brands develop identities as unique as they are meaningful."
+  theme="dark"
+  overlap
+>
+  <style slot="head" is:inline set:html={ixInitialState}></style>
+
+  <div class="wf-section hero-section">
+      <div data-w-id="9200f362-e52a-c667-3503-5cae3c218963" class="wf-container hero-top-container">
+        <div data-w-id="ecdf15b6-14a7-61d9-1778-a0d2e4f22588" class="hero-image-container"><img src="/images/mesh-gradient.png" loading="eager" sizes="(max-width: 2000px) 100vw, 2000px" srcset="/images/mesh-gradient-p-500.png 500w, /images/mesh-gradient-p-800.png 800w, /images/mesh-gradient-p-1080.png 1080w, /images/mesh-gradient-p-1600.png 1600w, /images/mesh-gradient.png 2000w" alt="" class="hero-image" /></div>
+        <div class="w-layout-grid _12-column-grid">
+          <h1 id="w-node-b5c999ab-fad3-cdf6-6265-b136a433b0b1-08125e4c" data-w-id="b5c999ab-fad3-cdf6-6265-b136a433b0b1" class="home-hero-text">We&#x27;re a design studio that&#x27;s here for good.<br /></h1>
+        </div>
+      </div>
+      <div class="wf-container hero-bottom-container">
+        <div class="w-layout-grid _12-column-grid home-hero-bottom-grid">
+          <div id="w-node-_0d63e369-9bf2-30e8-2491-b31230731ee6-08125e4c" data-w-id="0d63e369-9bf2-30e8-2491-b31230731ee6" class="hero-usp-container">
+            <p class="text-medium wf-margin-bottom-4">Nonprofits</p>
+            <p class="light-grey-text">Ignite your nonprofit&#x27;s impact with a powerful brand identity that captivates hearts and minds.</p>
+          </div>
+          <div id="w-node-_62f42900-a895-56fd-1eb7-f36b1e8320a5-08125e4c" data-w-id="62f42900-a895-56fd-1eb7-f36b1e8320a5" class="hero-usp-container">
+            <p class="text-medium wf-margin-bottom-4">B Corps</p>
+            <p class="light-grey-text">Amplify your B Corp&#x27;s social and environmental impact through strategic branding</p>
+          </div>
+          <div id="w-node-_41d1980a-7328-a581-4937-1507294be0e9-08125e4c" data-w-id="41d1980a-7328-a581-4937-1507294be0e9" class="hero-usp-container">
+            <p class="text-medium wf-margin-bottom-4">Purpose-Driven Brands</p>
+            <p class="light-grey-text">Unleash the power of your purpose-driven business with a brand that speaks volumes.</p>
+          </div>
+          <a href="#Welcome" id="w-node-_5330ff04-2d9e-2483-3791-b77e01915797-08125e4c" data-w-id="5330ff04-2d9e-2483-3791-b77e01915797" class="icon-button w-inline-block">
+            <div data-w-id="00efd6c2-a337-58ed-8a57-474efb76a080" class="button-arrow second-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.66406 18.6641L15.9974 27.9974L25.3307 18.6641" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                <path d="M16 27.9974V2.66406" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+              </svg></div>
+            <div data-w-id="1d11486b-61ac-3614-281c-1efbf268a2fd" class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.66406 18.6641L15.9974 27.9974L25.3307 18.6641" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                <path d="M16 27.9974V2.66406" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+              </svg></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  <section id="Welcome" class="wf-section">
+      <div class="wf-container fade-in-bottom">
+        <div class="_12-column-grid">
+          <div id="w-node-dd42f271-cd32-2455-63d8-0f531ea1191b-08125e4c">
+            <div class="section-heading-container">
+              <div class="section-heading-content">
+                <div class="dot"></div>
+                <h2 class="text-s">Welcome</h2>
+              </div>
+            </div>
+            <p class="text-4xl">We work with brands on purpose.</p>
+          </div>
+          <div id="w-node-_553609b7-844a-a432-39f5-ff22067293e2-08125e4c" class="w-layout-grid _2-column-grid">
+            <p id="w-node-a3daa308-2736-660e-de4c-0f6a0bbcf6d5-08125e4c" class="text-xl">We strive to create brands that are as unique as they are meaningful. By crafting authentic and inspiring brand stories, we help our clients connect with their audiences on a deeper level and inspire meaningful action.</p>
+            <div id="w-node-bb29d3da-06da-8ee6-826a-6e6f6375da46-08125e4c" class="lead-column-container">
+              <p class="text-medium wf-margin-bottom-8">Contact Us</p>
+              <p class="light-grey-text">At Ebert Design, we&#x27;re more than a branding agency – we&#x27;re purpose-driven brand architects. Learn about our values and the team making it happen.</p>
+              <a data-w-id="bb29d3da-06da-8ee6-826a-6e6f6375da4b" href="/contact" class="button w-inline-block">
+                <div class="button-content-wrapper">
+                  <div class="button-background"></div>
+                  <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                      <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                    </svg></div>
+                  <p class="button-text">Get in touch</p>
+                </div>
+              </a>
+            </div>
+            <div id="w-node-_7f3e6006-60cf-7f3e-f4d2-28d6eb5b33a9-08125e4c" class="lead-column-container">
+              <p class="text-medium wf-margin-bottom-8">About Us</p>
+              <p class="light-grey-text">At Ebert Design, we&#x27;re more than a branding agency – we&#x27;re purpose-driven brand architects. Learn about our values and the team making it happen.</p>
+              <a data-w-id="9a31b581-681a-895e-ebc0-93345cd66c42" href="/journal" class="button w-inline-block">
+                <div class="button-content-wrapper">
+                  <div class="button-background"></div>
+                  <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                      <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                    </svg></div>
+                  <p class="button-text">Read more</p>
+                </div>
+              </a>
+            </div>
+          </div><img class="lead-image" src="/images/sigmund-rJnx12RKrd4-unsplash-min.jpg" alt="" sizes="(max-width: 3314px) 100vw, 3314px" data-w-id="19665838-910f-3f74-f4c9-831752420cf2" id="w-node-_19665838-910f-3f74-f4c9-831752420cf2-08125e4c" loading="lazy" srcset="/images/sigmund-rJnx12RKrd4-unsplash-min-p-500.jpeg 500w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-800.jpeg 800w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1080.jpeg 1080w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1600.jpeg 1600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2000.jpeg 2000w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2600.jpeg 2600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-3200.jpeg 3200w, /images/sigmund-rJnx12RKrd4-unsplash-min.jpg 3314w" />
+        </div>
+      </div>
+    </section>
+
+  <div class="wf-section">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid">
+          <div id="w-node-_5a409e38-8910-ad0d-6c5e-baf282ad2ffa-08125e4c" class="section-heading-container no-margin-bottom sticky-rotated-section-heading">
+            <div class="section-heading-content">
+              <div class="dot"></div>
+              <h2 class="text-s">Case Studies</h2>
+            </div>
+          </div>
+          <div id="w-node-_6b8f9c39-042a-1432-59bd-17ae3616a66c-08125e4c" class="projects w-dyn-list">
+            <div role="list" class="projects-list w-dyn-items">
+              <div role="listitem" class="case fade-in-bottom w-dyn-item">
+                <a href="#" class="case-wrapper w-inline-block">
+                  <div data-w-id="6b8f9c39-042a-1432-59bd-17ae3616a66f" class="project-thumbnail-wrapper"><img src="" loading="eager" alt="" class="project-thumbnail w-dyn-bind-empty" />
+                    <div class="case-overlay"></div>
+                    <div style="-webkit-transform:translate3d(0, 0, 0) scale3d(0.6, 0.6, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-moz-transform:translate3d(0, 0, 0) scale3d(0.6, 0.6, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);-ms-transform:translate3d(0, 0, 0) scale3d(0.6, 0.6, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);transform:translate3d(0, 0, 0) scale3d(0.6, 0.6, 1) rotateX(0) rotateY(0) rotateZ(0) skew(0, 0);opacity:0" class="view-circle">
+                      <div>View</div>
+                    </div>
+                  </div>
+                  <div id="w-node-_6b8f9c39-042a-1432-59bd-17ae3616a671-08125e4c" class="case-info-wrapper">
+                    <div class="case-info-container">
+                      <h3 id="w-node-_6b8f9c39-042a-1432-59bd-17ae3616a673-08125e4c" class="text-3xl wf-margin-bottom-8 w-dyn-bind-empty"></h3>
+                      <p class="case-service w-dyn-bind-empty"></p>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div class="w-dyn-empty">
+              <div>No items found.</div>
+            </div>
+          </div>
+        </div>
+        <div class="_12-column-grid">
+          <a id="w-node-_917f04f8-36b4-9205-5144-030db4b0909a-08125e4c" data-w-id="917f04f8-36b4-9205-5144-030db4b0909a" href="/work" class="button no-margin-top w-inline-block">
+            <div class="button-content-wrapper">
+              <div class="button-background"></div>
+              <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                  <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                </svg></div>
+              <p class="button-text">All cases</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section black-800-background no-margin-bottom">
+      <div class="wf-container">
+        <div class="w-layout-grid _12-column-grid grid-large">
+          <div id="w-node-_7dd433f2-c6e7-8972-0f2e-91c8cfa88743-08125e4c" class="approach-item-container fade-in-bottom">
+            <p class="text-4xl primary-text">01</p>
+            <div class="divider margin-top-24 margin-bottom-32"></div>
+            <p class="text-xl margin-bottom-32">Finding Your Organization&#x27;s Unique Purpose.</p>
+            <p class="light-grey-text">Discover your brand&#x27;s essence through our collaborative process. We explore your mission, values, and goals to uncover your unique purpose, laying the foundation for an authentic and inspiring brand identity.<br /></p>
+          </div>
+          <div id="w-node-e95c69b0-cc1d-1bd9-1e22-86b6ce35043b-08125e4c" class="approach-item-container fade-in-bottom-100ms">
+            <p class="text-4xl primary-text">02</p>
+            <div class="divider margin-top-24 margin-bottom-32"></div>
+            <p class="text-xl margin-bottom-32">Designing a Purpose-Driven Identity.</p>
+            <p class="light-grey-text">We specialize in crafting a purpose-driven brand identity that captivates your audience, from logos to visuals. We ensure your brand communicates its core values, leaving a lasting impression on all who encounter it.</p>
+          </div>
+          <div id="w-node-_5de4a0d6-f964-8bcd-5c88-3e32614b1ab6-08125e4c" class="section-heading-container wf-margin-top-4">
+            <div class="section-heading-content">
+              <div class="dot"></div>
+              <h2 class="text-s">Approach</h2>
+            </div>
+          </div>
+          <div id="w-node-f8e2fe27-44a8-c67f-9556-93d9a49bc8c4-08125e4c" class="approach-item-container fade-in-bottom">
+            <p class="text-4xl primary-text">03</p>
+            <div class="divider margin-top-24 margin-bottom-32"></div>
+            <p class="text-xl margin-bottom-32">Creating Internal and External Alignment.</p>
+            <p class="light-grey-text">Experience the strength of a united purpose as we align your brand&#x27;s narrative with its visual representation. Through seamless integration of messaging and design, we ensure your internal team and external audience share a cohesive understanding of your organization&#x27;s impact.</p>
+          </div>
+          <div id="w-node-d314dd8d-253a-cd50-fde0-d0257599b3a9-08125e4c" class="approach-item-container fade-in-bottom-100ms">
+            <p class="text-4xl primary-text">04</p>
+            <div class="divider margin-top-24 margin-bottom-32"></div>
+            <p class="text-xl margin-bottom-32">Developing a Brand You&#x27;re Proud Of</p>
+            <p class="light-grey-text">Achieve a brand that reflects your passion and purpose, embodying everything you stand for. With Ebert Design, you&#x27;ll have a purpose-driven brand you can proudly showcase to the world, empowering you to make a meaningful difference with every interaction.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section black-800-background no-padding-top-bottom">
+      <div class="black-900-background"></div>
+      <div class="wf-container"></div>
+      <div data-w-id="bf8c0885-ce08-1b80-7124-56d218c0a2e8" class="large-image-container"><img src="/images/tripoint-style-sheet.png" loading="lazy" sizes="100vw" srcset="/images/tripoint-style-sheet-p-500.png 500w, /images/tripoint-style-sheet-p-800.png 800w, /images/tripoint-style-sheet-p-1080.png 1080w, /images/tripoint-style-sheet-p-1600.png 1600w, /images/tripoint-style-sheet-p-2000.png 2000w, /images/tripoint-style-sheet-p-2600.png 2600w, /images/tripoint-style-sheet.png 2750w" alt="" class="image" /></div>
+    </div>
+
+  <div class="wf-section">
+      <div class="wf-container">
+        <div class="section-heading-container">
+          <div class="section-heading-content">
+            <div class="dot"></div>
+            <h2 class="text-s">Services</h2>
+          </div>
+        </div>
+        <div class="services-list-container fade-in-bottom w-dyn-list">
+          <div role="list" class="w-dyn-items">
+            <div data-w-id="0d2f32d8-dd7a-1c22-9997-a4b1fffe347d" role="listitem" class="service-container fade-in-bottom w-dyn-item">
+              <a href="#" class="service-list-item w-inline-block">
+                <div class="w-layout-grid _12-column-grid list-grid">
+                  <h3 id="w-node-_0d2f32d8-dd7a-1c22-9997-a4b1fffe347f-fffe3474" class="text-2xl text-regular w-dyn-bind-empty"></h3>
+                  <p id="w-node-_0d2f32d8-dd7a-1c22-9997-a4b1fffe3480-fffe3474" class="w-dyn-bind-empty"></p>
+                  <div id="w-node-_0d2f32d8-dd7a-1c22-9997-a4b1fffe3481-fffe3474" class="icon-button">
+                    <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                        <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                      </svg></div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <div class="w-dyn-empty">
+            <div>No items found.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="wf-section">
+      <div class="wf-container fade-in-bottom">
+        <div class="w-layout-grid _12-column-grid">
+          <div id="w-node-_65b5bba4-9c92-97d4-8cf2-1147ca561a3a-ca561a36" class="center-text">
+            <p class="text-5xl">Let&#x27;s<br />elevate your<br />‍<span class="primary-text">impact.</span> </p>
+            <a data-w-id="47f37b6a-26d9-367f-2fb2-b65122d64894" href="/contact" class="button w-inline-block">
+              <div class="button-content-wrapper">
+                <div class="button-background"></div>
+                <div class="button-arrow w-embed"><svg width="100%" height="100%" viewbox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                    <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+                  </svg></div>
+                <p class="button-text">Get in touch</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+</BaseLayout>
