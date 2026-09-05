@@ -19,7 +19,8 @@
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
+import { mkdirSync, existsSync, readdirSync, statSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { promises as fs } from "node:fs";
 
@@ -79,17 +80,35 @@ async function capture(label) {
   for (const route of list) {
     for (const { name, w, h } of WIDTHS) {
       const file = join(dir, `${slug(route)}--${name}.png`);
+      /* A fresh profile per shot. Without --user-data-dir Chrome reuses the
+         default profile's HTTP cache, so a stylesheet edited between the two
+         captures is served from cache and the pages compare byte-identical —
+         a silent false "unchanged", which is the one failure mode this tool
+         must not have. */
+      const profile = mkdtempSync(join(tmpdir(), "lumos-shot-"));
       await run(CHROME, [
         "--headless=new",
         "--disable-gpu",
         "--hide-scrollbars",
         "--force-device-scale-factor=1",
+        `--user-data-dir=${profile}`,
+        "--incognito",
+        "--disable-application-cache",
+        "--disk-cache-size=1",
+        /* Run the page's clock forward before shooting, so scroll- and
+           load-triggered animations have finished. A tall viewport puts every
+           section in view at once, so without this the shot catches fades
+           mid-flight and two runs of an unchanged page differ by several
+           percent — noise that buries the real diff. */
+        "--virtual-time-budget=8000",
+        "--force-prefers-reduced-motion",
         `--window-size=${w},${h}`,
         `--screenshot=${file}`,
         `${BASE}${route}`,
       ]).catch((e) => {
         console.error(`  ${route} @${name}: capture failed — ${e.shortMessage ?? e.message}`);
       });
+      rmSync(profile, { recursive: true, force: true });
       console.log(`  ${route} @${name} -> ${relative(process.cwd(), file)}`);
     }
   }

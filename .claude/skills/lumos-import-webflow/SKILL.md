@@ -126,10 +126,62 @@ gets unpublished and the answers stop being checkable.
     remaining gap is CMS content** — the 3 Cases and 4 Services collection lists, which is
     7 headings and 7 links, exactly the two lists the scanner found on this page. Nothing
     static is missing. IX2 scroll animations replay correctly in the rebuild.
-  - **Next** — pass 2 on this same slice: componentise the nav, footer and the 7 sections onto
-    `src/components/*`, moving each block's CSS out of `styles/webflow/site.css` and into the
-    component, then retire `webflow.js` and jQuery. Then pass 3: model the 5 collections in
-    Sanity and bind the lists. Do not start page two until the homepage clears the gate.
+  - **Pass 2, in progress.**
+    - **Variables ported.** The ten Lumos type slots now carry the template's scale (min = its
+      `<=479` value, max = its desktop value); the three families are `--primary-family`
+      Switzer, `--secondary-family` Inter, `--display-family` Syne. Every type margin token is
+      **0** on purpose — the template zeroes its heading and paragraph margins and spaces with
+      explicit `.margin-*` utilities. Section spacing is 80→200px. A new `--container-margin`
+      (24 / 40 / 48px / 9.5vw) drives the page gutter, kept separate from `--site-margin`,
+      which is also modal and dropdown padding. `.container` is uncapped: the design insets by
+      a percentage and keeps growing, and live confirms it at 1920.
+    - **`Global/Nav`** — the framework's disclosure nav wearing the site's design. No jQuery,
+      `aria-current` from the route, collapses at 62rem (Webflow's `data-collapse="medium"`),
+      `overlap` gates the absolute positioning for the 5 pages that carry it. Verified: 96px
+      bar, 180px logo, Syne 18px links, flush right gutter.
+    - **`Global/Footer`** — verified against the export's numbers to the pixel (9.5vw gutters,
+      120px badges at 50/100px spacing, Syne 48px/500 links, 1px `#333` rule).
+    - **`Utility/Reveal`** — IX2 rebuilt as an IntersectionObserver plus two classes, keeping
+      the export's own `.fade-in-bottom` names so no markup changed. **`webflow.js` (247 KB)
+      and jQuery are deleted.**
+    - **`SectionHeroHome`** — full-height hero, pixel-exact against Webflow's twelve-column
+      geometry (headline x=237 w=965 at 1440, columns at 237/539/841, cue flush at 1303).
+      **The headline keeps the export's own `8vw` scale**, stepping to 6.5rem / 4.8rem /
+      2.7rem below the large breakpoint — verified at 2004, 1440, 900, 700 and 420.
+      It was first rebuilt on Lumos primitives (Heading, a 12-col grid, tokens); the owner
+      rejected it twice — the token-capped headline, then the gradient stretched full-bleed
+      when **the 69.3%-wide right-pinned panel with its hard vertical edge is the intended
+      design**. The section is now a **verbatim revert of the export's hero** — original class
+      names, values (69.3%, 70/68/32vh, 8vw) and its own 991/767/479 max-width breakpoints,
+      deliberately kept out of the Lumos token system. Only the shared carry-overs remain:
+      rewritten paths, the `wf-container` collision prefix, grid ids as classes, and `Reveal`
+      for the entrance. Verified: panel 69.3% with a hard edge, headline 160px at 2004.
+      **Two lessons for the remaining sections. (1) This design is viewport-proportional in
+      places — where the export uses `vw`, keep `vw`; the fluid token scale is a regression.
+      (2) A section's distinctive look may depend on values that read like leftover Webflow
+      cruft (a 69.3% width, an absolute-positioned panel). Confirm intent against the *live*
+      site before "correcting" them — and prefer a faithful revert over a Lumos rebuild when
+      the two disagree.**
+    - **`site.css` is down from 68 KB to 45 KB** — a third of the export's stylesheet still to
+      relocate.
+  - **Next** — the remaining **6 sections** on the homepage (`grep -rn "wf-section" src/`),
+    then the gate, then pass 3: model the 5 collections in Sanity and bind the lists.
+    Do not start page two until the homepage clears the gate.
+
+- **Verification notes** *(learned the hard way; read before trusting a diff)*
+  - `visual-check.mjs` was patched twice and both fixes matter. It gave Chrome no
+    `--user-data-dir`, so a stylesheet edited between two captures was served from the browser
+    cache and the pages compared **byte-identical** — a silent false "unchanged", the one
+    failure mode the tool must not have. It now uses a throwaway profile per shot, plus
+    `--virtual-time-budget` and `--force-prefers-reduced-motion` so animations have settled.
+  - **A self-diff is the calibration.** Capture `before` and `after` with no code change
+    between them; anything but 0.000% is noise and the real diff is buried in it. While IX2
+    was still running this read 4-6% and drifted run to run; with IX2 gone it is 0.000%.
+  - **The captures are 3200px tall, so `100vh` resolves to 3200px.** Any vh-based block is
+    inflated in a screenshot and everything below it shifts. Read those diffs as "the hero
+    grew", not as a regression, and measure vh layout from the DOM at a real viewport instead.
+  - **The Browser pane returns black screenshots while it is hidden.** Its DOM queries are
+    still accurate — measure computed styles rather than looking.
 ```
 
 **This section belongs to the project, not to the framework.** In a fresh

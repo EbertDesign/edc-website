@@ -14,7 +14,12 @@
   --brand-text: var(--light-100);
 
   /* Typography primitives */
-  --primary-family: var(--font-inter, system-ui, sans-serif);
+  /* Three families. Switzer is the body face everything inherits, Inter sets
+     h2-h6 and the UI, Syne is the display face used for h1, links and the
+     site's own .text-xl … .text-7xl scale. */
+  --primary-family: var(--font-switzer, system-ui, sans-serif);
+  --secondary-family: var(--font-inter, system-ui, sans-serif);
+  --display-family: var(--font-syne, system-ui, sans-serif);
   --primary-regular: 400;
   --primary-medium: 500;
   --primary-bold: 700;
@@ -22,13 +27,17 @@
   --primary-trim-bottom: 0.38em;
 
   /* Letter spacing */
-  --letter-spacing-tight: -0.03em;
+  --letter-spacing-tight: -0.05em;
   --letter-spacing-normal: 0em;
+  /* The template's -.25px on 18px body copy. */
+  --letter-spacing-slight: -0.014em;
+  /* p and .rich-text-block run looser than the headings. */
+  --line-height-body: 1.6;
 
   /* Line height */
-  --line-height-small: 1;
-  --line-height-medium: 1.1;
-  --line-height-large: 1.3;
+  --line-height-small: 0.9;
+  --line-height-medium: 1;
+  --line-height-large: 1.2;
   --line-height-huge: 1.5;
 
   /* Borders & focus */
@@ -63,126 +72,134 @@
   --nav-height: 5rem;
 
   /* Typography styles */
+  /* Every margin token below is 0 on purpose. The imported design zeroes its
+     heading and paragraph margins (`h1`,`h2` and `p` all declare `margin: 0`)
+     and spaces blocks with explicit `.margin-bottom-*` utilities instead, so
+     the number to port is zero. Those utilities live in the `webflow` layer,
+     above `patterns`, so they keep winning over `.container > [class]`.
+     Rhythm between blocks comes from `Section`'s `gap`.
+     The one value lost is the template's 10px on `h4`-`h6`, which only 8
+     elements across the whole site relied on. */
   --display: clamp(var(--display-min) / 16 * 1rem, ((var(--display-min) - ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--display-max) / 16 * 1rem);
-  --display-min: 64;
-  --display-max: 112;
+  --display-min: 45;
+  --display-max: 144;
   --display-line-height: var(--line-height-small);
-  --display-letter-spacing: var(--letter-spacing-tight);
+  --display-letter-spacing: var(--letter-spacing-normal);
   --display-text-transform: none;
-  --display-margin-top: var(--space-7);
-  --display-margin-bottom: var(--space-6);
-  --display-font-family: var(--primary-family);
+  --display-margin-top: 0;
+  --display-margin-bottom: 0;
+  --display-font-family: var(--display-family);
   --display-font-weight: var(--primary-medium);
   --display-trim-top: var(--primary-trim-top);
   --display-trim-bottom: var(--primary-trim-bottom);
   --display-text-wrap: balance;
 
   --h1: clamp(var(--h1-min) / 16 * 1rem, ((var(--h1-min) - ((var(--h1-max) - var(--h1-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h1-max) - var(--h1-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h1-max) / 16 * 1rem);
-  --h1-min: 48;
-  --h1-max: 80;
+  --h1-min: 46;
+  --h1-max: 112;
   --h1-line-height: var(--line-height-small);
-  --h1-letter-spacing: var(--letter-spacing-tight);
+  --h1-letter-spacing: var(--letter-spacing-normal);
   --h1-text-transform: none;
-  --h1-margin-top: var(--space-7);
-  --h1-margin-bottom: var(--space-6);
-  --h1-font-family: var(--primary-family);
+  --h1-margin-top: 0;
+  --h1-margin-bottom: 0;
+  --h1-font-family: var(--display-family);
   --h1-font-weight: var(--primary-medium);
   --h1-trim-top: var(--primary-trim-top);
   --h1-trim-bottom: var(--primary-trim-bottom);
   --h1-text-wrap: balance;
 
   --h2: clamp(var(--h2-min) / 16 * 1rem, ((var(--h2-min) - ((var(--h2-max) - var(--h2-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h2-max) - var(--h2-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h2-max) / 16 * 1rem);
-  --h2-min: 40;
+  --h2-min: 35;
   --h2-max: 64;
-  --h2-line-height: var(--line-height-small);
+  --h2-line-height: var(--line-height-medium);
   --h2-letter-spacing: var(--letter-spacing-tight);
   --h2-text-transform: none;
-  --h2-margin-top: var(--space-7);
-  --h2-margin-bottom: var(--space-5);
-  --h2-font-family: var(--primary-family);
-  --h2-font-weight: var(--primary-medium);
+  --h2-margin-top: 0;
+  --h2-margin-bottom: 0;
+  --h2-font-family: var(--secondary-family);
+  --h2-font-weight: var(--primary-regular);
   --h2-trim-top: var(--primary-trim-top);
   --h2-trim-bottom: var(--primary-trim-bottom);
   --h2-text-wrap: balance;
 
   --h3: clamp(var(--h3-min) / 16 * 1rem, ((var(--h3-min) - ((var(--h3-max) - var(--h3-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h3-max) - var(--h3-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h3-max) / 16 * 1rem);
-  --h3-min: 36;
+  --h3-min: 28;
   --h3-max: 48;
-  --h3-line-height: var(--line-height-medium);
-  --h3-letter-spacing: var(--letter-spacing-tight);
+  --h3-line-height: var(--line-height-large);
+  --h3-letter-spacing: var(--letter-spacing-slight);
   --h3-text-transform: none;
-  --h3-margin-top: var(--space-6);
-  --h3-margin-bottom: var(--space-5);
-  --h3-font-family: var(--primary-family);
-  --h3-font-weight: var(--primary-medium);
+  --h3-margin-top: 0;
+  --h3-margin-bottom: 0;
+  --h3-font-family: var(--secondary-family);
+  --h3-font-weight: var(--primary-regular);
   --h3-trim-top: var(--primary-trim-top);
   --h3-trim-bottom: var(--primary-trim-bottom);
   --h3-text-wrap: balance;
 
   --h4: clamp(var(--h4-min) / 16 * 1rem, ((var(--h4-min) - ((var(--h4-max) - var(--h4-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h4-max) - var(--h4-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h4-max) / 16 * 1rem);
-  --h4-min: 28;
+  --h4-min: 32;
   --h4-max: 32;
-  --h4-line-height: var(--line-height-medium);
-  --h4-letter-spacing: var(--letter-spacing-tight);
+  --h4-line-height: var(--line-height-large);
+  --h4-letter-spacing: var(--letter-spacing-normal);
   --h4-text-transform: none;
-  --h4-margin-top: var(--space-6);
-  --h4-margin-bottom: var(--space-4);
-  --h4-font-family: var(--primary-family);
-  --h4-font-weight: var(--primary-medium);
+  --h4-margin-top: 0;
+  --h4-margin-bottom: 0;
+  --h4-font-family: var(--secondary-family);
+  --h4-font-weight: var(--primary-regular);
   --h4-trim-top: var(--primary-trim-top);
   --h4-trim-bottom: var(--primary-trim-bottom);
   --h4-text-wrap: balance;
 
   --h5: clamp(var(--h5-min) / 16 * 1rem, ((var(--h5-min) - ((var(--h5-max) - var(--h5-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h5-max) - var(--h5-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h5-max) / 16 * 1rem);
-  --h5-min: 22;
-  --h5-max: 24;
-  --h5-line-height: var(--line-height-medium);
-  --h5-letter-spacing: var(--letter-spacing-tight);
+  --h5-min: 28;
+  --h5-max: 28;
+  --h5-line-height: var(--line-height-large);
+  --h5-letter-spacing: var(--letter-spacing-normal);
   --h5-text-transform: none;
-  --h5-margin-top: var(--space-5);
-  --h5-margin-bottom: var(--space-4);
-  --h5-font-family: var(--primary-family);
-  --h5-font-weight: var(--primary-medium);
+  --h5-margin-top: 0;
+  --h5-margin-bottom: 0;
+  --h5-font-family: var(--secondary-family);
+  --h5-font-weight: var(--primary-regular);
   --h5-trim-top: var(--primary-trim-top);
   --h5-trim-bottom: var(--primary-trim-bottom);
   --h5-text-wrap: balance;
 
   --h6: clamp(var(--h6-min) / 16 * 1rem, ((var(--h6-min) - ((var(--h6-max) - var(--h6-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h6-max) - var(--h6-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h6-max) / 16 * 1rem);
-  --h6-min: 16;
-  --h6-max: 18;
-  --h6-line-height: var(--line-height-medium);
-  --h6-letter-spacing: var(--letter-spacing-tight);
+  --h6-min: 24;
+  --h6-max: 24;
+  --h6-line-height: var(--line-height-large);
+  --h6-letter-spacing: var(--letter-spacing-normal);
   --h6-text-transform: none;
-  --h6-margin-top: var(--space-5);
-  --h6-margin-bottom: var(--space-3);
+  --h6-margin-top: 0;
+  --h6-margin-bottom: 0;
   --h6-font-family: var(--primary-family);
-  --h6-font-weight: var(--primary-medium);
+  --h6-font-weight: var(--primary-regular);
   --h6-trim-top: var(--primary-trim-top);
   --h6-trim-bottom: var(--primary-trim-bottom);
   --h6-text-wrap: balance;
 
   --text-large: clamp(var(--text-large-min) / 16 * 1rem, ((var(--text-large-min) - ((var(--text-large-max) - var(--text-large-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-large-max) - var(--text-large-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-large-max) / 16 * 1rem);
-  --text-large-min: 18;
-  --text-large-max: 20;
-  --text-large-line-height: var(--line-height-large);
-  --text-large-letter-spacing: var(--letter-spacing-normal);
+  --text-large-min: 20;
+  --text-large-max: 24;
+  --text-large-line-height: var(--line-height-huge);
+  --text-large-letter-spacing: var(--letter-spacing-slight);
   --text-large-text-transform: none;
-  --text-large-margin-top: var(--space-4);
-  --text-large-margin-bottom: var(--space-4);
-  --text-large-font-family: var(--primary-family);
+  --text-large-margin-top: 0;
+  --text-large-margin-bottom: 0;
+  --text-large-font-family: var(--display-family);
   --text-large-font-weight: var(--primary-regular);
   --text-large-trim-top: var(--primary-trim-top);
   --text-large-trim-bottom: var(--primary-trim-bottom);
   --text-large-text-wrap: pretty;
 
   --text-main: clamp(var(--text-main-min) / 16 * 1rem, ((var(--text-main-min) - ((var(--text-main-max) - var(--text-main-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-main-max) - var(--text-main-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-main-max) / 16 * 1rem);
-  --text-main-min: 16;
+  --text-main-min: 18;
   --text-main-max: 18;
-  --text-main-line-height: var(--line-height-huge);
-  --text-main-letter-spacing: var(--letter-spacing-normal);
+  --text-main-line-height: var(--line-height-body);
+  --text-main-letter-spacing: var(--letter-spacing-slight);
   --text-main-text-transform: none;
-  --text-main-margin-top: var(--space-4);
-  --text-main-margin-bottom: var(--space-4);
+  --text-main-margin-top: 0;
+  --text-main-margin-bottom: 0;
   --text-main-font-family: var(--primary-family);
   --text-main-font-weight: var(--primary-regular);
   --text-main-trim-top: var(--primary-trim-top);
@@ -191,13 +208,13 @@
 
   --text-small: clamp(var(--text-small-min) / 16 * 1rem, ((var(--text-small-min) - ((var(--text-small-max) - var(--text-small-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-small-max) - var(--text-small-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-small-max) / 16 * 1rem);
   --text-small-min: 14;
-  --text-small-max: 16;
-  --text-small-line-height: var(--line-height-huge);
+  --text-small-max: 14;
+  --text-small-line-height: var(--line-height-medium);
   --text-small-letter-spacing: var(--letter-spacing-normal);
   --text-small-text-transform: none;
-  --text-small-margin-top: var(--space-4);
-  --text-small-margin-bottom: var(--space-4);
-  --text-small-font-family: var(--primary-family);
+  --text-small-margin-top: 0;
+  --text-small-margin-bottom: 0;
+  --text-small-font-family: var(--secondary-family);
   --text-small-font-weight: var(--primary-regular);
   --text-small-trim-top: var(--primary-trim-top);
   --text-small-trim-bottom: var(--primary-trim-bottom);
@@ -212,7 +229,13 @@
   --site-gutter-min: 16;
   --site-gutter-max: 32;
 
-  --site-width: calc(100% - var(--site-margin) * 2);
+  /* The page gutter. Kept separate from --site-margin, which is also the
+     padding inside modals, dropdowns and the padding-* utilities — the
+     imported design insets its sections by 9.5vw at desktop, which is a
+     sensible page margin and an absurd modal one. */
+  --container-margin: 1.5rem;
+
+  --site-width: calc(100% - var(--container-margin) * 2);
 
   /* Spacing */
   --space-1: clamp(var(--space-1-min) / 16 * 1rem, ((var(--space-1-min) - ((var(--space-1-max) - var(--space-1-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--space-1-max) - var(--space-1-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--space-1-max) / 16 * 1rem);
@@ -240,15 +263,21 @@
   --space-8-min: 40;
   --space-8-max: 64;
 
+  /* Ported from the export, which spaced sections with `margin-bottom`
+     (200px, stepping to 120 then 80) rather than padding. On this site the
+     plain sections are transparent, so the same number as padding reads
+     identically; the one place it matters is the dark band, which needs its
+     background to stop before the gap — that section carries the gap as a
+     margin instead. */
   --section-space-small: clamp(var(--section-space-small-min) / 16 * 1rem, ((var(--section-space-small-min) - ((var(--section-space-small-max) - var(--section-space-small-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--section-space-small-max) - var(--section-space-small-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--section-space-small-max) / 16 * 1rem);
-  --section-space-small-min: 48;
-  --section-space-small-max: 80;
+  --section-space-small-min: 80;
+  --section-space-small-max: 120;
   --section-space-medium: clamp(var(--section-space-medium-min) / 16 * 1rem, ((var(--section-space-medium-min) - ((var(--section-space-medium-max) - var(--section-space-medium-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--section-space-medium-max) - var(--section-space-medium-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--section-space-medium-max) / 16 * 1rem);
-  --section-space-medium-min: 64;
-  --section-space-medium-max: 112;
+  --section-space-medium-min: 80;
+  --section-space-medium-max: 200;
   --section-space-large: clamp(var(--section-space-large-min) / 16 * 1rem, ((var(--section-space-large-min) - ((var(--section-space-large-max) - var(--section-space-large-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--section-space-large-max) - var(--section-space-large-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--section-space-large-max) / 16 * 1rem);
-  --section-space-large-min: 88;
-  --section-space-large-max: 160;
+  --section-space-large-min: 120;
+  --section-space-large-max: 200;
   --section-space-nav-overlap: clamp(var(--section-space-nav-overlap-min) / 16 * 1rem, ((var(--section-space-nav-overlap-min) - ((var(--section-space-nav-overlap-max) - var(--section-space-nav-overlap-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--section-space-nav-overlap-max) - var(--section-space-nav-overlap-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--section-space-nav-overlap-max) / 16 * 1rem);
   --section-space-nav-overlap-min: 160;
   --section-space-nav-overlap-max: 224;
@@ -258,6 +287,25 @@
    it that was genuinely global. */
 body {
   -webkit-font-smoothing: antialiased;
+}
+
+/* The export steps its gutter three times before settling on 9.5vw. */
+@media (width >= 30rem) {
+  :root {
+    --container-margin: 2.5rem;
+  }
+}
+
+@media (width >= 48rem) {
+  :root {
+    --container-margin: 3rem;
+  }
+}
+
+@media (width >= 62rem) {
+  :root {
+    --container-margin: 9.5vw;
+  }
 }
 
 /* 2. Color themes */

@@ -1,0 +1,287 @@
+---
+/**
+ * The homepage hero — a deliberate exception to the rest of the migration.
+ *
+ * This section is reverted to the Webflow export's own markup, class names,
+ * values and max-width breakpoints, verbatim. Its look is intentional and
+ * does not map onto the Lumos token scale:
+ *
+ * - The mesh gradient is a 69.3%-wide panel pinned to the right, giving a
+ *   hard vertical edge across the hero. That edge is the design — an earlier
+ *   pass mistook it for an unfinished IX2 state and stretched it full-bleed.
+ * - The headline is `font-size: 8vw`, proportional to the viewport, stepping
+ *   to 6.5 / 4.8 / 2.7rem below 992px. It fills the hero on any screen; the
+ *   `h1` token would cap it and leave it undersized wide.
+ *
+ * So the only things changed from the export are the ones every page needed:
+ * asset paths are rewritten, `.container` is prefixed `wf-` to clear the
+ * Lumos collision, the `#w-node-…` grid ids are ordinary classes, and the
+ * IX2 entrance is `Utility/Reveal`'s `.fade-in-*` classes. The type utility
+ * classes (`.text-medium`, `.light-grey-text`) and `._12-column-grid` are the
+ * site's own, still defined in `styles/webflow/site.css`.
+ */
+interface Props {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+}
+
+const { render = true } = Astro.props;
+
+const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M6.66406 18.6641L15.9974 27.9974L25.3307 18.6641" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+  <path d="M16 27.9974V2.66406" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
+</svg>`;
+---
+
+{
+  render && (
+    <section class="hero-section">
+      <div class="wf-container hero-top-container">
+        <div class="hero-image-container">
+          <img
+            src="/images/mesh-gradient.png"
+            loading="eager"
+            sizes="(max-width: 2000px) 100vw, 2000px"
+            srcset="/images/mesh-gradient-p-500.png 500w, /images/mesh-gradient-p-800.png 800w, /images/mesh-gradient-p-1080.png 1080w, /images/mesh-gradient-p-1600.png 1600w, /images/mesh-gradient.png 2000w"
+            alt=""
+            class="hero-image"
+          />
+        </div>
+        <div class="_12-column-grid">
+          <h1 class="home-hero-text fade-in-load-far hero-cell-title">
+            We're a design studio that's here for good.
+          </h1>
+        </div>
+      </div>
+      <div class="wf-container hero-bottom-container">
+        <div class="_12-column-grid home-hero-bottom-grid">
+          <div class="hero-usp-container fade-in-load hero-cell-a">
+            <p class="text-medium">Nonprofits</p>
+            <p class="light-grey-text">
+              Ignite your nonprofit's impact with a powerful brand identity that
+              captivates hearts and minds.
+            </p>
+          </div>
+          <div class="hero-usp-container fade-in-load fade-in-load-2 hero-cell-b">
+            <p class="text-medium">B Corps</p>
+            <p class="light-grey-text">
+              Amplify your B Corp's social and environmental impact through
+              strategic branding
+            </p>
+          </div>
+          <div class="hero-usp-container fade-in-load fade-in-load-3 hero-cell-c">
+            <p class="text-medium">Purpose-Driven Brands</p>
+            <p class="light-grey-text">
+              Unleash the power of your purpose-driven business with a brand that
+              speaks volumes.
+            </p>
+          </div>
+          <a
+            href="#Welcome"
+            class="icon-button hero-cell-cue fade-in-load fade-in-load-3"
+            aria-label="Skip to the introduction"
+          >
+            <div class="button-arrow second-arrow" set:html={arrow} />
+            <div class="button-arrow" set:html={arrow} />
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* Verbatim from the export. Left outside the Lumos token system on
+       purpose — see the file header. */
+    .hero-section {
+      height: 100vh;
+      margin-bottom: 120px;
+      padding-top: 0;
+    }
+
+    .wf-container.hero-top-container {
+      height: 68vh;
+    }
+
+    .hero-top-container {
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 70vh;
+      padding-left: 9.5vw;
+      padding-right: 9.5vw;
+      display: flex;
+      position: relative;
+    }
+
+    .wf-container.hero-bottom-container {
+      align-items: center;
+      height: 32vh;
+      display: flex;
+    }
+
+    .hero-bottom-container {
+      height: 30vh;
+    }
+
+    /* The intentional hard edge: a 69.3%-wide panel pinned right. */
+    .hero-image-container {
+      z-index: -10;
+      opacity: 1;
+      justify-content: center;
+      align-items: center;
+      width: 69.3%;
+      height: 100%;
+      margin-top: 0%;
+      margin-bottom: 0;
+      margin-left: auto;
+      padding-bottom: 0;
+      display: flex;
+      position: absolute;
+      top: 0;
+      right: 0;
+      overflow: hidden;
+    }
+
+    .hero-image {
+      z-index: -1;
+      opacity: 0.8;
+      object-fit: cover;
+      height: 100%;
+      margin-top: 0%;
+      position: static;
+    }
+
+    .hero-usp-container {
+      max-width: 85%;
+    }
+
+    .home-hero-text {
+      color: var(--white);
+      margin-bottom: 48px;
+      font-size: 8vw;
+    }
+
+    .icon-button {
+      background-color: #ffffff1a;
+      border-radius: 100vw;
+      justify-content: center;
+      align-items: center;
+      width: 4rem;
+      height: 4rem;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .button-arrow {
+      width: 28px;
+      height: 28px;
+      color: var(--accent);
+      margin-top: 0;
+    }
+
+    .button-arrow.second-arrow {
+      margin-top: 0;
+      margin-right: 0;
+      position: absolute;
+      top: -42px;
+    }
+
+    /* IX2 slid the second arrow down over the first on hover; kept as a CSS
+       transition, honouring reduced motion. */
+    .icon-button .button-arrow {
+      transition: transform var(--open-duration) var(--open-ease);
+    }
+    @media (hover: hover) {
+      .icon-button:hover .button-arrow {
+        transform: translateY(42px);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .icon-button .button-arrow {
+        transition: none;
+      }
+    }
+
+    /* The export's `#w-node-…` grid placements, as classes. */
+    .hero-cell-title {
+      grid-area: 1 / 2 / 2 / 12;
+    }
+    .hero-cell-a {
+      grid-area: 1 / 2 / 2 / 5;
+    }
+    .hero-cell-b {
+      grid-area: 1 / 5 / 2 / 8;
+    }
+    .hero-cell-c {
+      grid-area: 1 / 8 / 2 / 11;
+    }
+    .hero-cell-cue {
+      grid-area: 1 / 11 / 2 / 13;
+      place-self: end;
+    }
+
+    /* The export's own breakpoints for this section, unchanged. */
+    @media screen and (max-width: 991px) {
+      .hero-section {
+        height: auto;
+      }
+      .hero-image-container {
+        width: 100%;
+        position: relative;
+      }
+      .hero-usp-container {
+        max-width: 100%;
+      }
+      .home-hero-text {
+        margin: -40px 48px 0;
+        font-size: 6.5rem;
+      }
+      .icon-button {
+        justify-content: center;
+      }
+      .hero-cell-title {
+        grid-area: span 1 / span 1 / span 1 / span 1;
+      }
+      .hero-cell-a,
+      .hero-cell-b,
+      .hero-cell-c,
+      .hero-cell-cue {
+        grid-area: span 1 / span 1 / span 1 / span 1;
+        justify-self: start;
+      }
+    }
+
+    @media screen and (max-width: 767px) {
+      .hero-section {
+        padding-top: 0;
+      }
+      .hero-image-container {
+        margin-top: 0%;
+      }
+      .hero-usp-container {
+        max-width: 100%;
+      }
+      .home-hero-text {
+        margin-left: 40px;
+        font-size: 4.8rem;
+      }
+    }
+
+    @media screen and (max-width: 479px) {
+      .hero-section {
+        padding-top: 80px;
+      }
+      .hero-image-container {
+        margin-top: 0%;
+      }
+      .home-hero-text {
+        margin-top: -19px;
+        margin-left: 24px;
+        margin-right: 24px;
+        font-size: 2.7rem;
+      }
+    }
+  }
+</style>
