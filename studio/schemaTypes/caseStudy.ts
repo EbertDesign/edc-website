@@ -13,6 +13,11 @@ export const caseStudy = defineType({
   title: 'Case study',
   type: 'document',
   icon: CaseIcon,
+  orderings: [
+    {title: 'Newest first', name: 'publishedDesc', by: [{field: 'publishedAt', direction: 'desc'}]},
+    {title: 'Oldest first', name: 'publishedAsc', by: [{field: 'publishedAt', direction: 'asc'}]},
+    {title: 'Client A–Z', name: 'titleAsc', by: [{field: 'title', direction: 'asc'}]},
+  ],
   groups: [
     {name: 'summary', title: 'Summary', default: true},
     {name: 'story', title: 'Story'},
@@ -102,5 +107,21 @@ export const caseStudy = defineType({
       description: 'Kept from the Webflow export so reruns and redirects can find this item.',
     }),
   ],
-  preview: {select: {title: 'title', subtitle: 'heading', media: 'thumbnail'}},
+  /* The service and the year, not the tagline: the list is grouped by service
+     and sorted by date, and the tagline is the first thing on the open form. */
+  preview: {
+    select: {
+      title: 'title',
+      service: 'service.title',
+      publishedAt: 'publishedAt',
+      media: 'thumbnail',
+    },
+    prepare: ({title, service, publishedAt, media}) => ({
+      title,
+      subtitle: [service ?? 'No service', publishedAt ? new Date(publishedAt).getFullYear() : null]
+        .filter(Boolean)
+        .join(' · '),
+      media,
+    }),
+  },
 })

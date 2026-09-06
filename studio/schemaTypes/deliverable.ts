@@ -11,6 +11,13 @@ export const deliverable = defineType({
   title: 'Deliverable',
   type: 'document',
   icon: CheckmarkCircleIcon,
+  /* Thirty-five of them and no inherent order, so alphabetical is the default
+     the Studio structure asks for. */
+  orderings: [
+    {title: 'Title A–Z', name: 'titleAsc', by: [{field: 'title', direction: 'asc'}]},
+    {title: 'Title Z–A', name: 'titleDesc', by: [{field: 'title', direction: 'desc'}]},
+    {title: 'Recently edited', name: 'updatedDesc', by: [{field: '_updatedAt', direction: 'desc'}]},
+  ],
   fields: [
     defineField({name: 'title', type: 'string', validation: (rule) => rule.required()}),
     defineField({

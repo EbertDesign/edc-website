@@ -2,6 +2,17 @@ import {defineType, defineField} from 'sanity'
 import {DocumentTextIcon} from '@sanity/icons/DocumentText'
 
 /**
+ * The topics a post can carry. Exported because the Studio structure groups
+ * the journal by these, and a list that drifts from the field would quietly
+ * hide posts.
+ */
+export const POST_TOPICS = ['About Us', 'Nonprofit', 'B Corps', 'Brand Strategy', 'Brand Identity']
+
+/** "12 Mar 2025" — short enough for a list row, unambiguous about the year. */
+const formatDate = (value: string) =>
+  new Date(value).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})
+
+/**
  * A journal entry. Webflow collection "Blog Posts".
  *
  * `topic` is a short fixed list rather than a reference: the site has five
@@ -16,6 +27,8 @@ export const post = defineType({
   icon: DocumentTextIcon,
   orderings: [
     {title: 'Newest first', name: 'publishedDesc', by: [{field: 'publishedAt', direction: 'desc'}]},
+    {title: 'Oldest first', name: 'publishedAsc', by: [{field: 'publishedAt', direction: 'asc'}]},
+    {title: 'Title A–Z', name: 'titleAsc', by: [{field: 'title', direction: 'asc'}]},
   ],
   fields: [
     defineField({name: 'title', type: 'string', validation: (rule) => rule.required()}),
@@ -28,15 +41,7 @@ export const post = defineType({
     defineField({
       name: 'topic',
       type: 'string',
-      options: {
-        list: [
-          {title: 'About Us', value: 'About Us'},
-          {title: 'Nonprofit', value: 'Nonprofit'},
-          {title: 'B Corps', value: 'B Corps'},
-          {title: 'Brand Strategy', value: 'Brand Strategy'},
-          {title: 'Brand Identity', value: 'Brand Identity'},
-        ],
-      },
+      options: {list: POST_TOPICS.map((topic) => ({title: topic, value: topic}))},
     }),
     defineField({name: 'publishedAt', type: 'datetime', validation: (rule) => rule.required()}),
     defineField({
@@ -54,5 +59,16 @@ export const post = defineType({
       description: 'Kept from the Webflow export so reruns and redirects can find this item.',
     }),
   ],
-  preview: {select: {title: 'title', subtitle: 'topic', media: 'mainImage'}},
+  /* Topic and date, because the list is ordered by date and grouped by topic
+     — those are the two things worth seeing without opening the post. */
+  preview: {
+    select: {title: 'title', topic: 'topic', publishedAt: 'publishedAt', media: 'mainImage'},
+    prepare: ({title, topic, publishedAt, media}) => ({
+      title,
+      subtitle: [topic, publishedAt ? formatDate(publishedAt) : 'No date']
+        .filter(Boolean)
+        .join(' · '),
+      media,
+    }),
+  },
 })
