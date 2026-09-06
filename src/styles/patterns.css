@@ -13,14 +13,20 @@
 }
 
 .section {
+  /* No background of its own. A section that names a theme paints through
+     `[class*="theme-"]`, and one that does not should let the page show
+     through — which is what the imported design assumes: several blocks sit
+     at a negative z-index behind their section (the hero's mesh gradient, the
+     Welcome lead image), and an opaque section hides them completely. */
   padding-top: var(--section-space-medium);
   padding-bottom: var(--section-space-medium);
-  background-color: var(--background);
   color: var(--text);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
+  /* A block, not a flex column. The imported design spaces everything with
+     margins and relies on them collapsing — through the container, through
+     the section, into the gap between sections. A flex parent stops that
+     dead, and every section grew by the margins that used to be absorbed.
+     Nothing here needs flex: `gap` is 0 on every section on this site. */
+  display: block;
   position: relative;
 }
 
@@ -31,11 +37,11 @@
      arithmetic with it. */
   width: var(--site-width);
   max-width: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: var(--_alignment, start);
-  gap: var(--space-8);
+  /* Block for the same reason as `.section` above — and because a flex column
+     with `align-items: start` also shrink-wraps its children, where the
+     export's block container let them fill the width. `--_alignment` still
+     cascades to the children that read it. */
+  display: block;
   position: relative;
   margin-inline: auto;
   & > [class] {

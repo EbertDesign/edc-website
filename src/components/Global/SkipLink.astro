@@ -28,6 +28,10 @@ const {
 <style is:global>
   @layer components {
     .skip-link {
+      /* Out of flow, so the 3rem the imported design puts above every button
+         does not apply — and would otherwise leave it peeking on screen,
+         because the hiding translate is relative to the box, not the margin. */
+      margin-top: 0;
       position: fixed;
       top: var(--space-2);
       inset-inline-start: var(--space-2);

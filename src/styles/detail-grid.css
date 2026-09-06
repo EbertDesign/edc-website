@@ -1,0 +1,103 @@
+/* Grid placement for the five CMS detail templates.
+
+   Webflow placed every cell of its twelve-column grid with an id selector —
+   `#w-node-7617afef-…-08125e53 { grid-area: 1 / 4 / 2 / 12 }` — one per
+   element per template. Pass 3 rebuilt those templates as Astro routes and
+   replaced the ids with the `cell-*` names used here, but the placements
+   themselves were never carried over, so every cell auto-placed into column 1
+   and the pages ran to roughly twice their height. These are those rules,
+   read back out of the export and keyed to the new names.
+
+   Below the large breakpoint the export collapses the grid to a single column
+   and pulls each section's small label above its content with `order: -9999`;
+   that is the second block. */
+
+@media (width >= 62rem) {
+  /* Hero: the title block sits in columns 2-9, centred against the artwork. */
+  .hero-cell-title {
+    grid-area: 1 / 2 / 2 / 9;
+    align-self: center;
+  }
+
+  /* Summary: a small label on the left, the lead and body on the right. */
+  .cell-summary-lead {
+    grid-area: 1 / 4 / 2 / 12;
+  }
+
+  .cell-summary-body {
+    grid-area: 2 / 4 / 2 / 12;
+  }
+
+  .cell-summary-label {
+    grid-area: 1 / 1 / 2 / 3;
+  }
+
+  /* Deliverables: label left, the list full width on the row beneath. */
+  .cell-list-label {
+    grid-area: 1 / 1 / 2 / 3;
+    place-self: start;
+  }
+
+  .cell-list-body {
+    grid-area: 2 / 1 / 3 / 13;
+  }
+
+  /* Process and Impact: a three-column label beside eight of rich text. */
+  .cell-story-label {
+    grid-column: span 3;
+  }
+
+  .cell-story-body {
+    grid-column: span 8;
+  }
+
+  /* Next case / related cases. */
+  .cell-next-lead {
+    grid-column: span 8;
+  }
+
+  .cell-next-label {
+    grid-column: span 4;
+    place-self: end;
+  }
+
+  .cell-next-body {
+    grid-column: span 12;
+  }
+
+  /* A journal post's header runs the full width from column 2. */
+  .cell-post-head {
+    grid-area: 1 / 2 / 2 / 13;
+  }
+
+  /* A team member: portrait on the left, name and role to its right. */
+  .cell-team-text {
+    grid-area: 1 / 5 / 2 / 13;
+    align-self: center;
+  }
+
+  .cell-team-image {
+    grid-area: 1 / 2 / 2 / 6;
+  }
+
+  .cell-team-bio {
+    grid-area: 2 / 4 / 2 / 10;
+  }
+}
+
+@media (width < 62rem) {
+  /* One column, with each section's label lifted above its content. */
+  .cell-list-label,
+  .cell-next-label,
+  .cell-team-image {
+    order: -9999;
+  }
+
+  .cell-next-label {
+    justify-self: start;
+  }
+
+  .cell-list-label {
+    place-self: auto;
+  }
+}

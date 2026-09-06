@@ -163,7 +163,7 @@ const named = {
       {variant === "close" && (
         <Icon class="button_mark" src={marks.close} variant="small" />
       )}
-      {variant === "arrow" && (
+      {(variant === "arrow" || variant === "main") && (
         <Icon class="button_mark" src={marks.arrow} variant="small" />
       )}
     </Tag>
@@ -173,29 +173,97 @@ const named = {
 <style is:global>
   @layer components {
     .button_wrap {
+      /* The imported design's button: a brand pill that starts as a circle
+         behind the arrow and grows across the label on hover. The pill is a
+         pseudo-element, so the component keeps its own markup — the export
+         used a spare `.button-background` div. Every labelled button on this
+         site carries the arrow, so `main` renders one. */
+      position: relative;
+      z-index: 0;
       display: inline-flex;
-      justify-content: center;
+      /* The export draws the arrow before the label; the component writes the
+         label first, so the row is reversed rather than the markup. */
+      flex-direction: row-reverse;
+      justify-content: flex-end;
       align-items: center;
-      gap: 0.5em;
-      padding: 0.75em 1.5em;
-      background-color: var(--button-background);
-      color: var(--button-text);
-      border: var(--border-width) solid var(--button-border);
-      border-radius: 0.5em;
+      gap: 0.5rem;
+      height: 4rem;
+      max-width: 100%;
+      margin-top: 3rem;
+      padding: 0.5rem 1.75rem 0.5rem 1.25rem;
+      color: var(--light-200);
+      background-color: transparent;
+      border: 0;
+      border-radius: 0;
       line-height: 1.2;
+      text-align: left;
       text-decoration: none;
-      text-align: center;
-      transition:
-        background-color var(--hover-duration) var(--hover-ease),
-        color var(--hover-duration) var(--hover-ease),
-        border-color var(--hover-duration) var(--hover-ease);
+      transition: color var(--hover-duration) var(--hover-ease);
+
+      &::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset-block: 0;
+        inset-inline-start: 0;
+        width: 4rem;
+        background-color: color-mix(in srgb, var(--light-100) 10%, transparent);
+        border-radius: var(--radius-round);
+        transition:
+          width calc(var(--hover-duration) * 2) var(--hover-ease),
+          background-color var(--hover-duration) var(--hover-ease);
+      }
+
+      /* A bare class beside the root, as the export had it. */
+      &.no-margin-top {
+        margin-top: 0;
+      }
+
+      .button_mark {
+        --_size: 1.75rem;
+        flex: none;
+        color: var(--brand-500);
+        transition: color var(--hover-duration) var(--hover-ease);
+      }
+
+      .button_text {
+        /* The export set the case and weight on the button and let the label
+           inherit them, which is easy to miss when reading `.button-text`
+           alone: the labels are uppercase Syne 600, not sentence case. */
+        font-family: var(--display-family);
+        font-size: 0.875rem;
+        font-weight: var(--primary-semibold);
+        letter-spacing: 0.05rem;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
       @media (hover: hover) {
         &:hover:not(:disabled) {
-          background-color: var(--button-background-hover);
-          color: var(--button-text-hover);
-          border-color: var(--button-border-hover);
+          &::before {
+            width: 100%;
+            background-color: var(--brand-500);
+          }
+          .button_mark,
+          .button_text {
+            color: var(--dark-900);
+          }
         }
       }
+
+      /* The framework's other emphases. The imported site uses none of them
+         today, but they are the component's API and stay working: both drop
+         the pill and fall back to the token-driven surface. */
+      &:is(.secondary, .link) {
+        height: auto;
+        flex-direction: row;
+        justify-content: center;
+        color: var(--button-text);
+        &::before {
+          content: none;
+        }
+      }
+
       &.secondary {
         --button-background: var(--button-2-background);
         --button-text: var(--button-2-text);
@@ -203,19 +271,31 @@ const named = {
         --button-background-hover: var(--button-2-background-hover);
         --button-text-hover: var(--button-2-text-hover);
         --button-border-hover: var(--button-2-border-hover);
+
+        padding: 0.75em 1.5em;
+        background-color: var(--button-background);
+        border: var(--border-width) solid var(--button-border);
+        border-radius: 0.5em;
+        transition:
+          background-color var(--hover-duration) var(--hover-ease),
+          color var(--hover-duration) var(--hover-ease),
+          border-color var(--hover-duration) var(--hover-ease);
+        @media (hover: hover) {
+          &:hover:not(:disabled) {
+            background-color: var(--button-background-hover);
+            color: var(--button-text-hover);
+            border-color: var(--button-border-hover);
+          }
+        }
       }
+
       &.link {
-        --button-background: transparent;
         --button-text: var(--link-text);
         --button-border: var(--link-border);
-        --button-background-hover: transparent;
         --button-text-hover: var(--link-text-hover);
-        --button-border-hover: var(--link-border);
 
         padding: 0.4em 0;
-        border: 0;
         border-bottom: var(--border-width) solid var(--button-border);
-        border-radius: 0;
         background-image: linear-gradient(
           var(--link-border-hover),
           var(--link-border-hover)
@@ -230,22 +310,55 @@ const named = {
           border-color var(--hover-duration) var(--hover-ease);
         @media (hover: hover) {
           &:hover:not(:disabled) {
+            color: var(--button-text-hover);
             background-position: 0 100%;
             background-size: 100% var(--border-width);
           }
         }
       }
+
+      /* Icon-only controls — a slider's arrows, a modal's close, a marquee's
+         play. These sit inside other components, so they take none of the
+         labelled button's height, pill or margin. */
       &:is(.play, .close, .arrow) {
+        flex-direction: row;
+        justify-content: center;
         gap: 0;
+        height: auto;
+        margin-top: 0;
         padding: 0.75em;
+        color: var(--button-text);
+        background-color: var(--button-background);
+        border: var(--border-width) solid var(--button-border);
         border-radius: var(--radius-round);
+        transition:
+          background-color var(--hover-duration) var(--hover-ease),
+          color var(--hover-duration) var(--hover-ease),
+          border-color var(--hover-duration) var(--hover-ease);
+        &::before {
+          content: none;
+        }
+        .button_mark {
+          --_size: 1.5em;
+          color: currentcolor;
+        }
+        @media (hover: hover) {
+          &:hover:not(:disabled) {
+            background-color: var(--button-background-hover);
+            color: var(--button-text-hover);
+            border-color: var(--button-border-hover);
+          }
+        }
       }
+
       &.back .button_mark {
         rotate: 180deg;
       }
+
       &.play .button_pause {
         display: none;
       }
+
       &.play[aria-pressed="true"] {
         & .button_play {
           display: none;
@@ -254,6 +367,7 @@ const named = {
           display: block;
         }
       }
+
       &:disabled {
         cursor: not-allowed;
         opacity: 0.5;

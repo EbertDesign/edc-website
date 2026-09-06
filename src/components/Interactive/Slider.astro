@@ -296,6 +296,18 @@ const slides = await slotContent(Astro.slots);
   @layer components {
     .slider_wrap {
       --_gap-size: var(--site-gutter);
+      /* The imported slider sets its own 40px gutter between slides, and
+         hides both the arrows and the dots (`data-hide-arrows="true"` and
+         `.slide-nav { display: none }` in the export). It stays operable —
+         the list is a focusable scroll-snap strip, so drag, wheel and arrow
+         keys all work. Delete this block to get the framework's controls back. */
+      &.slider {
+        --_gap-size: 2.5rem;
+        gap: 0;
+        .slider_controls {
+          display: none;
+        }
+      }
       --_edge: max(var(--site-margin), (100vw - var(--max-width-main)) / 2);
       --_visible: var(--_visible-xs);
       --_visible-xs: 1.02;

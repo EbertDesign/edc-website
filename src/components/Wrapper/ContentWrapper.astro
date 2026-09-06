@@ -266,8 +266,13 @@ const column2 = await slotContent(Astro.slots, "column2");
         }
       }
       &.breakout {
+        /* Self-centring, so it does not depend on the container being a flex
+           box: `.container` is a block on this site, where `align-self` is
+           inert and a 100vw child would start at the container's inset and
+           run off the right edge. */
         display: grid;
         width: 100vw;
+        margin-inline: calc(50% - 50vw);
         flex-shrink: 0;
         align-self: center;
         column-gap: 0;

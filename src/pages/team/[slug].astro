@@ -1,10 +1,12 @@
 ---
 /**
- * PASS 3 — a team member, from Sanity. The export's `detail_team.html` with
- * its placeholders bound to the `teamMember` document. Same shared
- * substitutions as every pass-1 page. Becomes Lumos components in pass 2.
+ * a team member, from Sanity. The export's `detail_team.html` with
+ * its placeholders bound to the `teamMember` document. The twelve-column placements live in
+ * `styles/detail-grid.css`.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Wrapper/Section.astro";
+import Eyebrow from "@/components/Typography/Eyebrow.astro";
 import SanityImg from "@/components/Media/SanityImg.astro";
 import { sanityClient, TEAM_DETAIL_QUERY } from "@/utils/sanity.ts";
 
@@ -20,16 +22,10 @@ if (!m) throw new Error(`No document for /${Astro.url.pathname}`);
 ---
 
 <BaseLayout title={m.name} description={m.bio ?? undefined}>
-  <div class="wf-section subpage-hero-section margin-top-48">
-    <div class="wf-container">
+  <Section paddingTop="none" paddingBottom="none" class="subpage-hero-section margin-top-48" gap="0">
       <div class="w-layout-grid _12-column-grid">
         <div class="team-member-text-container cell-team-text">
-          <div class="section-heading-container margin-bottom-16">
-            <div class="section-heading-content">
-              <div class="dot"></div>
-              <p class="text-s">Team member</p>
-            </div>
-          </div>
+          <Eyebrow class="margin-bottom-16">Team member</Eyebrow>
           <h1>{m.name}</h1>
           <p>{m.jobTitle}</p>
         </div>
@@ -38,6 +34,5 @@ if (!m) throw new Error(`No document for /${Astro.url.pathname}`);
         </div>
         <p class="text-large margin-top-48 fade-in-bottom cell-team-bio">{m.bio}</p>
       </div>
-    </div>
-  </div>
+  </Section>
 </BaseLayout>

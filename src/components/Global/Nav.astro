@@ -146,15 +146,17 @@ const { render = true, overlap = false } = Astro.props;
     }
 
     .nav_logo {
-      /* The export sets `.logo { width: 50% }` on an image inside a
-         shrink-to-fit float, which resolves to zero — so the live site shows
-         no logo at all below 480px. Kept visible here on purpose, sized to
-         sit inside the 48px control row; the bar's height is unchanged. */
+      /* The export's `.logo { width: 50%; max-width: 180px }` sits in a
+         shrink-to-fit brand link, so the 50% resolves against the capped
+         180px and the mark actually renders 90px wide at every width down
+         to 480px. Below that the export's `max-height: 24px` shrinks it to
+         ~43px; kept at 90px here on purpose so it stays legible on phones.
+         The bar's height is unchanged either way. */
       z-index: 99;
       display: flex;
       align-items: center;
       width: 100%;
-      max-width: 8rem;
+      max-width: 5.625rem;
       transition: opacity var(--hover-duration) var(--hover-ease);
       @media (hover: hover) {
         &:hover {
@@ -309,10 +311,6 @@ const { render = true, overlap = false } = Astro.props;
 
       .nav_inner {
         padding-block: 0;
-      }
-
-      .nav_logo {
-        max-width: 11.25rem; /* the export's 180px */
       }
 
       .nav_toggle {

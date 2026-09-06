@@ -256,10 +256,188 @@ gets unpublished and the answers stop being checkable.
     Parity against live (`compare-pages.mjs`): headings exact on every list page, word counts
     within a few percent; the persistent link −1 is the copyright link → text and image −2 is
     the nav logo + footer mark now inline SVG. Journal is newest-first, matching live.
-  - **Next** — pass 2 across the pages, block by block, Lumos-first with revert as fallback;
-    the homepage's remaining **5** `wf-section`s first, then the shared blocks that now exist
-    as pass-1 components (`ContentCtaContact`, `Item/CaseCard`, the deliverable pop-up →
-    `Interactive/Modal`, the `/about` `w-slider` → `Interactive/Slider`), then forms.
+  - **Pass 2 — the two sitewide primitives are done (2026-09-05), and `18 of 20` captured
+    views are pixel-identical to the baseline.** Only `/example-components` differs, which is
+    the scaffold's own component gallery and exists to display them.
+    - **`Typography/Eyebrow`** replaces the export's `.section-heading-container` >
+      `.section-heading-content` > `.dot` + `.text-s` trio — **24 instances across 12 files**.
+      The marker is the 8px brand dot; `no-margin-bottom`, `margin-top-12` and the rotated
+      sticky treatment on the case-studies label are bare classes beside the root.
+    - **`Button`** replaces `.button` > `.button-content-wrapper` + `.button-background` +
+      `.button-arrow` + `.button-text` — **9 instances**. The expanding pill is a
+      `::before`, so the component keeps its own markup. `main` now renders the arrow,
+      because every labelled button on this site has one; `arrow`/`close`/`play` stay the
+      framework's icon-only controls for Slider, Modal, Tabs and Marquee.
+      The export's arrow replaced the framework's placeholder `assets/icons/arrow-full.svg`.
+  - **Three traps this pass, all worth knowing:**
+    1. **`.text-style-*` shipped in `base.css`, the *lowest* layer** — so the export's bare
+       `h2 { font-size: 4rem }` in the `webflow` layer beat them, and an `<Eyebrow tag="h2">`
+       rendered at 4rem (`/work` was 26% off). They are utilities by name and by LUMOS.md's
+       own wording, and they now live in `utilities.css`, the top layer. **Any Lumos
+       typography component dropped onto an imported page hits this**; check it first.
+    2. **Restyling a component's base rule can swallow its variants.** Lumos nests
+       `&.secondary`, `&.link`, `&:is(.play,.close,.arrow)` *inside* `.button_wrap`, so
+       replacing that rule by brace-matching deleted them and silently unstyled every
+       control in Slider/Modal/Tabs/Marquee. Merge into the nested structure; do not replace it.
+    3. **Read the parent, not just the named rule.** `.button-text` alone looks like sentence
+       case at weight 500; `text-transform: uppercase` and `font-weight: 600` sat on `.button`
+       and were inherited. The labels were 27px narrow until that was caught by measuring
+       against live.
+  - **Also settled:** a default `margin-top` on `Button` broke `SkipLink`'s off-screen hiding
+    (the translate is relative to the box, not the margin) — reset there. Post bodies match
+    live's rhythm, including its own cramped `.rich-text-block h3` (0 bottom margin).
+  - **`Wrapper/Section` replaces `wf-section` / `wf-container` — 73 sections across 14 files.**
+    Only the 4 hero sections on the detail routes keep the export's markup, on the hero
+    precedent. Props: `paddingTop="none"` everywhere (the export's sections had no top
+    padding), `paddingBottom` left at `medium` where the export used its 200px section margin
+    and `none` where a `.margin-*` utility supplied one, `gap="0"` on all of them because the
+    export's container had no gap. `--section-space-medium` is now **stepped** (80 / 120 /
+    200 at 30rem / 62rem) rather than fluid, because the export steps it and a fluid curve
+    between the same endpoints drifts ~15px at tablet widths.
+  - **Three regressions this introduced, all found and fixed:**
+    1. **Compound selectors stop matching.** `.wf-section.subpage-hero-section` and
+       `.wf-section.black-800-background` silently did nothing once the element became
+       `.section` — the homepage's dark band rendered `#0e0e0f` instead of `#211e1e` and every
+       subpage hero lost its 120px margins. Rewired onto `.section.*`. **Whenever a renamed
+       class becomes a framework class, grep the stylesheet for compound rules on the old name.**
+    2. **`.section` painted an opaque `background-color: var(--background)`.** The export's
+       sections are transparent, and the design puts things *behind* them at a negative
+       z-index — the hero's mesh gradient and the Welcome lead image. The section's own
+       background hid the lead image completely. Removed from `patterns.css`: a section that
+       names a theme still paints through `[class*="theme-"]`, and one that does not now lets
+       the page show through. Same root cause as the pass-1 root-background bug.
+    3. **Flex sections do not collapse margins.** The export's block sections absorbed a last
+       child's bottom margin; a Lumos flex column adds it. `.section > .container >
+       :last-child { margin-bottom: 0 }` in `Section`'s own styles restores the rhythm.
+  - **The verification tool was rebuilt, and it had been hiding real bugs.** `visual-check.mjs`
+    captured a fixed `1440×3200` window, which did two bad things: it clipped every page at
+    3200px — **the homepage is 9900px, so nine tenths of it was never compared, which is how
+    the black-band regression passed as `0.000% unchanged`** — and it made `100vh` resolve to
+    3200px, distorting the hero. It now drives Chrome over CDP: a realistic 1440×900 / 390×844
+    viewport with `Page.captureScreenshot({captureBeyondViewport: true})`, so `vh` stays
+    honest and the whole scroll height is compared. It also forces `loading="lazy"` images to
+    fetch before the shot, since `captureBeyondViewport` paints the page without ever
+    scrolling it and below-the-fold images otherwise appear in one run and not the next.
+    **Re-baselining needs the tool kept outside the repo** (`git stash` reverts it along with
+    everything else), and `.lumos-upgrade/` is now gitignored — it was tracked, and the fresh
+    captures blocked a `stash pop`.
+  - **The four height deltas are resolved (2026-09-05).** Chased with a DOM measuring script
+    (`scratchpad/measure.mjs`: section/container/child geometry as JSON, at HEAD and now) —
+    far faster and more exact than reading screenshots. Four separate causes:
+    1. **Flex kills margin collapsing.** Lumos's `.section` and `.container` are flex columns;
+       the imported design spaces everything with margins that collapse — between siblings,
+       and out through the container into the gap below the section. Every section grew by the
+       margins that used to be absorbed. **Both are `display: block` now** (`patterns.css`),
+       which is also what the export had. Nothing was lost: `gap` is 0 on every section here,
+       and a flex column with `align-items: start` was additionally shrink-wrapping children
+       that the export let fill the width.
+    2. **A trailing margin meets padding.** The last child's bottom margin used to escape and
+       collapse into the section's 200px *margin*; a section's *padding* never collapses, so
+       it was added on top. `.section > .container:last-child > :last-child { margin-bottom: 0 }`
+       in `Section`'s own styles. Scoped to the **last** container: an early version hit every
+       container and ate the 80px gap between the two on `/about`.
+    3. **The section conversion reordered two-container sections.** Anything outside the first
+       container went into Section's `background` slot, which renders *before* the container —
+       so `/about`'s image slider jumped above the text it belongs under. Only `/about` was
+       affected; `index`'s background slot is legitimate (that section has no container).
+    4. **A full-bleed sibling can't just move inside the container.** `.slider` is
+       `width: 90.5vw; margin-left: 9.5vw` — a right-bleed positioned from the viewport, which
+       double-insets once nested. Re-expressed as an overhang:
+       `width: calc(100% + var(--container-margin)); margin-left: 0`.
+  - **Two framework bugs found on the way, both from making `.container` a block:**
+    `ContentWrapper`'s `breakout` variant centred its 100vw box with `align-self: center`,
+    which is inert outside flex — it now self-centres with `margin-inline: calc(50% - 50vw)`.
+    And `visual-check.mjs` was applying the viewport override *before* `Page.navigate` only, so
+    a fast-laying-out page could be shot at the previous route's width — `/test` came back with
+    the mobile layout in a desktop capture. The override is re-asserted after load now.
+  - **Where it stands.** 13 of 20 views are pixel-identical to the pre-pass-2 commit
+    (`≤0.05%`): `/about` desktop, `/contact`, `/info/changelog`, `/info/instructions`,
+    `/journal`, `/test`, `/work`. Measured against **live**, which is the real reference:
+    `/grants` is **16px** from live where the pre-pass-2 commit was 104px off, and the
+    homepage and `/about` are both ~5% *shorter* than live on mobile (9677 vs 10201,
+    11145 vs 11709) — the same order as before this pass, not a regression from it.
+    The homepage desktop diff fluctuates 4–8% between runs: a Sanity CDN thumbnail that
+    sometimes misses the capture window, not a layout difference.
+    Content parity against live is unchanged — headings exact on all 10 pages, forms exact.
+  - **The interactive blocks and both forms are done (2026-09-05).**
+    - **`Interactive/Slider`** replaces the `/about` `w-slider`, which had been dead since
+      `webflow.js` was deleted. `variant="crop-start"` is exactly the export's right-bleed,
+      one slide in view, 40px gutter. Arrows and dots stay hidden as the export hid them
+      (`data-hide-arrows`, `.slide-nav { display: none }`) — the list is a focusable
+      scroll-snap strip, so drag, wheel and arrow keys all work. Deleting one block in
+      `Slider.astro` restores the framework's controls.
+    - **`Interactive/Modal`** replaces the deliverable `.popup` on case and service pages,
+      via a new `Item/DeliverableItem`. It was a `position: fixed; display: none` div shown by
+      IX2 with a hand-rolled close button; it is a real `<dialog>` now — Escape, focus trap
+      and restore, browser backdrop — keeping the half-image/half-copy split. The name stays a
+      link to `/deliverables/<slug>`: `Modal`'s opener calls `preventDefault`, so with JS the
+      click opens the panel and without it the link still works.
+    - **`Form/*`** rebuilds `/contact` (4 fields) and `/grants` (10, including three selects).
+      Field names, types and required flags are preserved exactly, so whatever provider is
+      chosen receives the same payload. `Form` with no `action` reports success without
+      sending — verified end to end: validates, hides the fields, shows the export's own
+      "Thank you!" message. **The submit handler is still a stub pending the provider choice.**
+      Styling moved to `src/styles/forms.css`.
+  - **Three cascade traps, worth knowing before the next component swap:**
+    1. **A file imported with `layer(x)` must not also contain `@layer x { }`.** That nests
+       `x.x`, a *sub*-layer, which loses to the parent layer's own unlayered rules — so
+       `forms.css` was silently beaten by `text-style-main` and by `.button_wrap`, while its
+       other declarations applied. Confusing precisely because the file half-worked.
+    2. **The framework's form controls carry `text-style-main`**, a utility. Overriding their
+       font needs to be in `utilities` too; a `components`-layer rule cannot win however
+       specific it is. `forms.css` is imported after `utilities.css`, into the same layer.
+    3. **Lumos forms stack with `gap: var(--space-8)`; the export used each control's own
+       48px bottom margin.** Left alone that adds 64px per field — `/grants` grew 1051px.
+       The form is `display: block` here. The controls also needed the export's literal
+       `height: 2.375rem` (Webflow's `.w-input`, border-box, so its 60px of padding decides
+       the real height): without it each control is line-height tall, 90px against live's 61.
+  - **Where it stands.** 11 of 20 views pixel-identical; `/about` desktop 0.616% (the slider is
+    a live scroll-snap strip now, not a dead masked div). Against **live**: `/grants` is 88px
+    off, having been 947px off mid-pass and 104px off before pass 2. Content parity is exact
+    on every page — headings, and forms 4/4 and 10/10.
+    `site.css` is down to **44 KB** from the export's 68 KB.
+  - **Pass 2 is complete (2026-09-05): `grep -rn "wf-" src/` returns nothing.** The last
+    pieces:
+    - **`SectionHeroSubpage`** — the four subpage heroes (`/case`, `/service`,
+      `/deliverables`, `/about`) were repeating the same markup *and quietly borrowing
+      `SectionHeroHome`'s stylesheet*, so editing the homepage hero could have reshaped four
+      other pages without warning. One component owns it now. Verified against live: backdrop
+      988×612 at x=437, title cell x=236 w=655 — exact.
+    - **`SectionHeroHome`** owns its class names (`hero-home_top` / `_bottom`) instead of the
+      shared `wf-container hero-*-container`, so nothing outside it can depend on them.
+    - **`ContentCtaContact`** is a `Wrapper/Section`.
+    - **`.wf-heading`** → `.journal-post_title`, named for the block it belongs to rather
+      than colliding with the framework's `.heading` primitive.
+    - **`.wf-margin-bottom-8`** (14 elements) → the framework's `.margin-bottom-1`.
+      **Note the trade:** the site's utility was a flat 8px, `--space-1` is `clamp(6px, …,
+      8px)` — identical at desktop, up to 2px tighter below 480px. Desktop stayed at
+      `0.000%`; `/info/instructions` mobile moved 8px over four elements. On the token scale
+      now; a literal `8px` would restore exactness if that matters.
+    - **`.wf-margin-top-4`** was already dead — the rule went with the old eyebrow CSS. The
+      4px optical nudge is restored as `.eyebrow_wrap.eyebrow-offset`, its own name because
+      the framework's `.margin-top-4` means `--space-4` (20-24px).
+  - **A real bug surfaced while finishing this: the CMS detail routes had no grid at all.**
+    Pass 3 rebuilt those templates and replaced Webflow's `#w-node-…` id placements with
+    `cell-*` class names — but never wrote the CSS, so every cell auto-placed into column 1
+    and the pages ran to roughly **twice** their height (`/case/ann-cooper` 17218px against
+    live's 12232). Content parity could not see it: the text was all present, just stacked.
+    The placements are recovered from the export into **`src/styles/detail-grid.css`**,
+    covering all five templates plus the single-column reflow below 62rem.
+    `/case/ann-cooper` is now 11989 against live's 12232, and its hero matches to the pixel.
+    **Lesson: content parity proves nothing about layout. A route rebuilt from a template
+    needs its grid checked against live, not just its text.**
+  - **Also worth knowing:** an earlier reading of "live is 7945px" was wrong — that was
+    measured before live's own lazy images loaded. Force them (or wait) before comparing
+    heights against live, or the target moves under you.
+  - **Where it stands.** Content parity across all 11 pages checked: **headings exact on every
+    one**, forms exact (4/4, 10/10), word counts within a few percent. Two known text
+    differences, both improvements: `/contact` (+13%) and `/deliverables/*` (+23%) — the
+    latter because live still shows the template's lorem ipsum there.
+    `site.css` is **44 KB**, down from the export's 68 KB, and holds no block-level layout —
+    only the site's own utilities, the twelve-column grid and page-specific rules.
+  - **Next** — the form provider is the one open decision, and the 301 redirect CSV is still
+    the only unrecoverable item. The ~5% mobile shortfall against live on `/` and `/about`
+    predates pass 2 and is still unexplained.
 
 - **Verification notes** *(learned the hard way; read before trusting a diff)*
   - `visual-check.mjs` was patched twice and both fixes matter. It gave Chrome no

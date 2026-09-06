@@ -1,0 +1,131 @@
+/* Form styling, ported from the export.
+   The fields were `.text-field` / `.drop-down-field` / `.wf-field-label` /
+   `.submit-button` in Webflow; they are the framework's `Form/*` components
+   now, so the design moves onto their class names. Underlined fields on a
+   transparent ground, a Syne label above each, and a pill submit. */
+
+/* No `@layer` block here: `global.css` imports this file with
+   `layer(utilities)`, and wrapping the rules again would nest a
+   `utilities.utilities` sub-layer — which loses to the parent layer's own
+   rules, so `text-style-main` would keep winning the font. */
+
+/* The export's form is a plain block: the space between fields comes from
+   each control's own 48px bottom margin, not from a gap on the form. The
+   framework stacks them with `gap: var(--space-8)`, which added 64px to every
+   field. */
+.form_fields {
+  display: block;
+}
+
+.form_fields .field {
+  display: block;
+}
+
+.form_fields .field-label {
+  margin-bottom: 1.5rem;
+  font-family: var(--display-family);
+}
+
+.form_fields .field-control {
+  width: 100%;
+  margin-bottom: 3rem;
+  padding: 0.75rem 0 3rem;
+  color: var(--light-100);
+  background-color: transparent;
+  border: 0;
+  border-bottom: 0.0625rem solid var(--dark-700);
+  border-radius: 0;
+  font-family: var(--secondary-family);
+  font-size: 1.125rem;
+  /* Webflow's `.w-input` is 38px tall with `box-sizing: border-box`, so the
+     60px of padding decides the real height and the text sits at the top with
+     the rule well below it. Reproduced literally — without it the control is
+     line-height tall and the whole form grows by ~29px a field. */
+  height: 2.375rem;
+
+  &::placeholder {
+    color: color-mix(in srgb, var(--light-100) 30%, transparent);
+    font-family: var(--secondary-family);
+    font-size: 1.125rem;
+  }
+
+  &:active,
+  &:focus {
+    border-bottom-color: var(--brand-500);
+  }
+}
+
+/* The select sits on the same rule, and its own control wrapper must not
+   add a second box around it. */
+.form_fields .form-select_control {
+  display: block;
+  position: relative;
+}
+
+.form_fields .form-select_field {
+  padding-block: 0 0.75rem;
+  text-align: left;
+}
+
+.form_fields .form-select_mark {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 0.5rem;
+  pointer-events: none;
+}
+
+.form_fields .form-textarea_field {
+  /* A textarea sizes from its rows, not the input's fixed height. */
+  height: auto;
+  min-height: 11.25rem;
+  margin-bottom: 0;
+}
+
+/* The submit is the export's pill, not the site's arrow button. */
+.form_fields .button_wrap.submit {
+  height: auto;
+  margin-top: 5rem;
+  padding: 1.4375rem 2rem 1.25rem;
+  color: var(--light-100);
+  background-color: color-mix(in srgb, var(--light-100) 10%, transparent);
+  border-radius: var(--radius-round);
+  cursor: pointer;
+  transition:
+    background-color var(--hover-duration) var(--hover-ease),
+    color var(--hover-duration) var(--hover-ease);
+
+  &::before {
+    content: none;
+  }
+
+  .button_mark {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--brand-500);
+      color: var(--dark-900);
+    }
+  }
+}
+
+@media (width < 30rem) {
+  .form_fields .field-control {
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    &::placeholder {
+      font-size: 1.25rem;
+    }
+  }
+
+  .form_fields .form-textarea_field {
+    min-height: 7.5rem;
+  }
+
+  .form_fields .button_wrap.submit {
+    margin-top: 3rem;
+    padding-top: 1.4375rem;
+    font-size: 0.875rem;
+  }
+}

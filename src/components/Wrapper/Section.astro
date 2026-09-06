@@ -109,3 +109,17 @@ const background = await slotContent(Astro.slots, "background");
     </section>
   )
 }
+
+<style is:global>
+  @layer components {
+    /* The imported design lets a block's bottom margin escape its container
+       and collapse into the gap below the section. A section's padding stops
+       that — padding never collapses — so the trailing margin would be added
+       on top of the section gap instead of absorbed by it. Zero it: the
+       section's own padding is the gap. Margins between siblings still
+       collapse normally, because the section and container are blocks. */
+    .section > .container:last-child > :last-child {
+      margin-bottom: 0;
+    }
+  }
+</style>

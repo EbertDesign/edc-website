@@ -1,0 +1,138 @@
+---
+/**
+ * One deliverable in the list on a case study or a service page: the name,
+ * and a full-screen panel describing it that opens on click.
+ *
+ * The export built that panel as a `.popup` div — `position: fixed`,
+ * `display: none`, shown by an IX2 interaction, with a hand-rolled close
+ * button. It is `Interactive/Modal` now, so it is a real `<dialog>`: Escape
+ * closes it, focus is trapped and restored, and the backdrop is the
+ * browser's. The design is unchanged — a half-width image beside the copy.
+ *
+ * The name stays a link to the deliverable's own page. `Modal`'s opener calls
+ * `preventDefault`, so with JavaScript the click opens the panel and without
+ * it the link still goes somewhere useful.
+ */
+import Modal from "@/components/Interactive/Modal.astro";
+import Eyebrow from "@/components/Typography/Eyebrow.astro";
+import SanityImg from "@/components/Media/SanityImg.astro";
+import type { ComponentProps } from "astro/types";
+
+type Props = {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** A deliverable, as projected by `CASE_DETAIL_QUERY` / `SERVICE_DETAIL_QUERY`. */
+  deliverable: {
+    _id?: string | null;
+    title?: string | null;
+    slug?: string | null;
+    subtitle?: string | null;
+    description?: string | null;
+    image?: ComponentProps<typeof SanityImg>["image"];
+  };
+};
+
+const { render = true, deliverable: d } = Astro.props;
+
+/* Both a case and a service can list the same deliverable, and a case page
+   shows one list — so the document id alone is unique per page. */
+const modalId = `deliverable-${d._id ?? d.slug}`;
+---
+
+{
+  render && d.title && (
+    <div role="listitem" class="deliverable-container">
+      <a
+        class="deliverables-list-container"
+        href={d.slug ? `/deliverables/${d.slug}` : undefined}
+        data-modal-open={modalId}
+      >
+        <p class="text-xl">{d.title}</p>
+      </a>
+
+      <Modal
+        id={modalId}
+        variant="full-screen"
+        label={d.title}
+        class="deliverable-modal"
+      >
+        <div class="deliverable-modal_layout">
+          <SanityImg
+            image={d.image}
+            alt=""
+            class="deliverable-modal_image"
+            sizes="(min-width: 62rem) 50vw, 100vw"
+          />
+          <div class="deliverable-modal_copy">
+            <Eyebrow tag="h2">Deliverables</Eyebrow>
+            <h2 class="deliverable-modal_title">{d.title}</h2>
+            {d.subtitle && <h5 class="deliverable-modal_subtitle">{d.subtitle}</h5>}
+            {d.description && <p class="light-grey-text">{d.description}</p>}
+          </div>
+        </div>
+      </Modal>
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* The export's `.popup` split: image on one half, copy on the other,
+       both full height. It stacks below the large breakpoint, where a
+       half-width image would be unreadable. */
+    .deliverable-modal .modal_body {
+      padding: 0;
+    }
+
+    .deliverable-modal_layout {
+      display: flex;
+      flex-direction: column;
+      min-height: 100svh;
+    }
+
+    .deliverable-modal_image {
+      width: 100%;
+      height: 40svh;
+      object-fit: cover;
+    }
+
+    .deliverable-modal_copy {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      flex: 1;
+      padding: var(--container-margin);
+    }
+
+    .deliverable-modal_title {
+      margin-bottom: 2rem;
+    }
+
+    .deliverable-modal_subtitle {
+      margin-bottom: 1rem;
+    }
+
+    @media (width >= 62rem) {
+      .deliverable-modal_layout {
+        flex-direction: row;
+        height: 100svh;
+      }
+
+      .deliverable-modal_image {
+        width: 50%;
+        height: 100%;
+      }
+
+      .deliverable-modal_copy {
+        width: 50%;
+        /* The export's `padding: 4em` on `.popup__content`. */
+        padding: 4rem;
+      }
+
+      .deliverable-modal_title {
+        margin-bottom: 4rem;
+      }
+    }
+  }
+</style>

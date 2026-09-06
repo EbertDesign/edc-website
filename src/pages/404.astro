@@ -1,16 +1,17 @@
 ---
 /**
- * PASS 1 — /404, as Webflow exported it, with only the shared substitutions
- * applied: paths rewritten, the nine colliding class names prefixed `wf-`,
- * `data-w-id` stripped (IX2 is gone; `.fade-in-bottom` plays through
- * `Utility/Reveal`), and the chrome supplied by `BaseLayout`.
- * Every other class is still the template's own and every rule still lives in
- * `styles/webflow/site.css`. Becomes Lumos components in pass 2, one block at a
- * time, against this baseline.
+ * /404. Sections are `Wrapper/Section`, labels `Typography/Eyebrow`, buttons
+ * `Button`; the entrance animations play through `Utility/Reveal` rather than
+ * Webflow's IX2, and the chrome comes from `BaseLayout`.
+ * What is still the export's own is the twelve-column grid (`_12-column-grid`
+ * and the `#w-node-…` placements it needs) and the site's utility classes —
+ * both deliberate: they are this design's layout system, and the framework's
+ * `Grid` expresses column counts rather than named areas.
  *
  * Webflow widgets still in this markup, non-functional until pass 2: w-form.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Button from "@/components/Button.astro";
 ---
 
 <BaseLayout
@@ -20,16 +21,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
       <div class="utility-page-content w-form">
         <h2 class="text-2xl margin-bottom-48">Oops!<br />Nothing is here.</h2>
         <div class="utility-form-text">The page you are looking for doesn&#x27;t exist or has been moved</div>
-        <a href="#" class="button w-inline-block">
-          <div class="button-content-wrapper">
-            <div class="button-background"></div>
-            <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-              </svg></div>
-            <p class="button-text">Take me home</p>
-          </div>
-        </a>
+        <Button element="link" href="#">Take me home</Button>
       </div>
     </div>
 </BaseLayout>

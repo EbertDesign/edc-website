@@ -1,17 +1,21 @@
 ---
 /**
- * PASS 3 — a case study, from Sanity. The markup is the export's
+ * a case study, from Sanity. The markup is the export's
  * `detail_case.html` template with the `w-dyn-bind-empty` placeholders bound
  * to the `caseStudy` document; the same shared substitutions as every other
- * pass-1 page (paths, `wf-` prefix, `data-w-id` stripped, chrome from
- * `BaseLayout`). Becomes Lumos components in pass 2 like the rest.
+ * page: paths rewritten, `data-w-id` stripped, chrome from `BaseLayout`.
+ * The twelve-column placements live in `styles/detail-grid.css`.
  *
  * The deliverable pop-ups were IX2-driven on Webflow and do nothing yet.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeroSubpage from "@/components/SectionHeroSubpage.astro";
+import Section from "@/components/Wrapper/Section.astro";
+import Eyebrow from "@/components/Typography/Eyebrow.astro";
 import SanityImg from "@/components/Media/SanityImg.astro";
 import PortableText from "@/components/Typography/PortableText.astro";
 import CtaContact from "@/components/ContentCtaContact.astro";
+import DeliverableItem from "@/components/Item/DeliverableItem.astro";
 import CaseCard from "@/components/Item/CaseCard.astro";
 import { sanityClient, CASE_DETAIL_QUERY } from "@/utils/sanity.ts";
 
@@ -27,86 +31,45 @@ if (!c) throw new Error(`No document for /${Astro.url.pathname}`);
 ---
 
 <BaseLayout title={c.title} description={c.description ?? undefined} overlap>
-  <div class="wf-section">
-    <div class="wf-container hero-top-container">
-      <div class="hero-image-container">
-        <SanityImg image={c.thumbnail} loading="eager" class="hero-image" alt="" />
-      </div>
-      <div class="w-layout-grid _12-column-grid">
-        <div class="subpage-hero-text-container fade-in-bottom hero-cell-title">
-          <a href="/work" class="subtle-text-link">Back to cases</a>
-          <h1 class="text-7xl margin-top-64">{c.title}</h1>
-        </div>
-      </div>
-    </div>
-  </div>
+  <SectionHeroSubpage image={c.thumbnail}>
+      <a href="/work" class="subtle-text-link">Back to cases</a>
+      <h1 class="text-7xl margin-top-64">{c.title}</h1>
+  </SectionHeroSubpage>
 
-  <div class="wf-section margin-bottom-120">
-    <div class="wf-container">
+  <Section paddingTop="none" paddingBottom="none" class="margin-bottom-120" gap="0">
       <div class="w-layout-grid _12-column-grid margin-top-80 fade-in-bottom">
         <p class="text-2xl cell-summary-lead">{c.subheading}</p>
         <p class="light-grey-text text-2-columns cell-summary-body">{c.description}</p>
         <p class="text-s light-grey-text margin-top-12 cell-summary-label">Summary</p>
       </div>
-    </div>
-  </div>
+  </Section>
 
-  <div class="wf-section">
-    <div class="wf-container">
+  <Section paddingTop="none" gap="0">
       <div class="w-layout-grid _12-column-grid margin-top-80">
-        <div class="section-heading-container no-margin-bottom cell-list-label">
-          <div class="section-heading-content">
-            <div class="dot"></div>
-            <h2 class="text-s">Deliverables</h2>
-          </div>
-        </div>
+        <Eyebrow tag="h2" class="no-margin-bottom cell-list-label">Deliverables</Eyebrow>
         <div class="deliverables-container w-dyn-list cell-list-body">
           <div role="list" class="w-dyn-items">
             {(c.deliverables ?? []).map((d) => (
-              <div role="listitem" class="deliverable-container w-dyn-item">
-                <div class="popup">
-                  <SanityImg image={d.image} class="popup_image" sizes="(min-width: 62rem) 50vw, 100vw" />
-                  <div class="popup__content">
-                    <a href="#" class="popup__close w-inline-block"><img src="/images/X.svg" loading="lazy" alt="" class="popup__icon" /></a>
-                    <div class="section-heading-content margin-bottom-64">
-                      <div class="dot"></div>
-                      <h2 class="text-s">Deliverables</h2>
-                    </div>
-                    <h2 class="margin-bottom-64">{d.title}</h2>
-                    <h5 class="margin-bottom-16">{d.subtitle}</h5>
-                    <p class="light-grey-text">{d.description}</p>
-                  </div>
-                </div>
-                <a href={`/deliverables/${d.slug}`} class="deliverables-list-container w-inline-block">
-                  <p class="text-xl">{d.title}</p>
-                </a>
-              </div>
+              <DeliverableItem deliverable={d} />
             ))}
           </div>
         </div>
       </div>
-    </div>
-  </div>
+  </Section>
 
   {c.process && (
-    <div class="wf-section margin-bottom-120">
-      <div class="wf-container">
+    <Section paddingTop="none" paddingBottom="none" class="margin-bottom-120" gap="0">
         <div class="w-layout-grid _12-column-grid margin-top-80 fade-in-bottom">
-          <div class="section-heading-content cell-story-label">
-            <div class="dot"></div>
-            <h2 class="text-s">Process</h2>
-          </div>
+          <Eyebrow tag="h2" class="cell-story-label">Process</Eyebrow>
           <div class="cell-story-body">
             <PortableText value={c.process} />
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
   )}
 
   {c.gallery && c.gallery.length > 0 && (
-    <div class="wf-section">
-      <div class="wf-container">
+    <Section paddingTop="none" gap="0">
         <div class="w-dyn-list">
           <div role="list" class="images-grid w-dyn-items">
             {c.gallery.map((img) => (
@@ -116,45 +79,32 @@ if (!c) throw new Error(`No document for /${Astro.url.pathname}`);
             ))}
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
   )}
 
   {c.impact && (
-    <div class="wf-section margin-bottom-120">
-      <div class="wf-container">
+    <Section paddingTop="none" paddingBottom="none" class="margin-bottom-120" gap="0">
         <div class="w-layout-grid _12-column-grid margin-top-80 fade-in-bottom">
-          <div class="section-heading-content cell-story-label">
-            <div class="dot"></div>
-            <h2 class="text-s">Impact</h2>
-          </div>
+          <Eyebrow tag="h2" class="cell-story-label">Impact</Eyebrow>
           <div class="cell-story-body">
             <PortableText value={c.impact} />
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
   )}
 
   {c.next && (
-    <div class="wf-section">
-      <div class="wf-container">
+    <Section paddingTop="none" gap="0">
         <div class="w-layout-grid _12-column-grid">
           <p class="text-4xl fade-in-bottom cell-next-lead">Want to see more?</p>
-          <div class="section-heading-container no-margin-bottom cell-next-label">
-            <div class="section-heading-content">
-              <div class="dot"></div>
-              <h2 class="text-s">Next case</h2>
-            </div>
-          </div>
+          <Eyebrow tag="h2" class="no-margin-bottom cell-next-label">Next case</Eyebrow>
           <div class="projects w-dyn-list cell-next-body">
             <div role="list" class="projects-list w-dyn-items">
               <CaseCard case={c.next} />
             </div>
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
   )}
 
   <CtaContact />

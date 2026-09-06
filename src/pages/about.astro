@@ -1,17 +1,20 @@
 ---
 /**
- * PASS 1 — /about, as Webflow exported it, with only the shared substitutions
- * applied: paths rewritten, the nine colliding class names prefixed `wf-`,
- * `data-w-id` stripped (IX2 is gone; `.fade-in-bottom` plays through
- * `Utility/Reveal`), and the chrome supplied by `BaseLayout`.
- * PASS 3 — the collection lists are bound to Sanity (see `utils/sanity.ts`).
- * Every other class is still the template's own and every rule still lives in
- * `styles/webflow/site.css`. Becomes Lumos components in pass 2, one block at a
- * time, against this baseline.
- *
- * Webflow widgets still in this markup, non-functional until pass 2: w-slider.
+ * /about. Sections are `Wrapper/Section`, labels `Typography/Eyebrow`, buttons
+ * `Button`; the collection lists are bound to Sanity (see `utils/sanity.ts`),
+ * the entrance animations play through `Utility/Reveal` rather than Webflow's
+ * IX2, and the chrome comes from `BaseLayout`.
+ * What is still the export's own is the twelve-column grid (`_12-column-grid`
+ * and the `#w-node-…` placements it needs) and the site's utility classes —
+ * both deliberate: they are this design's layout system, and the framework's
+ * `Grid` expresses column counts rather than named areas.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionHeroSubpage from "@/components/SectionHeroSubpage.astro";
+import Slider from "@/components/Interactive/Slider.astro";
+import Section from "@/components/Wrapper/Section.astro";
+import Eyebrow from "@/components/Typography/Eyebrow.astro";
+import Button from "@/components/Button.astro";
 import SanityImg from "@/components/Media/SanityImg.astro";
 import { sanityClient, SERVICES_LIST_QUERY, TEAM_LIST_QUERY } from "@/utils/sanity.ts";
 const [services, team] = await Promise.all([
@@ -28,92 +31,64 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
   title="About"
   overlap
 >
-  <div class="wf-section">
-      <div class="wf-container hero-top-container">
-        <div class="hero-image-container"><img src="/images/mesh-gradient.png" loading="eager" sizes="(max-width: 2000px) 100vw, 2000px" srcset="/images/mesh-gradient-p-500.png 500w, /images/mesh-gradient-p-800.png 800w, /images/mesh-gradient-p-1080.png 1080w, /images/mesh-gradient-p-1600.png 1600w, /images/mesh-gradient.png 2000w" alt="" class="hero-image" /></div>
-        <div class="w-layout-grid _12-column-grid">
-          <div id="w-node-bc360bae-d6ab-0c2b-ed71-56df2fc11189-08125e4f" class="subpage-hero-text-container">
-            <div id="w-node-da40a133-ee64-2ac4-b5a1-3a20cd9c3a8a-08125e4f" class="section-heading-container">
-              <div class="section-heading-content fade-in-bottom">
-                <div class="dot"></div>
-                <h1 class="text-s">About</h1>
-              </div>
-            </div>
-            <h1 id="w-node-ef919d60-4741-0d5d-1dd8-8ae1b7f3cc8e-08125e4f" class="fade-in-bottom-100ms">Passion &amp; Purpose</h1>
-          </div>
-        </div>
-      </div>
-    </div>
+  <SectionHeroSubpage
+    imageSrc="/images/mesh-gradient.png"
+    imageSrcset="/images/mesh-gradient-p-500.png 500w, /images/mesh-gradient-p-800.png 800w, /images/mesh-gradient-p-1080.png 1080w, /images/mesh-gradient-p-1600.png 1600w, /images/mesh-gradient.png 2000w"
+  >
+      <Eyebrow tag="h1" class="fade-in-bottom">About</Eyebrow>
+      <h1 class="fade-in-bottom-100ms">Passion &amp; Purpose</h1>
+  </SectionHeroSubpage>
 
-  <div class="wf-section">
-      <div class="wf-container">
+  <Section paddingTop="none" gap="0">
         <div class="w-layout-grid _12-column-grid margin-top-80">
           <p id="w-node-_86135ea5-251d-60f4-8792-7711422faa32-08125e4f" class="text-2xl margin-bottom-80 fade-in-bottom">Our mission is to empower purposeful brands to make a meaningful impact through creative solutions. We design brands that resonate deeply, fostering alignment and leaving a positive imprint on the world.</p>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa34-08125e4f" class="lead-column-container fade-in-bottom">
-            <p class="text-medium wf-margin-bottom-8">Excellence</p>
+            <p class="text-medium margin-bottom-1">Excellence</p>
             <p class="light-grey-text">Leave it better than when we found it. Whether we are working on a small project or a large-scale initiative, we approach each task with the same level of dedication and attention to detail, always striving to exceed expectations and make a difference.<br /></p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa39-08125e4f" class="lead-column-container fade-in-bottom-100ms">
-            <p class="text-medium wf-margin-bottom-8">Quality</p>
+            <p class="text-medium margin-bottom-1">Quality</p>
             <p class="light-grey-text">Exceeding expectations every time. Our commitment to excellence extends beyond just our products and services; we prioritize strong communication and collaboration with our customers to drive mutual success.</p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa3e-08125e4f" class="lead-column-container fade-in-bottom-200ms">
-            <p class="text-medium wf-margin-bottom-8">Collaboration</p>
+            <p class="text-medium margin-bottom-1">Collaboration</p>
             <p class="light-grey-text">Together we create, together we succeed. Collaboration not only enhances creativity but also helps in bringing forth unique ideas that can lead to unprecedented results. Together we can create an environment that fosters growth and development.</p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa43-08125e4f" class="lead-column-container fade-in-bottom">
-            <p class="text-medium wf-margin-bottom-8">Sustainability</p>
+            <p class="text-medium margin-bottom-1">Sustainability</p>
             <p class="light-grey-text">Designing a better future, one brand at a time. Our team of experts is dedicated to staying up-to-date with the latest sustainable and responsible techniques in branding, ensuring that our clients always receive the most innovative and impactful solutions.</p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa48-08125e4f" class="lead-column-container fade-in-bottom-100ms">
-            <p class="text-medium wf-margin-bottom-8">Integrity</p>
+            <p class="text-medium margin-bottom-1">Integrity</p>
             <p class="light-grey-text">Honesty and transparency in all we do. It is not just a statement, but a way of life that we strive to embody in everything we do. Honesty means being truthful in our interactions and dealings with others, while transparency involves being open and forthright about our intentions, actions, and decisions.</p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa4d-08125e4f" class="lead-column-container fade-in-bottom-200ms">
-            <p class="text-medium wf-margin-bottom-8">Empathy</p>
+            <p class="text-medium margin-bottom-1">Empathy</p>
             <p class="light-grey-text">We listen, we understand, we deliver. We take the time to fully understand their unique situations so that we can deliver the best possible solutions. Our team of experts is dedicated to providing outstanding service every step of the way, from initial consultation to final delivery.</p>
           </div>
-          <div id="w-node-_264b6b87-e33f-cb16-ab18-213b74b9a6b6-08125e4f" class="section-heading-container margin-top-12 no-margin-bottom">
-            <div class="section-heading-content fade-in-bottom">
-              <div class="dot"></div>
-              <h2 class="text-s">Our mission &amp; values</h2>
-            </div>
-          </div>
+          <Eyebrow id="w-node-_264b6b87-e33f-cb16-ab18-213b74b9a6b6-08125e4f" tag="h2" class="fade-in-bottom margin-top-12 no-margin-bottom">Our mission &amp; values</Eyebrow>
         </div>
-      </div>
-    </div>
+  </Section>
 
-  <div class="wf-section">
-      <div class="wf-container">
+  <Section paddingTop="none" gap="0">
         <div class="w-layout-grid _12-column-grid margin-bottom-80 fade-in-bottom">
           <p id="w-node-bba87639-05b8-8f05-0c3f-6e8815a617d3-08125e4f" class="text-4xl">Remote,<br />not distant.</p>
           <p id="w-node-_8b266af7-8918-9138-45bd-5d8958641925-08125e4f" class="text-medium light-grey-text">Our agency is comprised of a network of part-time, full-time and remote contractors who all share the same vision and values.</p>
         </div>
-      </div>
-      <div data-delay="4000" data-animation="slide" class="slider w-slider" data-autoplay="false" data-easing="ease" data-hide-arrows="true" data-disable-swipe="false" data-autoplay-limit="0" data-nav-spacing="3" data-duration="500" data-infinite="true">
-        <div class="mask w-slider-mask">
-          <div class="slide w-slide"><img src="/images/jason-goodman-vbxyFxlgpjM-unsplash.jpg" loading="lazy" sizes="(max-width: 3600px) 100vw, 3600px" srcset="/images/jason-goodman-vbxyFxlgpjM-unsplash-p-500.jpg 500w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-800.jpg 800w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1080.jpg 1080w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1600.jpg 1600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2000.jpg 2000w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2600.jpg 2600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-3200.jpg 3200w, /images/jason-goodman-vbxyFxlgpjM-unsplash.jpg 3600w" alt="" /></div>
-          <div class="slide w-slide"><img src="/images/kaleidico-26MJGnCM0Wc-unsplash.jpg" loading="lazy" sizes="(max-width: 5029px) 100vw, 5029px" srcset="/images/kaleidico-26MJGnCM0Wc-unsplash-p-500.jpg 500w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-800.jpg 800w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-1080.jpg 1080w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-1600.jpg 1600w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-2000.jpg 2000w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-2600.jpg 2600w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-3200.jpg 3200w, /images/kaleidico-26MJGnCM0Wc-unsplash.jpg 5029w" alt="" /></div>
-          <div class="slide w-slide"><img src="/images/jason-goodman-Oalh2MojUuk-unsplash.jpg" loading="lazy" sizes="(max-width: 3600px) 100vw, 3600px" srcset="/images/jason-goodman-Oalh2MojUuk-unsplash-p-500.jpg 500w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-800.jpg 800w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-1080.jpg 1080w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-1600.jpg 1600w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-2000.jpg 2000w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-2600.jpg 2600w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-3200.jpg 3200w, /images/jason-goodman-Oalh2MojUuk-unsplash.jpg 3600w" alt="" /></div>
-        </div>
-        <div class="w-slider-arrow-left">
-          <div class="w-icon-slider-left"></div>
-        </div>
-        <div class="right-arrow w-slider-arrow-right">
-          <div class="w-icon-slider-right"></div>
-        </div>
-        <div class="slide-nav w-slider-nav"></div>
-      </div>
-    </div>
+    <Slider
+      variant="crop-start"
+      xsmall={1}
+      label="Inside Ebert Design"
+      class="slider"
+    >
+      <img src="/images/jason-goodman-vbxyFxlgpjM-unsplash.jpg" loading="lazy" sizes="(max-width: 3600px) 100vw, 3600px" srcset="/images/jason-goodman-vbxyFxlgpjM-unsplash-p-500.jpg 500w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-800.jpg 800w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1080.jpg 1080w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1600.jpg 1600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2000.jpg 2000w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2600.jpg 2600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-3200.jpg 3200w, /images/jason-goodman-vbxyFxlgpjM-unsplash.jpg 3600w" alt="" />
+      <img src="/images/kaleidico-26MJGnCM0Wc-unsplash.jpg" loading="lazy" sizes="(max-width: 5029px) 100vw, 5029px" srcset="/images/kaleidico-26MJGnCM0Wc-unsplash-p-500.jpg 500w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-800.jpg 800w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-1080.jpg 1080w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-1600.jpg 1600w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-2000.jpg 2000w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-2600.jpg 2600w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-3200.jpg 3200w, /images/kaleidico-26MJGnCM0Wc-unsplash.jpg 5029w" alt="" />
+      <img src="/images/jason-goodman-Oalh2MojUuk-unsplash.jpg" loading="lazy" sizes="(max-width: 3600px) 100vw, 3600px" srcset="/images/jason-goodman-Oalh2MojUuk-unsplash-p-500.jpg 500w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-800.jpg 800w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-1080.jpg 1080w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-1600.jpg 1600w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-2000.jpg 2000w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-2600.jpg 2600w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-3200.jpg 3200w, /images/jason-goodman-Oalh2MojUuk-unsplash.jpg 3600w" alt="" />
+    </Slider>
+  </Section>
 
-  <div class="wf-section">
-      <div class="wf-container">
-        <div class="section-heading-container">
-          <div class="section-heading-content">
-            <div class="dot"></div>
-            <h2 class="text-s">Services</h2>
-          </div>
-        </div>
+  <Section paddingTop="none" gap="0">
+        <Eyebrow tag="h2">Services</Eyebrow>
         <div class="services-list-container fade-in-bottom w-dyn-list">
           <div role="list" class="w-dyn-items">
             {services.map((s) => (
@@ -132,19 +107,12 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
             ))}
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
 
-  <div class="wf-section">
-      <div class="wf-container">
+  <Section paddingTop="none" gap="0">
         <div class="w-layout-grid _12-column-grid margin-bottom-64 fade-in-bottom">
           <p id="w-node-e063e9c8-34c3-f434-edb6-834a30f086e5-08125e4f" class="text-4xl">Method, with a hint<br />of madness</p>
-          <div id="w-node-e063e9c8-34c3-f434-edb6-834a30f086e7-08125e4f" class="section-heading-container no-margin-bottom">
-            <div class="section-heading-content">
-              <div class="dot"></div>
-              <h2 class="text-s">Processs</h2>
-            </div>
-          </div>
+          <Eyebrow id="w-node-e063e9c8-34c3-f434-edb6-834a30f086e7-08125e4f" tag="h2" class="no-margin-bottom">Processs</Eyebrow>
         </div>
         <div class="list-container fade-in-bottom">
           <div class="list-item-container">
@@ -176,19 +144,12 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
             </div>
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
 
-  <div class="wf-section">
-      <div class="wf-container">
+  <Section paddingTop="none" gap="0">
         <div class="w-layout-grid _12-column-grid">
           <p id="w-node-f22e61f5-f3b5-0b57-4b97-9b959f55861a-08125e4f" class="text-4xl fade-in-bottom">Meet the people that make it possible.</p>
-          <div id="w-node-_604b573f-9188-477d-f30a-46b558a32dd8-08125e4f" class="section-heading-container no-margin-bottom">
-            <div class="section-heading-content">
-              <div class="dot"></div>
-              <h2 class="text-s">Team</h2>
-            </div>
-          </div>
+          <Eyebrow id="w-node-_604b573f-9188-477d-f30a-46b558a32dd8-08125e4f" tag="h2" class="no-margin-bottom">Team</Eyebrow>
           <div class="collection-list-wrapper w-dyn-list team-cell">
             <div role="list" class="_12-column-grid w-dyn-items">
               {team.map((m) => (
@@ -209,26 +170,14 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
             </div>
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
 
-  <div class="wf-section">
-      <div class="wf-container fade-in-bottom">
+  <Section paddingTop="none" containerClass="fade-in-bottom" gap="0">
         <div class="w-layout-grid _12-column-grid">
           <div id="w-node-_65b5bba4-9c92-97d4-8cf2-1147ca561a3a-ca561a36" class="center-text">
             <p class="text-5xl">Let&#x27;s<br />elevate your<br />‍<span class="primary-text">impact.</span> </p>
-            <a href="/contact" class="button w-inline-block">
-              <div class="button-content-wrapper">
-                <div class="button-background"></div>
-                <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                    <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                  </svg></div>
-                <p class="button-text">Get in touch</p>
-              </div>
-            </a>
+            <Button element="link" href="/contact">Get in touch</Button>
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
 </BaseLayout>

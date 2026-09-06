@@ -9,8 +9,12 @@
  * components one at a time against the pass-1 baseline.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Eyebrow from "@/components/Typography/Eyebrow.astro";
+import Button from "@/components/Button.astro";
 import SectionHeroHome from "@/components/SectionHeroHome.astro";
 import CaseCard from "@/components/Item/CaseCard.astro";
+import CtaContact from "@/components/ContentCtaContact.astro";
+import Section from "@/components/Wrapper/Section.astro";
 import { sanityClient, CASES_LIST_QUERY, SERVICES_LIST_QUERY } from "@/utils/sanity.ts";
 
 const [cases, services] = await Promise.all([
@@ -32,62 +36,31 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
 >
   <SectionHeroHome />
 
-  <section id="Welcome" class="wf-section">
-      <div class="wf-container fade-in-bottom">
+  <Section id="Welcome" paddingTop="none" containerClass="fade-in-bottom" gap="0">
         <div class="_12-column-grid">
           <div id="w-node-dd42f271-cd32-2455-63d8-0f531ea1191b-08125e4c">
-            <div class="section-heading-container">
-              <div class="section-heading-content">
-                <div class="dot"></div>
-                <h2 class="text-s">Welcome</h2>
-              </div>
-            </div>
+            <Eyebrow tag="h2">Welcome</Eyebrow>
             <p class="text-4xl">We work with brands on purpose.</p>
           </div>
           <div id="w-node-_553609b7-844a-a432-39f5-ff22067293e2-08125e4c" class="w-layout-grid _2-column-grid">
             <p id="w-node-a3daa308-2736-660e-de4c-0f6a0bbcf6d5-08125e4c" class="text-xl">We strive to create brands that are as unique as they are meaningful. By crafting authentic and inspiring brand stories, we help our clients connect with their audiences on a deeper level and inspire meaningful action.</p>
             <div id="w-node-bb29d3da-06da-8ee6-826a-6e6f6375da46-08125e4c" class="lead-column-container">
-              <p class="text-medium wf-margin-bottom-8">Contact Us</p>
+              <p class="text-medium margin-bottom-1">Contact Us</p>
               <p class="light-grey-text">At Ebert Design, we&#x27;re more than a branding agency – we&#x27;re purpose-driven brand architects. Learn about our values and the team making it happen.</p>
-              <a href="/contact" class="button w-inline-block">
-                <div class="button-content-wrapper">
-                  <div class="button-background"></div>
-                  <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                      <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                    </svg></div>
-                  <p class="button-text">Get in touch</p>
-                </div>
-              </a>
+              <Button element="link" href="/contact">Get in touch</Button>
             </div>
             <div id="w-node-_7f3e6006-60cf-7f3e-f4d2-28d6eb5b33a9-08125e4c" class="lead-column-container">
-              <p class="text-medium wf-margin-bottom-8">About Us</p>
+              <p class="text-medium margin-bottom-1">About Us</p>
               <p class="light-grey-text">At Ebert Design, we&#x27;re more than a branding agency – we&#x27;re purpose-driven brand architects. Learn about our values and the team making it happen.</p>
-              <a href="/journal" class="button w-inline-block">
-                <div class="button-content-wrapper">
-                  <div class="button-background"></div>
-                  <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                      <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                    </svg></div>
-                  <p class="button-text">Read more</p>
-                </div>
-              </a>
+              <Button element="link" href="/journal">Read more</Button>
             </div>
           </div><img class="lead-image" src="/images/sigmund-rJnx12RKrd4-unsplash-min.jpg" alt="" sizes="(max-width: 3314px) 100vw, 3314px" id="w-node-_19665838-910f-3f74-f4c9-831752420cf2-08125e4c" loading="lazy" srcset="/images/sigmund-rJnx12RKrd4-unsplash-min-p-500.jpeg 500w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-800.jpeg 800w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1080.jpeg 1080w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1600.jpeg 1600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2000.jpeg 2000w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2600.jpeg 2600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-3200.jpeg 3200w, /images/sigmund-rJnx12RKrd4-unsplash-min.jpg 3314w" />
         </div>
-      </div>
-    </section>
+  </Section>
 
-  <div class="wf-section">
-      <div class="wf-container">
+  <Section paddingTop="none" gap="0">
         <div class="w-layout-grid _12-column-grid">
-          <div id="w-node-_5a409e38-8910-ad0d-6c5e-baf282ad2ffa-08125e4c" class="section-heading-container no-margin-bottom sticky-rotated-section-heading">
-            <div class="section-heading-content">
-              <div class="dot"></div>
-              <h2 class="text-s">Case Studies</h2>
-            </div>
-          </div>
+          <Eyebrow id="w-node-_5a409e38-8910-ad0d-6c5e-baf282ad2ffa-08125e4c" tag="h2" class="no-margin-bottom sticky-rotated">Case Studies</Eyebrow>
           <div class="projects w-dyn-list cases-cell cases-cell-home">
             <div role="list" class="projects-list w-dyn-items">
               {cases.map((c) => <CaseCard case={c} variant="home" />)}
@@ -95,22 +68,11 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
           </div>
         </div>
         <div class="_12-column-grid">
-          <a id="w-node-_917f04f8-36b4-9205-5144-030db4b0909a-08125e4c" href="/work" class="button no-margin-top w-inline-block">
-            <div class="button-content-wrapper">
-              <div class="button-background"></div>
-              <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                  <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                </svg></div>
-              <p class="button-text">All cases</p>
-            </div>
-          </a>
+          <Button element="link" href="/work" id="w-node-_917f04f8-36b4-9205-5144-030db4b0909a-08125e4c" class="no-margin-top">All cases</Button>
         </div>
-      </div>
-    </div>
+  </Section>
 
-  <div class="wf-section black-800-background no-margin-bottom">
-      <div class="wf-container">
+  <Section class="black-800-background" paddingTop="large" paddingBottom="large" gap="0">
         <div class="w-layout-grid _12-column-grid grid-large">
           <div id="w-node-_7dd433f2-c6e7-8972-0f2e-91c8cfa88743-08125e4c" class="approach-item-container fade-in-bottom">
             <p class="text-4xl primary-text">01</p>
@@ -124,12 +86,7 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
             <p class="text-xl margin-bottom-32">Designing a Purpose-Driven Identity.</p>
             <p class="light-grey-text">We specialize in crafting a purpose-driven brand identity that captivates your audience, from logos to visuals. We ensure your brand communicates its core values, leaving a lasting impression on all who encounter it.</p>
           </div>
-          <div id="w-node-_5de4a0d6-f964-8bcd-5c88-3e32614b1ab6-08125e4c" class="section-heading-container wf-margin-top-4">
-            <div class="section-heading-content">
-              <div class="dot"></div>
-              <h2 class="text-s">Approach</h2>
-            </div>
-          </div>
+          <Eyebrow id="w-node-_5de4a0d6-f964-8bcd-5c88-3e32614b1ab6-08125e4c" tag="h2" class="eyebrow-offset">Approach</Eyebrow>
           <div id="w-node-f8e2fe27-44a8-c67f-9556-93d9a49bc8c4-08125e4c" class="approach-item-container fade-in-bottom">
             <p class="text-4xl primary-text">03</p>
             <div class="divider margin-top-24 margin-bottom-32"></div>
@@ -143,23 +100,17 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
             <p class="light-grey-text">Achieve a brand that reflects your passion and purpose, embodying everything you stand for. With Ebert Design, you&#x27;ll have a purpose-driven brand you can proudly showcase to the world, empowering you to make a meaningful difference with every interaction.</p>
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
 
-  <div class="wf-section black-800-background no-padding-top-bottom">
+  <Section class="black-800-background" paddingTop="none" gap="0">
+    <Fragment slot="background">
       <div class="black-900-background"></div>
-      <div class="wf-container"></div>
       <div class="large-image-container"><img src="/images/tripoint-style-sheet.png" loading="lazy" sizes="100vw" srcset="/images/tripoint-style-sheet-p-500.png 500w, /images/tripoint-style-sheet-p-800.png 800w, /images/tripoint-style-sheet-p-1080.png 1080w, /images/tripoint-style-sheet-p-1600.png 1600w, /images/tripoint-style-sheet-p-2000.png 2000w, /images/tripoint-style-sheet-p-2600.png 2600w, /images/tripoint-style-sheet.png 2750w" alt="" class="image" /></div>
-    </div>
+    </Fragment>
+  </Section>
 
-  <div class="wf-section">
-      <div class="wf-container">
-        <div class="section-heading-container">
-          <div class="section-heading-content">
-            <div class="dot"></div>
-            <h2 class="text-s">Services</h2>
-          </div>
-        </div>
+  <Section paddingTop="none" gap="0">
+        <Eyebrow tag="h2">Services</Eyebrow>
         <div class="services-list-container fade-in-bottom w-dyn-list">
           <div role="list" class="w-dyn-items">
             {services.map((s) => (
@@ -178,26 +129,7 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
             ))}
           </div>
         </div>
-      </div>
-    </div>
+  </Section>
 
-  <div class="wf-section">
-      <div class="wf-container fade-in-bottom">
-        <div class="w-layout-grid _12-column-grid">
-          <div id="w-node-_65b5bba4-9c92-97d4-8cf2-1147ca561a3a-ca561a36" class="center-text">
-            <p class="text-5xl">Let&#x27;s<br />elevate your<br />‍<span class="primary-text">impact.</span> </p>
-            <a href="/contact" class="button w-inline-block">
-              <div class="button-content-wrapper">
-                <div class="button-background"></div>
-                <div class="button-arrow w-embed"><svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                    <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-                  </svg></div>
-                <p class="button-text">Get in touch</p>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+  <CtaContact />
 </BaseLayout>

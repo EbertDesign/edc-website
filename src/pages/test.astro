@@ -1,12 +1,12 @@
 ---
 /**
- * PASS 1 — /test, as Webflow exported it, with only the shared substitutions
- * applied: paths rewritten, the nine colliding class names prefixed `wf-`,
- * `data-w-id` stripped (IX2 is gone; `.fade-in-bottom` plays through
- * `Utility/Reveal`), and the chrome supplied by `BaseLayout`.
- * Every other class is still the template's own and every rule still lives in
- * `styles/webflow/site.css`. Becomes Lumos components in pass 2, one block at a
- * time, against this baseline.
+ * /test. Sections are `Wrapper/Section`, labels `Typography/Eyebrow`, buttons
+ * `Button`; the entrance animations play through `Utility/Reveal` rather than
+ * Webflow's IX2, and the chrome comes from `BaseLayout`.
+ * What is still the export's own is the twelve-column grid (`_12-column-grid`
+ * and the `#w-node-…` placements it needs) and the site's utility classes —
+ * both deliberate: they are this design's layout system, and the framework's
+ * `Grid` expresses column counts rather than named areas.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
 ---

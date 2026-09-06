@@ -15,4 +15,14 @@
 @import "./webflow/webflow.css" layer(webflow);
 @import "./webflow/site.css" layer(webflow);
 
+/* Grid placement for the CMS detail routes. `components`, so it sits above
+   the export's leftovers but below the utilities a page may override with. */
+@import "./detail-grid.css" layer(components);
+
 @import "./utilities.css" layer(utilities);
+
+/* After `utilities`, because the framework's form components apply
+   `text-style-main` to their own labels and controls — a utility this site
+   overrides with a different family. A `components`-layer rule cannot win
+   against it however specific it is. */
+@import "./forms.css" layer(utilities);

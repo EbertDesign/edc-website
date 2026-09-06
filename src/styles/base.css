@@ -22,6 +22,7 @@
   --display-family: var(--font-syne, system-ui, sans-serif);
   --primary-regular: 400;
   --primary-medium: 500;
+  --primary-semibold: 600;
   --primary-bold: 700;
   --primary-trim-top: 0.4em;
   --primary-trim-bottom: 0.38em;
@@ -72,14 +73,21 @@
   --nav-height: 5rem;
 
   /* Typography styles */
-  /* Every margin token below is 0 on purpose. The imported design zeroes its
+  /* The `-margin-top` tokens are 0 on purpose. The imported design zeroes its
      heading and paragraph margins (`h1`,`h2` and `p` all declare `margin: 0`)
      and spaces blocks with explicit `.margin-bottom-*` utilities instead, so
      the number to port is zero. Those utilities live in the `webflow` layer,
      above `patterns`, so they keep winning over `.container > [class]`.
      Rhythm between blocks comes from `Section`'s `gap`.
-     The one value lost is the template's 10px on `h4`-`h6`, which only 8
-     elements across the whole site relied on. */
+
+     The `-margin-bottom` tokens are not zero, because zero was wrong: they are
+     what `patterns`' `.heading:has(+ .text)` reads for the gap under a heading
+     that is followed by body copy, so a `Heading` sat above a `Paragraph`
+     rendered with the two literally touching. They step down with the type
+     scale — a 112px `h1` needs more air beneath it than a 24px `h6`.
+     Only four rules read these: that `.heading:has(+ .text)`, the opt-in
+     `.margin-bottom-text` / `.margin-block-text` utilities, and `RichText`.
+     Nothing wearing the export's own classes is affected. */
   --display: clamp(var(--display-min) / 16 * 1rem, ((var(--display-min) - ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--display-max) / 16 * 1rem);
   --display-min: 45;
   --display-max: 144;
@@ -87,7 +95,7 @@
   --display-letter-spacing: var(--letter-spacing-normal);
   --display-text-transform: none;
   --display-margin-top: 0;
-  --display-margin-bottom: 0;
+  --display-margin-bottom: var(--space-5);
   --display-font-family: var(--display-family);
   --display-font-weight: var(--primary-medium);
   --display-trim-top: var(--primary-trim-top);
@@ -101,7 +109,7 @@
   --h1-letter-spacing: var(--letter-spacing-normal);
   --h1-text-transform: none;
   --h1-margin-top: 0;
-  --h1-margin-bottom: 0;
+  --h1-margin-bottom: var(--space-5);
   --h1-font-family: var(--display-family);
   --h1-font-weight: var(--primary-medium);
   --h1-trim-top: var(--primary-trim-top);
@@ -115,7 +123,7 @@
   --h2-letter-spacing: var(--letter-spacing-tight);
   --h2-text-transform: none;
   --h2-margin-top: 0;
-  --h2-margin-bottom: 0;
+  --h2-margin-bottom: var(--space-4);
   --h2-font-family: var(--secondary-family);
   --h2-font-weight: var(--primary-regular);
   --h2-trim-top: var(--primary-trim-top);
@@ -129,7 +137,7 @@
   --h3-letter-spacing: var(--letter-spacing-slight);
   --h3-text-transform: none;
   --h3-margin-top: 0;
-  --h3-margin-bottom: 0;
+  --h3-margin-bottom: var(--space-4);
   --h3-font-family: var(--secondary-family);
   --h3-font-weight: var(--primary-regular);
   --h3-trim-top: var(--primary-trim-top);
@@ -143,7 +151,7 @@
   --h4-letter-spacing: var(--letter-spacing-normal);
   --h4-text-transform: none;
   --h4-margin-top: 0;
-  --h4-margin-bottom: 0;
+  --h4-margin-bottom: var(--space-3);
   --h4-font-family: var(--secondary-family);
   --h4-font-weight: var(--primary-regular);
   --h4-trim-top: var(--primary-trim-top);
@@ -157,7 +165,7 @@
   --h5-letter-spacing: var(--letter-spacing-normal);
   --h5-text-transform: none;
   --h5-margin-top: 0;
-  --h5-margin-bottom: 0;
+  --h5-margin-bottom: var(--space-3);
   --h5-font-family: var(--secondary-family);
   --h5-font-weight: var(--primary-regular);
   --h5-trim-top: var(--primary-trim-top);
@@ -171,7 +179,7 @@
   --h6-letter-spacing: var(--letter-spacing-normal);
   --h6-text-transform: none;
   --h6-margin-top: 0;
-  --h6-margin-bottom: 0;
+  --h6-margin-bottom: var(--space-2);
   --h6-font-family: var(--primary-family);
   --h6-font-weight: var(--primary-regular);
   --h6-trim-top: var(--primary-trim-top);
@@ -185,7 +193,7 @@
   --text-large-letter-spacing: var(--letter-spacing-slight);
   --text-large-text-transform: none;
   --text-large-margin-top: 0;
-  --text-large-margin-bottom: 0;
+  --text-large-margin-bottom: var(--space-4);
   --text-large-font-family: var(--display-family);
   --text-large-font-weight: var(--primary-regular);
   --text-large-trim-top: var(--primary-trim-top);
@@ -199,7 +207,7 @@
   --text-main-letter-spacing: var(--letter-spacing-slight);
   --text-main-text-transform: none;
   --text-main-margin-top: 0;
-  --text-main-margin-bottom: 0;
+  --text-main-margin-bottom: var(--space-4);
   --text-main-font-family: var(--primary-family);
   --text-main-font-weight: var(--primary-regular);
   --text-main-trim-top: var(--primary-trim-top);
@@ -209,11 +217,11 @@
   --text-small: clamp(var(--text-small-min) / 16 * 1rem, ((var(--text-small-min) - ((var(--text-small-max) - var(--text-small-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-small-max) - var(--text-small-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-small-max) / 16 * 1rem);
   --text-small-min: 14;
   --text-small-max: 14;
-  --text-small-line-height: var(--line-height-medium);
+  --text-small-line-height: 1.1; /* the export's .text-s */
   --text-small-letter-spacing: var(--letter-spacing-normal);
   --text-small-text-transform: none;
   --text-small-margin-top: 0;
-  --text-small-margin-bottom: 0;
+  --text-small-margin-bottom: var(--space-3);
   --text-small-font-family: var(--secondary-family);
   --text-small-font-weight: var(--primary-regular);
   --text-small-trim-top: var(--primary-trim-top);
@@ -289,10 +297,20 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* The export's section rhythm is stepped, not fluid: 80px below 30rem, 120px
+   to 62rem, 200px above. Expressed as steps so the gaps land on the same
+   pixels the Webflow build did — a fluid curve between the same endpoints
+   drifts ~15px at tablet widths. `large` is the dark band's flat 200px. */
+:root {
+  --section-space-medium: 5rem;
+  --section-space-large: 12.5rem;
+}
+
 /* The export steps its gutter three times before settling on 9.5vw. */
 @media (width >= 30rem) {
   :root {
     --container-margin: 2.5rem;
+    --section-space-medium: 7.5rem;
   }
 }
 
@@ -305,6 +323,7 @@ body {
 @media (width >= 62rem) {
   :root {
     --container-margin: 9.5vw;
+    --section-space-medium: 12.5rem;
   }
 }
 
@@ -530,9 +549,12 @@ h6 {
   overflow-wrap: break-word;
 }
 
+/* No `margin-bottom` here. Spacing under a heading is the `--*-margin-bottom`
+   tokens' job, applied by `patterns` only where a heading actually precedes
+   body copy; a blanket margin on the element would also push apart headings
+   the export deliberately sets solid. */
 p {
   overflow-wrap: break-word;
-  margin-bottom: 20;
 }
 
 p {
@@ -575,8 +597,7 @@ select:has(option[value=""]:checked) {
 }
 
 /* 4. Text styles */
-body,
-.text-style-main {
+body {
   font-family: var(--text-main-font-family);
   font-size: var(--text-main);
   font-weight: var(--text-main-font-weight);
@@ -588,52 +609,7 @@ body,
   --_trim-bottom: var(--text-main-trim-bottom);
   --_margin-top: var(--text-main-margin-top);
   --_margin-bottom: var(--text-main-margin-bottom);
-}
-
-.text-style-small {
-  font-family: var(--text-small-font-family);
-  font-size: var(--text-small);
-  font-weight: var(--text-small-font-weight);
-  line-height: var(--text-small-line-height);
-  letter-spacing: var(--text-small-letter-spacing);
-  text-transform: var(--text-small-text-transform);
-  text-wrap: var(--text-small-text-wrap);
-  --_trim-top: var(--text-small-trim-top);
-  --_trim-bottom: var(--text-small-trim-bottom);
-  --_margin-top: var(--text-small-margin-top);
-  --_margin-bottom: var(--text-small-margin-bottom);
-}
-
-.text-style-large {
-  font-family: var(--text-large-font-family);
-  font-size: var(--text-large);
-  font-weight: var(--text-large-font-weight);
-  line-height: var(--text-large-line-height);
-  letter-spacing: var(--text-large-letter-spacing);
-  text-transform: var(--text-large-text-transform);
-  text-wrap: var(--text-large-text-wrap);
-  --_trim-top: var(--text-large-trim-top);
-  --_trim-bottom: var(--text-large-trim-bottom);
-  --_margin-top: var(--text-large-margin-top);
-  --_margin-bottom: var(--text-large-margin-bottom);
-}
-
-.text-style-display {
-  font-family: var(--display-font-family);
-  font-size: var(--display);
-  font-weight: var(--display-font-weight);
-  line-height: var(--display-line-height);
-  letter-spacing: var(--display-letter-spacing);
-  text-transform: var(--display-text-transform);
-  text-wrap: var(--display-text-wrap);
-  --_trim-top: var(--display-trim-top);
-  --_trim-bottom: var(--display-trim-bottom);
-  --_margin-top: var(--display-margin-top);
-  --_margin-bottom: var(--display-margin-bottom);
-}
-
-h1,
-.text-style-h1 {
+}h1 {
   font-family: var(--h1-font-family);
   font-size: var(--h1);
   font-weight: var(--h1-font-weight);
@@ -645,10 +621,7 @@ h1,
   --_trim-bottom: var(--h1-trim-bottom);
   --_margin-top: var(--h1-margin-top);
   --_margin-bottom: var(--h1-margin-bottom);
-}
-
-h2,
-.text-style-h2 {
+}h2 {
   font-family: var(--h2-font-family);
   font-size: var(--h2);
   font-weight: var(--h2-font-weight);
@@ -660,10 +633,7 @@ h2,
   --_trim-bottom: var(--h2-trim-bottom);
   --_margin-top: var(--h2-margin-top);
   --_margin-bottom: var(--h2-margin-bottom);
-}
-
-h3,
-.text-style-h3 {
+}h3 {
   font-family: var(--h3-font-family);
   font-size: var(--h3);
   font-weight: var(--h3-font-weight);
@@ -675,10 +645,7 @@ h3,
   --_trim-bottom: var(--h3-trim-bottom);
   --_margin-top: var(--h3-margin-top);
   --_margin-bottom: var(--h3-margin-bottom);
-}
-
-h4,
-.text-style-h4 {
+}h4 {
   font-family: var(--h4-font-family);
   font-size: var(--h4);
   font-weight: var(--h4-font-weight);
@@ -690,10 +657,7 @@ h4,
   --_trim-bottom: var(--h4-trim-bottom);
   --_margin-top: var(--h4-margin-top);
   --_margin-bottom: var(--h4-margin-bottom);
-}
-
-h5,
-.text-style-h5 {
+}h5 {
   font-family: var(--h5-font-family);
   font-size: var(--h5);
   font-weight: var(--h5-font-weight);
@@ -705,10 +669,7 @@ h5,
   --_trim-bottom: var(--h5-trim-bottom);
   --_margin-top: var(--h5-margin-top);
   --_margin-bottom: var(--h5-margin-bottom);
-}
-
-h6,
-.text-style-h6 {
+}h6 {
   font-family: var(--h6-font-family);
   font-size: var(--h6);
   font-weight: var(--h6-font-weight);

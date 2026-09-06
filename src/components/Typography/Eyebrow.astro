@@ -55,10 +55,16 @@ const content = await slotContent(Astro.slots);
 <style is:global>
   @layer components {
     .eyebrow_wrap {
-      display: inline-flex;
+      /* The imported design: an 8px brand dot, and 48px of air beneath —
+         the export carried both on a `.section-heading-container` wrapper
+         that this component replaces. `no-margin-bottom` and the rotated
+         sticky treatment are bare classes beside the root, as the export
+         had them. */
+      display: flex;
       align-items: center;
       justify-content: var(--_alignment, start);
-      gap: var(--space-2);
+      gap: 0.5rem;
+      margin-bottom: 3rem;
 
       &.tag {
         background-color: var(--text);
@@ -66,11 +72,46 @@ const content = await slotContent(Astro.slots);
         padding: var(--space-1) var(--space-2);
         border-radius: var(--radius-small);
       }
+
+      &.no-margin-bottom {
+        margin-bottom: 0;
+      }
+
       .eyebrow_marker {
         flex: none;
-        width: var(--border-width);
-        height: 0.75rem;
-        background-color: currentcolor;
+        width: 0.5rem;
+        height: 0.5rem;
+        background-color: var(--brand-500);
+        border-radius: var(--radius-round);
+      }
+    }
+
+    /* A 4px optical nudge, so the marker lines up with the number beside it
+       on the homepage's Approach grid. The export spelt this `margin-top-4`,
+       which is the framework's own utility for `--space-4` (20-24px) — hence
+       a name of its own rather than a shared one. */
+    .eyebrow_wrap.eyebrow-offset {
+      margin-top: 4px;
+    }
+
+    /* The export zeroed this utility's 12px on the label below the large
+       breakpoint (`@media (max-width: 991px) .section-heading-container
+       .margin-top-12`), so it is scoped to the component here too. */
+    .eyebrow_wrap.margin-top-12 {
+      margin-top: 0;
+      @media (width >= 62rem) {
+        margin-top: 12px;
+      }
+    }
+
+    /* The case-studies label stands on its side and follows the scroll. */
+    .eyebrow_wrap.sticky-rotated {
+      margin-bottom: 0;
+      @media (width >= 62rem) {
+        position: sticky;
+        top: 1.5rem;
+        transform: rotate(90deg);
+        transform-origin: 7% 60%;
       }
     }
   }

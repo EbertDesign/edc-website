@@ -1,10 +1,11 @@
 ---
 /**
- * PASS 3 — a journal post, from Sanity. The export's `detail_post.html` with
+ * a journal post, from Sanity. The export's `detail_post.html` with
  * its placeholders bound to the `post` document. Same shared substitutions as
  * every pass-1 page. Becomes Lumos components in pass 2.
  */
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Wrapper/Section.astro";
 import SanityImg from "@/components/Media/SanityImg.astro";
 import PortableText from "@/components/Typography/PortableText.astro";
 import CtaContact from "@/components/ContentCtaContact.astro";
@@ -23,8 +24,7 @@ if (!p) throw new Error(`No document for /${Astro.url.pathname}`);
 ---
 
 <BaseLayout title={p.title} type="article">
-  <div class="wf-section subpage-hero-section">
-    <div class="wf-container">
+  <Section paddingTop="none" paddingBottom="none" class="subpage-hero-section" gap="0">
       <div class="w-layout-grid _12-column-grid">
         <div class="fade-in-bottom cell-post-head">
           <a href="/journal" class="subtle-text-link">Back to journal</a>
@@ -37,23 +37,18 @@ if (!p) throw new Error(`No document for /${Astro.url.pathname}`);
           </div>
         </div>
       </div>
-    </div>
-  </div>
+  </Section>
 
   {p.mainImage?.asset && (
-    <div class="wf-section">
-      <div class="wf-container">
+    <Section paddingTop="none" gap="0">
         <SanityImg image={p.mainImage} sizes="(min-width: 62rem) 81vw, 100vw" />
-      </div>
-    </div>
+  </Section>
   )}
 
   {p.body && (
-    <div class="wf-section">
-      <div class="wf-container">
+    <Section paddingTop="none" gap="0">
         <PortableText value={p.body} />
-      </div>
-    </div>
+  </Section>
   )}
 
   <CtaContact />

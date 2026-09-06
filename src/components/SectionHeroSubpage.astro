@@ -1,0 +1,136 @@
+---
+/**
+ * The hero at the top of every subpage — a case study, a service, a
+ * deliverable, and About. A backdrop image pinned to the right two-thirds
+ * with a hard vertical edge, and the page title over it.
+ *
+ * The same block as `SectionHeroHome` in spirit, but a different one in fact:
+ * that one is 100vh with a row of audience columns beneath, this is 68vh with
+ * only a title. Both keep the export's own values rather than the token scale
+ * — including the 69.3% panel, which is the design and not a leftover.
+ *
+ * Four routes were repeating this markup and quietly borrowing
+ * `SectionHeroHome`'s stylesheet for it, which meant editing the homepage
+ * hero could silently reshape four other pages. It owns its styles now.
+ */
+import type { ComponentProps } from "astro/types";
+import SanityImg from "@/components/Media/SanityImg.astro";
+import { slotContent } from "@/utils/slots.ts";
+
+type Props = {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** The backdrop, from Sanity. Leave unset and pass `imageSrc` for a static one. */
+  image?: ComponentProps<typeof SanityImg>["image"];
+  /** A static backdrop in `public/`, for pages with no CMS image. */
+  imageSrc?: string;
+  /** `srcset` for a static backdrop. */
+  imageSrcset?: string;
+};
+
+const { render = true, image, imageSrc, imageSrcset } = Astro.props;
+const content = await slotContent(Astro.slots);
+---
+
+{
+  render && content && (
+    <section class="hero-subpage_wrap">
+      <div class="hero-subpage_inner">
+        <div class="hero-subpage_backdrop">
+          {image && (
+            <SanityImg
+              image={image}
+              alt=""
+              loading="eager"
+              class="hero-subpage_image"
+              sizes="(min-width: 62rem) 70vw, 100vw"
+            />
+          )}
+          {!image && imageSrc && (
+            <img
+              class="hero-subpage_image"
+              src={imageSrc}
+              srcset={imageSrcset}
+              sizes="(min-width: 62rem) 70vw, 100vw"
+              loading="eager"
+              alt=""
+            />
+          )}
+        </div>
+        <div class="_12-column-grid">
+          <div class="hero-subpage_content hero-cell-title fade-in-bottom">
+            <Fragment set:html={content} />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @layer components {
+    /* The export's `.section` base: no padding, and the gap below carried as
+       a margin so a following block's margin collapses into it. */
+    .hero-subpage_wrap {
+      min-height: 2rem;
+      margin-bottom: 12.5rem;
+      padding: 0;
+    }
+
+    /* `.container.hero-top-container` — 68vh, with the title on the bottom. */
+    .hero-subpage_inner {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      width: 100%;
+      height: 68vh;
+      padding-inline: 9.5vw;
+    }
+
+    /* The intentional hard edge: a 69.3%-wide panel pinned right, behind the
+       page. It paints because the root is transparent and the body carries
+       the canvas — see the note in base.css. */
+    .hero-subpage_backdrop {
+      position: absolute;
+      inset: 0 0 auto auto;
+      z-index: -10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 69.3%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .hero-subpage_image {
+      z-index: -1;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.8;
+    }
+
+    @media (width < 62rem) {
+      .hero-subpage_wrap {
+        margin-bottom: 7.5rem;
+      }
+
+      .hero-subpage_inner {
+        height: auto;
+        margin-bottom: 5rem;
+        padding-inline: 0;
+      }
+
+      .hero-subpage_backdrop {
+        position: relative;
+        width: 100%;
+      }
+    }
+
+    @media (width < 30rem) {
+      .hero-subpage_wrap {
+        margin-bottom: 5rem;
+      }
+    }
+  }
+</style>

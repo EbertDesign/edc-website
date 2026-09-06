@@ -1081,3 +1081,152 @@
   inset: 0% 0% auto;
   overflow: hidden;
 }
+
+/* Type styles.
+   These live here, in the top layer, rather than in `base.css` where the
+   framework ships them. The imported Webflow stylesheet sits in its own
+   `webflow` layer above `base`, and it styles bare `h1`-`h6` — so a
+   `.text-style-*` class defined in `base` loses to the export's element rule
+   and an `<Eyebrow tag="h2">` renders at 4rem. A utility should win over an
+   element selector; moving them up makes that true. When the last of
+   `styles/webflow/` is gone these could move back, but there is no reason to. */
+
+.text-style-main {
+  font-family: var(--text-main-font-family);
+  font-size: var(--text-main);
+  font-weight: var(--text-main-font-weight);
+  line-height: var(--text-main-line-height);
+  letter-spacing: var(--text-main-letter-spacing);
+  text-transform: var(--text-main-text-transform);
+  text-wrap: var(--text-main-text-wrap);
+  --_trim-top: var(--text-main-trim-top);
+  --_trim-bottom: var(--text-main-trim-bottom);
+  --_margin-top: var(--text-main-margin-top);
+  --_margin-bottom: var(--text-main-margin-bottom);
+}
+
+.text-style-small {
+  font-family: var(--text-small-font-family);
+  font-size: var(--text-small);
+  font-weight: var(--text-small-font-weight);
+  line-height: var(--text-small-line-height);
+  letter-spacing: var(--text-small-letter-spacing);
+  text-transform: var(--text-small-text-transform);
+  text-wrap: var(--text-small-text-wrap);
+  --_trim-top: var(--text-small-trim-top);
+  --_trim-bottom: var(--text-small-trim-bottom);
+  --_margin-top: var(--text-small-margin-top);
+  --_margin-bottom: var(--text-small-margin-bottom);
+}
+
+.text-style-large {
+  font-family: var(--text-large-font-family);
+  font-size: var(--text-large);
+  font-weight: var(--text-large-font-weight);
+  line-height: var(--text-large-line-height);
+  letter-spacing: var(--text-large-letter-spacing);
+  text-transform: var(--text-large-text-transform);
+  text-wrap: var(--text-large-text-wrap);
+  --_trim-top: var(--text-large-trim-top);
+  --_trim-bottom: var(--text-large-trim-bottom);
+  --_margin-top: var(--text-large-margin-top);
+  --_margin-bottom: var(--text-large-margin-bottom);
+}
+
+.text-style-display {
+  font-family: var(--display-font-family);
+  font-size: var(--display);
+  font-weight: var(--display-font-weight);
+  line-height: var(--display-line-height);
+  letter-spacing: var(--display-letter-spacing);
+  text-transform: var(--display-text-transform);
+  text-wrap: var(--display-text-wrap);
+  --_trim-top: var(--display-trim-top);
+  --_trim-bottom: var(--display-trim-bottom);
+  --_margin-top: var(--display-margin-top);
+  --_margin-bottom: var(--display-margin-bottom);
+}
+
+.text-style-h1 {
+  font-family: var(--h1-font-family);
+  font-size: var(--h1);
+  font-weight: var(--h1-font-weight);
+  line-height: var(--h1-line-height);
+  letter-spacing: var(--h1-letter-spacing);
+  text-transform: var(--h1-text-transform);
+  text-wrap: var(--h1-text-wrap);
+  --_trim-top: var(--h1-trim-top);
+  --_trim-bottom: var(--h1-trim-bottom);
+  --_margin-top: var(--h1-margin-top);
+  --_margin-bottom: var(--h1-margin-bottom);
+}
+
+.text-style-h2 {
+  font-family: var(--h2-font-family);
+  font-size: var(--h2);
+  font-weight: var(--h2-font-weight);
+  line-height: var(--h2-line-height);
+  letter-spacing: var(--h2-letter-spacing);
+  text-transform: var(--h2-text-transform);
+  text-wrap: var(--h2-text-wrap);
+  --_trim-top: var(--h2-trim-top);
+  --_trim-bottom: var(--h2-trim-bottom);
+  --_margin-top: var(--h2-margin-top);
+  --_margin-bottom: var(--h2-margin-bottom);
+}
+
+.text-style-h3 {
+  font-family: var(--h3-font-family);
+  font-size: var(--h3);
+  font-weight: var(--h3-font-weight);
+  line-height: var(--h3-line-height);
+  letter-spacing: var(--h3-letter-spacing);
+  text-transform: var(--h3-text-transform);
+  text-wrap: var(--h3-text-wrap);
+  --_trim-top: var(--h3-trim-top);
+  --_trim-bottom: var(--h3-trim-bottom);
+  --_margin-top: var(--h3-margin-top);
+  --_margin-bottom: var(--h3-margin-bottom);
+}
+
+.text-style-h4 {
+  font-family: var(--h4-font-family);
+  font-size: var(--h4);
+  font-weight: var(--h4-font-weight);
+  line-height: var(--h4-line-height);
+  letter-spacing: var(--h4-letter-spacing);
+  text-transform: var(--h4-text-transform);
+  text-wrap: var(--h4-text-wrap);
+  --_trim-top: var(--h4-trim-top);
+  --_trim-bottom: var(--h4-trim-bottom);
+  --_margin-top: var(--h4-margin-top);
+  --_margin-bottom: var(--h4-margin-bottom);
+}
+
+.text-style-h5 {
+  font-family: var(--h5-font-family);
+  font-size: var(--h5);
+  font-weight: var(--h5-font-weight);
+  line-height: var(--h5-line-height);
+  letter-spacing: var(--h5-letter-spacing);
+  text-transform: var(--h5-text-transform);
+  text-wrap: var(--h5-text-wrap);
+  --_trim-top: var(--h5-trim-top);
+  --_trim-bottom: var(--h5-trim-bottom);
+  --_margin-top: var(--h5-margin-top);
+  --_margin-bottom: var(--h5-margin-bottom);
+}
+
+.text-style-h6 {
+  font-family: var(--h6-font-family);
+  font-size: var(--h6);
+  font-weight: var(--h6-font-weight);
+  line-height: var(--h6-line-height);
+  letter-spacing: var(--h6-letter-spacing);
+  text-transform: var(--h6-text-transform);
+  text-wrap: var(--h6-text-wrap);
+  --_trim-top: var(--h6-trim-top);
+  --_trim-bottom: var(--h6-trim-bottom);
+  --_margin-top: var(--h6-margin-top);
+  --_margin-bottom: var(--h6-margin-bottom);
+}
