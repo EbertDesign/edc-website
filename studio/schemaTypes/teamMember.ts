@@ -7,6 +7,12 @@ export const teamMember = defineType({
   title: 'Team member',
   type: 'document',
   icon: UserIcon,
+  /* "Site order" is creation order, which is what TEAM_LIST_QUERY sorts by, so
+     the Studio list and the About page agree. */
+  orderings: [
+    {title: 'Site order', name: 'createdAsc', by: [{field: '_createdAt', direction: 'asc'}]},
+    {title: 'Name A–Z', name: 'nameAsc', by: [{field: 'name', direction: 'asc'}]},
+  ],
   fields: [
     defineField({name: 'name', type: 'string', validation: (rule) => rule.required()}),
     defineField({
