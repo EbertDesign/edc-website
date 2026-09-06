@@ -19,6 +19,9 @@
    the export's leftovers but below the utilities a page may override with. */
 @import "./detail-grid.css" layer(components);
 
+/* Same reasoning, for the gap under a heading — see the file's own note. */
+@import "./typography.css" layer(components);
+
 @import "./utilities.css" layer(utilities);
 
 /* After `utilities`, because the framework's form components apply

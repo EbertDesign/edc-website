@@ -95,7 +95,7 @@
   --display-letter-spacing: var(--letter-spacing-normal);
   --display-text-transform: none;
   --display-margin-top: 0;
-  --display-margin-bottom: var(--space-5);
+  --display-margin-bottom: var(--space-6);
   --display-font-family: var(--display-family);
   --display-font-weight: var(--primary-medium);
   --display-trim-top: var(--primary-trim-top);
@@ -109,7 +109,7 @@
   --h1-letter-spacing: var(--letter-spacing-normal);
   --h1-text-transform: none;
   --h1-margin-top: 0;
-  --h1-margin-bottom: var(--space-5);
+  --h1-margin-bottom: var(--space-6);
   --h1-font-family: var(--display-family);
   --h1-font-weight: var(--primary-medium);
   --h1-trim-top: var(--primary-trim-top);
@@ -123,7 +123,7 @@
   --h2-letter-spacing: var(--letter-spacing-tight);
   --h2-text-transform: none;
   --h2-margin-top: 0;
-  --h2-margin-bottom: var(--space-4);
+  --h2-margin-bottom: var(--space-5);
   --h2-font-family: var(--secondary-family);
   --h2-font-weight: var(--primary-regular);
   --h2-trim-top: var(--primary-trim-top);
@@ -137,7 +137,7 @@
   --h3-letter-spacing: var(--letter-spacing-slight);
   --h3-text-transform: none;
   --h3-margin-top: 0;
-  --h3-margin-bottom: var(--space-4);
+  --h3-margin-bottom: var(--space-5);
   --h3-font-family: var(--secondary-family);
   --h3-font-weight: var(--primary-regular);
   --h3-trim-top: var(--primary-trim-top);
@@ -151,7 +151,7 @@
   --h4-letter-spacing: var(--letter-spacing-normal);
   --h4-text-transform: none;
   --h4-margin-top: 0;
-  --h4-margin-bottom: var(--space-3);
+  --h4-margin-bottom: var(--space-4);
   --h4-font-family: var(--secondary-family);
   --h4-font-weight: var(--primary-regular);
   --h4-trim-top: var(--primary-trim-top);
@@ -165,7 +165,7 @@
   --h5-letter-spacing: var(--letter-spacing-normal);
   --h5-text-transform: none;
   --h5-margin-top: 0;
-  --h5-margin-bottom: var(--space-3);
+  --h5-margin-bottom: var(--space-4);
   --h5-font-family: var(--secondary-family);
   --h5-font-weight: var(--primary-regular);
   --h5-trim-top: var(--primary-trim-top);
@@ -179,7 +179,7 @@
   --h6-letter-spacing: var(--letter-spacing-normal);
   --h6-text-transform: none;
   --h6-margin-top: 0;
-  --h6-margin-bottom: var(--space-2);
+  --h6-margin-bottom: var(--space-3);
   --h6-font-family: var(--primary-family);
   --h6-font-weight: var(--primary-regular);
   --h6-trim-top: var(--primary-trim-top);

@@ -1,0 +1,17 @@
+/* The gap under a heading that is followed by body copy.
+   `patterns` already declares this rule, but it can never win: the export's own
+   `h1`, `h2` and `h3` rules in `webflow/site.css` set `margin-bottom: 0`, and
+   `webflow` sits above `patterns` in the cascade — so a `Heading` above a
+   `Paragraph` rendered with the two literally touching, whatever the
+   `--*-margin-bottom` tokens said.
+
+   Re-asserted here in `components`: above `webflow`, so it beats those element
+   rules, and below `utilities`, so a page that sets its own `.margin-bottom-*`
+   still wins. It matches only the Lumos component pairing — `.heading`
+   immediately followed by `.text` — which the export's markup never produces,
+   so pass-1 pages carrying the export's classes are untouched.
+
+   The size of the gap lives with the type scale, in `base.css`. */
+.heading:has(+ .text) {
+  margin-bottom: var(--_margin-bottom);
+}
