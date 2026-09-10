@@ -199,13 +199,19 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
     }
 
     /* IX2 slid the second arrow down over the first on hover; kept as a CSS
-       transition, honouring reduced motion. */
+       transition, honouring reduced motion.
+
+       The fall is 60px, not the 42px IX2 used: `.second-arrow` is parked at
+       `top: -42px` and the resting arrow is centred at 18px in the 4rem
+       circle, so 42px leaves the incoming arrow 18px high, near the top edge.
+       `Item/ServiceItem` rolls the same button from its whole row and lands on
+       the same number. */
     .icon-button .button-arrow {
       transition: transform var(--open-duration) var(--open-ease);
     }
     @media (hover: hover) {
       .icon-button:hover .button-arrow {
-        transform: translateY(42px);
+        transform: translateY(3.75rem);
       }
     }
     @media (prefers-reduced-motion: reduce) {

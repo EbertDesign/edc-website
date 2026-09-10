@@ -8,8 +8,9 @@
  * Hovering the row draws its two ends toward each other — the title shifts
  * right, the arrow button left — and flips the button's colours, so the dark
  * circle with the accent arrow becomes an accent circle with a dark one. The
- * arrow's own roll-over is the shared `.icon-button` behaviour and is left
- * alone.
+ * arrow's own roll-over comes with it: `.icon-button` fires that from the
+ * button, which on a row this wide only caught a cursor already on the
+ * circle, so it is re-fired from the row and the three move as one.
  */
 type Props = {
   /** Set to `false` to skip rendering this component and its children. */
@@ -49,9 +50,16 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
 
 <style is:global>
   @layer components {
-    /* One distance for both ends, so they always travel together. */
+    /* One distance for both ends, so they always travel together.
+       `--service-item-roll` is how far the arrows fall for the second to land
+       where the first rests: `.second-arrow` is parked at `top: -42px` and the
+       resting arrow is centred at 18px in the 4rem circle, so 60px. IX2 moved
+       them 42px, which leaves the incoming arrow 18px high — invisible while
+       the roll only fired from the circle itself, obvious now the whole row
+       fires it. */
     .service-list-item {
       --service-item-shift: 0.75rem;
+      --service-item-roll: 3.75rem;
     }
 
     .service-list-item .service-cell-title {
@@ -79,8 +87,12 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
       background-color: var(--accent);
     }
 
+    /* Three classes, so the roll follows the row rather than the button:
+       `SectionHeroHome` fires it from `.icon-button:hover`, which on a row
+       this wide only caught a cursor already on the circle. */
     .service-list-item:focus-visible .service-cell-arrow .button-arrow {
       color: var(--black);
+      transform: translateY(var(--service-item-roll));
     }
 
     @media (hover: hover) {
@@ -95,15 +107,23 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
 
       .service-list-item:hover .service-cell-arrow .button-arrow {
         color: var(--black);
+        transform: translateY(var(--service-item-roll));
       }
     }
 
-    /* The colour swap still reads without the movement — and below 992px the
-       row stacks, arrow at the start, so there is no opposing edge to move
-       toward. */
-    @media (prefers-reduced-motion: reduce), screen and (max-width: 991px) {
+    /* The colour swap still reads without the movement. Below 992px only the
+       shift goes: the row stacks with the arrow at the start, so there is no
+       opposing edge to move toward, but the roll is unaffected by the stack. */
+    @media screen and (max-width: 991px) {
       .service-list-item {
         --service-item-shift: 0rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .service-list-item {
+        --service-item-shift: 0rem;
+        --service-item-roll: 0rem;
       }
     }
   }
