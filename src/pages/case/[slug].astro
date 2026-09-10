@@ -31,13 +31,13 @@ if (!c) throw new Error(`No document for /${Astro.url.pathname}`);
 ---
 
 <BaseLayout title={c.title} description={c.description ?? undefined} overlap>
-  <SectionHeroSubpage image={c.thumbnail}>
+  <SectionHeroSubpage image={c.thumbnail} intro>
       <a href="/work" class="subtle-text-link">Back to cases</a>
       <h1 class="text-7xl margin-top-64">{c.title}</h1>
   </SectionHeroSubpage>
 
   <Section paddingTop="none" paddingBottom="none" class="margin-bottom-120" gap="0">
-      <div class="w-layout-grid _12-column-grid margin-top-80 fade-in-bottom">
+      <div class="w-layout-grid _12-column-grid margin-top-80 fade-in-bottom hero-intro_wait">
         <p class="text-2xl cell-summary-lead">{c.subheading}</p>
         <p class="light-grey-text text-2-columns cell-summary-body">{c.description}</p>
         <p class="text-s light-grey-text margin-top-12 cell-summary-label">Summary</p>

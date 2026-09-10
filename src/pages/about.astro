@@ -16,6 +16,7 @@ import Section from "@/components/Wrapper/Section.astro";
 import Eyebrow from "@/components/Typography/Eyebrow.astro";
 import Button from "@/components/Button.astro";
 import SanityImg from "@/components/Media/SanityImg.astro";
+import ServiceItem from "@/components/Item/ServiceItem.astro";
 import { sanityClient, SERVICES_LIST_QUERY, TEAM_LIST_QUERY } from "@/utils/sanity.ts";
 const [services, team] = await Promise.all([
   sanityClient.fetch(SERVICES_LIST_QUERY),
@@ -43,27 +44,27 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
         <div class="w-layout-grid _12-column-grid margin-top-80">
           <p id="w-node-_86135ea5-251d-60f4-8792-7711422faa32-08125e4f" class="text-2xl margin-bottom-80 fade-in-bottom">Our mission is to empower purposeful brands to make a meaningful impact through creative solutions. We design brands that resonate deeply, fostering alignment and leaving a positive imprint on the world.</p>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa34-08125e4f" class="lead-column-container fade-in-bottom">
-            <p class="text-medium margin-bottom-1">Excellence</p>
+            <p class="text-medium">Excellence</p>
             <p class="light-grey-text">Leave it better than when we found it. Whether we are working on a small project or a large-scale initiative, we approach each task with the same level of dedication and attention to detail, always striving to exceed expectations and make a difference.<br /></p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa39-08125e4f" class="lead-column-container fade-in-bottom-100ms">
-            <p class="text-medium margin-bottom-1">Quality</p>
+            <p class="text-medium">Quality</p>
             <p class="light-grey-text">Exceeding expectations every time. Our commitment to excellence extends beyond just our products and services; we prioritize strong communication and collaboration with our customers to drive mutual success.</p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa3e-08125e4f" class="lead-column-container fade-in-bottom-200ms">
-            <p class="text-medium margin-bottom-1">Collaboration</p>
+            <p class="text-medium">Collaboration</p>
             <p class="light-grey-text">Together we create, together we succeed. Collaboration not only enhances creativity but also helps in bringing forth unique ideas that can lead to unprecedented results. Together we can create an environment that fosters growth and development.</p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa43-08125e4f" class="lead-column-container fade-in-bottom">
-            <p class="text-medium margin-bottom-1">Sustainability</p>
+            <p class="text-medium">Sustainability</p>
             <p class="light-grey-text">Designing a better future, one brand at a time. Our team of experts is dedicated to staying up-to-date with the latest sustainable and responsible techniques in branding, ensuring that our clients always receive the most innovative and impactful solutions.</p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa48-08125e4f" class="lead-column-container fade-in-bottom-100ms">
-            <p class="text-medium margin-bottom-1">Integrity</p>
+            <p class="text-medium">Integrity</p>
             <p class="light-grey-text">Honesty and transparency in all we do. It is not just a statement, but a way of life that we strive to embody in everything we do. Honesty means being truthful in our interactions and dealings with others, while transparency involves being open and forthright about our intentions, actions, and decisions.</p>
           </div>
           <div id="w-node-_86135ea5-251d-60f4-8792-7711422faa4d-08125e4f" class="lead-column-container fade-in-bottom-200ms">
-            <p class="text-medium margin-bottom-1">Empathy</p>
+            <p class="text-medium">Empathy</p>
             <p class="light-grey-text">We listen, we understand, we deliver. We take the time to fully understand their unique situations so that we can deliver the best possible solutions. Our team of experts is dedicated to providing outstanding service every step of the way, from initial consultation to final delivery.</p>
           </div>
           <Eyebrow id="w-node-_264b6b87-e33f-cb16-ab18-213b74b9a6b6-08125e4f" tag="h2" class="fade-in-bottom margin-top-12 no-margin-bottom">Our mission &amp; values</Eyebrow>
@@ -91,20 +92,7 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
         <Eyebrow tag="h2">Services</Eyebrow>
         <div class="services-list-container fade-in-bottom w-dyn-list">
           <div role="list" class="w-dyn-items">
-            {services.map((s) => (
-              <div role="listitem" class="service-container fade-in-bottom w-dyn-item">
-                <a href={`/service/${s.slug}`} class="service-list-item w-inline-block">
-                  <div class="w-layout-grid _12-column-grid list-grid">
-                    <h3 class="text-2xl text-regular service-cell-title">{s.title}</h3>
-                    <p class="service-cell-label">{s.label}</p>
-                    <div class="icon-button service-cell-arrow">
-                      <div class="button-arrow second-arrow w-embed" set:html={arrow} />
-                      <div class="button-arrow w-embed" set:html={arrow} />
-                    </div>
-                  </div>
-                </a>
-              </div>
-            ))}
+            {services.map((s) => <ServiceItem service={s} />)}
           </div>
         </div>
   </Section>
@@ -158,7 +146,7 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
                     <div class="team-member-image-container">
                       <SanityImg image={m.photo} class="team-member-image" sizes="(min-width: 62rem) 30vw, 100vw" />
                     </div>
-                    <p class="text-xl">{m.name}</p>
+                    <p class="text-xl margin-bottom-1">{m.name}</p>
                     <p class="text-medium light-grey-text">{m.jobTitle}</p>
                     <div class="team-member-link">
                       <p class="margin-right-8">See profile</p>

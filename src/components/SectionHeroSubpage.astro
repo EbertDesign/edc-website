@@ -12,9 +12,14 @@
  * Four routes were repeating this markup and quietly borrowing
  * `SectionHeroHome`'s stylesheet for it, which meant editing the homepage
  * hero could silently reshape four other pages. It owns its styles now.
+ *
+ * With `intro`, the backdrop plays the homepage's load timeline — opening
+ * full-screen and collapsing into the panel. That is `Utility/HeroIntro`,
+ * shared with `SectionHeroHome`; the elements below wear its role classes.
  */
 import type { ComponentProps } from "astro/types";
 import SanityImg from "@/components/Media/SanityImg.astro";
+import HeroIntro from "@/components/Utility/HeroIntro.astro";
 import { slotContent } from "@/utils/slots.ts";
 
 type Props = {
@@ -26,44 +31,62 @@ type Props = {
   imageSrc?: string;
   /** `srcset` for a static backdrop. */
   imageSrcset?: string;
+  /** Play the load intro: the backdrop opens full-screen, then collapses in. */
+  intro?: boolean;
 };
 
-const { render = true, image, imageSrc, imageSrcset } = Astro.props;
+const {
+  render = true,
+  image,
+  imageSrc,
+  imageSrcset,
+  intro = false,
+} = Astro.props;
 const content = await slotContent(Astro.slots);
 ---
 
 {
   render && content && (
-    <section class="hero-subpage_wrap">
-      <div class="hero-subpage_inner">
-        <div class="hero-subpage_backdrop">
-          {image && (
-            <SanityImg
-              image={image}
-              alt=""
-              loading="eager"
-              class="hero-subpage_image"
-              sizes="(min-width: 62rem) 70vw, 100vw"
-            />
-          )}
-          {!image && imageSrc && (
-            <img
-              class="hero-subpage_image"
-              src={imageSrc}
-              srcset={imageSrcset}
-              sizes="(min-width: 62rem) 70vw, 100vw"
-              loading="eager"
-              alt=""
-            />
-          )}
-        </div>
-        <div class="_12-column-grid">
-          <div class="hero-subpage_content hero-cell-title fade-in-bottom">
-            <Fragment set:html={content} />
+    <>
+      {intro && <HeroIntro />}
+      <section class:list={["hero-subpage_wrap", intro && "intro"]}>
+        <div class:list={["hero-subpage_inner", intro && "hero-intro_panel"]}>
+          <div
+            class:list={["hero-subpage_backdrop", intro && "hero-intro_crop"]}
+          >
+            {image && (
+              <SanityImg
+                image={image}
+                alt=""
+                loading="eager"
+                class="hero-subpage_image"
+                sizes="(min-width: 62rem) 70vw, 100vw"
+              />
+            )}
+            {!image && imageSrc && (
+              <img
+                class="hero-subpage_image"
+                src={imageSrc}
+                srcset={imageSrcset}
+                sizes="(min-width: 62rem) 70vw, 100vw"
+                loading="eager"
+                alt=""
+              />
+            )}
+          </div>
+          <div class="_12-column-grid">
+            <div
+              class:list={[
+                "hero-subpage_content hero-cell-title",
+                intro ? "hero-intro_lead" : "fade-in-bottom",
+              ]}
+            >
+              <Fragment set:html={content} />
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   )
 }
 
@@ -75,6 +98,16 @@ const content = await slotContent(Astro.slots);
       min-height: 2rem;
       margin-bottom: 12.5rem;
       padding: 0;
+    }
+
+    /* The intro takes the inner to 100vh and back. Fixing the height here
+       lets it overflow for those three seconds, the way the homepage hero's
+       own 100vh section does, rather than pushing the page down and hauling
+       it back up. Below the breakpoint the intro does not play. */
+    @media (width >= 62rem) {
+      .hero-subpage_wrap.intro {
+        height: 68vh;
+      }
     }
 
     /* `.container.hero-top-container` — 68vh, with the title on the bottom. */

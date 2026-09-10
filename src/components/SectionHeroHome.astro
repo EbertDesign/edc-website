@@ -15,11 +15,18 @@
  *
  * So the only things changed from the export are the ones every page needed:
  * asset paths are rewritten, the container classes are the component's own
- * so nothing else can depend on them, the `#w-node-…` grid ids are classes, and the
- * IX2 entrance is `Utility/Reveal`'s `.fade-in-*` classes. The type utility
- * classes (`.text-medium`, `.light-grey-text`) and `._12-column-grid` are the
- * site's own, still defined in `styles/webflow/site.css`.
+ * so nothing else can depend on them, and the `#w-node-…` grid ids are
+ * classes. The type utility classes (`.text-medium`, `.light-grey-text`) and
+ * `._12-column-grid` are the site's own, still defined in
+ * `styles/webflow/site.css`.
+ *
+ * The load intro — the gradient opening full-screen and collapsing into that
+ * panel, then the nav and the hero text arriving behind it — is IX2's `a-75`,
+ * shared with the case studies as `Utility/HeroIntro`. The elements below
+ * wear its role classes; the timeline is documented there.
  */
+import HeroIntro from "@/components/Utility/HeroIntro.astro";
+
 interface Props {
   /** Set to `false` to skip rendering this component and its children. */
   render?: boolean;
@@ -35,58 +42,61 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
 
 {
   render && (
-    <section class="hero-section">
-      <div class="hero-home_top">
-        <div class="hero-image-container">
-          <img
-            src="/images/mesh-gradient.png"
-            loading="eager"
-            sizes="(max-width: 2000px) 100vw, 2000px"
-            srcset="/images/mesh-gradient-p-500.png 500w, /images/mesh-gradient-p-800.png 800w, /images/mesh-gradient-p-1080.png 1080w, /images/mesh-gradient-p-1600.png 1600w, /images/mesh-gradient.png 2000w"
-            alt=""
-            class="hero-image"
-          />
-        </div>
-        <div class="_12-column-grid">
-          <h1 class="home-hero-text fade-in-load-far hero-cell-title">
-            We're a design studio that's here for good.
-          </h1>
-        </div>
-      </div>
-      <div class="hero-home_bottom">
-        <div class="_12-column-grid home-hero-bottom-grid">
-          <div class="hero-usp-container fade-in-load hero-cell-a">
-            <p class="text-medium">Nonprofits</p>
-            <p class="light-grey-text">
-              Ignite your nonprofit's impact with a powerful brand identity that
-              captivates hearts and minds.
-            </p>
+    <>
+      <HeroIntro />
+      <section class="hero-section">
+        <div class="hero-home_top hero-intro_panel">
+          <div class="hero-image-container hero-intro_crop">
+            <img
+              src="/images/mesh-gradient.png"
+              loading="eager"
+              sizes="(max-width: 2000px) 100vw, 2000px"
+              srcset="/images/mesh-gradient-p-500.png 500w, /images/mesh-gradient-p-800.png 800w, /images/mesh-gradient-p-1080.png 1080w, /images/mesh-gradient-p-1600.png 1600w, /images/mesh-gradient.png 2000w"
+              alt=""
+              class="hero-image"
+            />
           </div>
-          <div class="hero-usp-container fade-in-load fade-in-load-2 hero-cell-b">
-            <p class="text-medium">B Corps</p>
-            <p class="light-grey-text">
-              Amplify your B Corp's social and environmental impact through
-              strategic branding
-            </p>
+          <div class="_12-column-grid">
+            <h1 class="home-hero-text hero-cell-title hero-intro_lead">
+              We're a design studio that's here for good.
+            </h1>
           </div>
-          <div class="hero-usp-container fade-in-load fade-in-load-3 hero-cell-c">
-            <p class="text-medium">Purpose-Driven Brands</p>
-            <p class="light-grey-text">
-              Unleash the power of your purpose-driven business with a brand that
-              speaks volumes.
-            </p>
-          </div>
-          <a
-            href="#Welcome"
-            class="icon-button hero-cell-cue fade-in-load fade-in-load-3"
-            aria-label="Skip to the introduction"
-          >
-            <div class="button-arrow second-arrow" set:html={arrow} />
-            <div class="button-arrow" set:html={arrow} />
-          </a>
         </div>
-      </div>
-    </section>
+        <div class="hero-home_bottom">
+          <div class="_12-column-grid home-hero-bottom-grid">
+            <div class="hero-usp-container hero-cell-a hero-intro_item">
+              <p class="text-medium">Nonprofits</p>
+              <p class="light-grey-text">
+                Ignite your nonprofit's impact with a powerful brand identity
+                that captivates hearts and minds.
+              </p>
+            </div>
+            <div class="hero-usp-container hero-cell-b hero-intro_item">
+              <p class="text-medium">B Corps</p>
+              <p class="light-grey-text">
+                Amplify your B Corp's social and environmental impact through
+                strategic branding
+              </p>
+            </div>
+            <div class="hero-usp-container hero-cell-c hero-intro_item">
+              <p class="text-medium">Purpose-Driven Brands</p>
+              <p class="light-grey-text">
+                Unleash the power of your purpose-driven business with a brand
+                that speaks volumes.
+              </p>
+            </div>
+            <a
+              href="#Welcome"
+              class="icon-button hero-cell-cue hero-intro_cue"
+              aria-label="Skip to the introduction"
+            >
+              <div class="button-arrow second-arrow" set:html={arrow} />
+              <div class="button-arrow" set:html={arrow} />
+            </a>
+          </div>
+        </div>
+      </section>
+    </>
   )
 }
 
@@ -202,6 +212,18 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       .icon-button .button-arrow {
         transition: none;
       }
+    }
+
+    /* The stagger under the headline: `Utility/HeroIntro` gives the first
+       column its delay and duration, and these two follow it. */
+    .hero-cell-b {
+      --hero-intro-delay: 3400ms;
+      --hero-intro-duration: 300ms;
+    }
+
+    .hero-cell-c {
+      --hero-intro-delay: 3450ms;
+      --hero-intro-duration: 350ms;
     }
 
     /* The export's `#w-node-…` grid placements, as classes. */

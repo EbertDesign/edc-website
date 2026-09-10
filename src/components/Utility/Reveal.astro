@@ -5,13 +5,18 @@
  * IX2 was the one piece of the export that could not be moved as it stood: it
  * is compiled into `webflow.js` against `data-w-id` attributes, so it had to
  * be re-authored rather than relocated. What it did here is simple and worth
- * keeping — blocks fade up as they scroll into view, and the hero does the
- * same on load — so it is an IntersectionObserver and two CSS classes instead
- * of 247 KB of `webflow.js` plus jQuery.
+ * keeping — blocks fade up as they scroll into view — so it is an
+ * IntersectionObserver and two CSS classes instead of 247 KB of `webflow.js`
+ * plus jQuery.
  *
  * The class names are the export's own (`.fade-in-bottom`,
  * `.fade-in-bottom-100ms`) so no markup had to change to keep them working.
- * `.fade-in-load` is new, and stands in for the hero's load timeline.
+ *
+ * Scroll only. The homepage hero's load timeline used to live here too, but
+ * it cannot: this hides an element only once the script below has run, which
+ * is after first paint, so the hero text painted in place and then vanished
+ * for the length of the intro. It is CSS keyframes in `SectionHeroHome`
+ * instead, where the opening state is the first thing painted.
  *
  * Two things the original got wrong and this does not:
  *
@@ -29,13 +34,7 @@
 <style is:global>
   @layer components {
     /* Only hides once the script has announced itself — see above. */
-    [data-reveal]
-      :is(
-        .fade-in-bottom,
-        .fade-in-bottom-100ms,
-        .fade-in-load,
-        .fade-in-load-far
-      ) {
+    [data-reveal] :is(.fade-in-bottom, .fade-in-bottom-100ms) {
       opacity: 0;
       transform: translateY(var(--_reveal-distance, 2.5rem));
       transition:
@@ -50,41 +49,14 @@
       --_reveal-delay: 100ms;
     }
 
-    /* Everything in the hero's load timeline travelled 40px except the
-       headline, which travelled 104px. */
-    [data-reveal] .fade-in-load-far {
-      --_reveal-distance: 6.5rem;
-    }
-
-    /* The original staggered the three columns; keep that. */
-    [data-reveal] .fade-in-load-2 {
-      --_reveal-delay: 100ms;
-    }
-
-    [data-reveal] .fade-in-load-3 {
-      --_reveal-delay: 200ms;
-    }
-
-    [data-reveal]
-      :is(
-        .fade-in-bottom,
-        .fade-in-bottom-100ms,
-        .fade-in-load,
-        .fade-in-load-far
-      ).is-revealed {
+    [data-reveal] :is(.fade-in-bottom, .fade-in-bottom-100ms).is-revealed {
       opacity: 1;
       transform: none;
       will-change: auto;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      [data-reveal]
-        :is(
-          .fade-in-bottom,
-          .fade-in-bottom-100ms,
-          .fade-in-load,
-          .fade-in-load-far
-        ) {
+      [data-reveal] :is(.fade-in-bottom, .fade-in-bottom-100ms) {
         opacity: 1;
         transform: none;
         transition: none;
@@ -94,10 +66,7 @@
 </style>
 
 <script>
-  const SELECTOR =
-    ".fade-in-bottom, .fade-in-bottom-100ms, .fade-in-load, .fade-in-load-far";
-  /* Anything in the hero's load timeline, played at once rather than on scroll. */
-  const ON_LOAD = ".fade-in-load, .fade-in-load-far";
+  const SELECTOR = ".fade-in-bottom, .fade-in-bottom-100ms";
 
   /* Claim the hidden state only now that we can undo it. Anything the
      observer never reaches stays visible rather than disappearing. */
@@ -115,10 +84,6 @@
       return;
     }
 
-    /* The hero is already on screen; play it immediately rather than waiting
-       for a scroll that may never come. */
-    document.querySelectorAll(ON_LOAD).forEach(reveal);
-
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -130,9 +95,7 @@
       { rootMargin: "0px 0px -10% 0px", threshold: 0 },
     );
 
-    targets.forEach((el) => {
-      if (!el.matches(ON_LOAD)) observer.observe(el);
-    });
+    targets.forEach((el) => observer.observe(el));
   };
 
   if (document.readyState === "loading") {

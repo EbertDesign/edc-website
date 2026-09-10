@@ -4,8 +4,29 @@
  * and the "next case" on a case page. The export's `.case` item, verbatim,
  * bound to the `caseCardFields` projection from `utils/sanity.ts`.
  *
- * The "View" circle was scaled to 0.6 and hidden by IX2, revealed on hover;
- * it is a CSS transition here.
+ * The hover is the export's IX2 "Featured Case Hover" (`a-58`/`a-59`, bound by
+ * `e-181`/`e-198`/`e-217`/`e-220` to the thumbnail frame on every page that
+ * listed cases) plus "View Cirlce Move" (`a-54`, the `MOUSE_MOVE` continuous
+ * action on the same element). Three things happen at once:
+ *
+ *   - the title and service rise 8px (250ms, outSine, both ways)
+ *   - the thumbnail scales to 1.05 and dims to 0.8 (500ms/250ms in,
+ *     550ms out, outSine and inOutQuad)
+ *   - the "View" circle fades in over 50ms (inOutQuart) and scales 0.6 → 1
+ *     over 150ms (outSine), then trails the pointer across the frame
+ *
+ * All of it is CSS but the trailing circle, which needs a frame loop. IX2 gave
+ * it ±60px of travel on each axis, measured against the frame's own bounds,
+ * with `smoothing: 95` and `restingState: 50` — a 0.05 lerp toward the pointer
+ * each frame, settling at centre. The script below is that, made frame-rate
+ * independent so it feels the same on a 120Hz display, and skipped entirely
+ * under `prefers-reduced-motion` (IX2 ignored the setting).
+ *
+ * `.view-circle-track` is the one element the export did not have. The circle
+ * cannot both follow the pointer and transition its scale off a single
+ * `transform`, so the track carries the follow and the circle keeps the
+ * scale. It reproduces the frame's own centring, so the circle sits where it
+ * always did.
  */
 import type { ComponentProps } from "astro/types";
 import SanityImg from "@/components/Media/SanityImg.astro";
@@ -47,7 +68,9 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
             sizes="(min-width: 62rem) 40vw, 100vw"
           />
           <div class="case-overlay"></div>
-          <div class="view-circle"><div>View</div></div>
+          <div class="view-circle-track">
+            <div class="view-circle"><div>View</div></div>
+          </div>
         </div>
         <div class="case-info-wrapper">
           <div class="case-info-container">
@@ -62,23 +85,173 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
 
 <style is:global>
   @layer components {
+    /* The three easings `a-58`/`a-59` name, as their bezier equivalents. */
+    .case {
+      --case-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
+      --case-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+      --case-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    /* Base state is the hover-out half of the pair: `a-59` returns both
+       properties over 550ms. `a-58` brings them in on separate clocks, so
+       those durations live on the hover rule instead. */
+    .case .project-thumbnail {
+      transform-origin: center;
+      transition:
+        opacity 550ms var(--case-out-sine),
+        transform 550ms var(--case-out-sine);
+    }
+
+    .case .case-info-wrapper {
+      transition: transform 250ms var(--case-out-sine);
+    }
+
+    .case .view-circle-track {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
     .case .view-circle {
       opacity: 0;
       transform: scale(0.6);
       transition:
-        opacity var(--hover-duration) var(--hover-ease),
-        transform var(--hover-duration) var(--hover-ease);
+        opacity 150ms var(--case-out-sine),
+        transform 150ms var(--case-out-sine);
     }
+
     @media (hover: hover) {
+      .case-wrapper:hover .project-thumbnail {
+        opacity: 0.8;
+        transform: scale(1.05);
+        transition:
+          opacity 250ms var(--case-in-out-quad),
+          transform 500ms var(--case-out-sine);
+      }
+
+      .case-wrapper:hover .case-info-wrapper {
+        transform: translateY(-0.5rem);
+      }
+
+      .case-wrapper:hover .view-circle-track {
+        will-change: transform;
+      }
+
       .case-wrapper:hover .view-circle {
         opacity: 1;
         transform: scale(1);
+        transition:
+          opacity 50ms var(--case-in-out-quart),
+          transform 150ms var(--case-out-sine);
       }
     }
+
+    /* Show the circle, but move nothing: the scale and the rise are the
+       parts worth dropping, and the frame loop never starts. */
     @media (prefers-reduced-motion: reduce) {
-      .case .view-circle {
+      .case .project-thumbnail,
+      .case .case-info-wrapper,
+      .case .view-circle,
+      .case-wrapper:hover .project-thumbnail,
+      .case-wrapper:hover .case-info-wrapper,
+      .case-wrapper:hover .view-circle {
+        transform: none;
         transition: none;
       }
     }
   }
 </style>
+
+<script>
+  /* IX2's `a-54`: ±60px of travel on each axis, `smoothing: 95` (a 0.05 lerp
+     per frame) and `restingState: 50` (centre). Bundled once for the page
+     however many cards are on it. */
+  const FRAME = ".project-thumbnail-wrapper";
+  const TRACK = ".view-circle-track";
+  const REACH = 60;
+  const SMOOTHING = 0.05;
+  const FRAME_MS = 1000 / 60;
+
+  const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
+
+  const follow = (frame: HTMLElement) => {
+    const track = frame.querySelector<HTMLElement>(TRACK);
+    if (!track) return;
+
+    let pointerX = 0;
+    let pointerY = 0;
+    let x = 0;
+    let y = 0;
+    let hovering = false;
+    let raf = 0;
+    let last = 0;
+
+    const tick = (now: number) => {
+      /* Elapsed frames, so a 120Hz display converges at the same rate a 60Hz
+         one does. Capped so a backgrounded tab does not jump on return. */
+      const step = last ? Math.min((now - last) / FRAME_MS, 4) : 1;
+      last = now;
+
+      let targetX = 0;
+      let targetY = 0;
+
+      if (hovering) {
+        /* Read once a frame, immediately before the write below — the frame
+           can scroll under a held pointer. */
+        const rect = frame.getBoundingClientRect();
+        if (rect.width) targetX = (clamp01((pointerX - rect.left) / rect.width) - 0.5) * 2 * REACH;
+        if (rect.height) targetY = (clamp01((pointerY - rect.top) / rect.height) - 0.5) * 2 * REACH;
+      }
+
+      const k = 1 - Math.pow(1 - SMOOTHING, step);
+      x += (targetX - x) * k;
+      y += (targetY - y) * k;
+
+      if (!hovering && Math.abs(x) < 0.1 && Math.abs(y) < 0.1) {
+        track.style.transform = "";
+        x = 0;
+        y = 0;
+        raf = 0;
+        last = 0;
+        return;
+      }
+
+      track.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+      raf = requestAnimationFrame(tick);
+    };
+
+    const run = () => {
+      if (raf) return;
+      last = 0;
+      raf = requestAnimationFrame(tick);
+    };
+
+    frame.addEventListener("pointermove", (event) => {
+      if (event.pointerType === "touch") return;
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      hovering = true;
+      run();
+    });
+
+    frame.addEventListener("pointerleave", () => {
+      hovering = false;
+      run();
+    });
+  };
+
+  const start = () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!window.matchMedia("(hover: hover)").matches) return;
+    document.querySelectorAll<HTMLElement>(FRAME).forEach(follow);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+</script>

@@ -1,0 +1,160 @@
+---
+/**
+ * The load intro a hero plays over its backdrop, rebuilt from the export's
+ * IX2 "Hero Animation" (`a-75`, fired by `e-225` on PAGE_START with
+ * `mediaQueries: ["main"]` — so desktop only, as it is here).
+ *
+ * The backdrop starts full-bleed and full-height, fades up, then collapses
+ * into the 69.3% / 68vh panel the heroes settle at. Nothing else arrives
+ * until it has landed:
+ *
+ *   0.00s  panel at 100% x 100vh, hidden; nav and hero text hidden
+ *   0.50s  panel fades in over 1.75s (outQuad)
+ *   2.25s  panel collapses to 69.3% x 68vh over 1s (inOutQuint)
+ *   3.25s  panel has landed; nav fades in, and the lead rises 104px and
+ *          fades in over 0.5s (outSine)
+ *   3.35s  anything following the lead, staggered by its own delay
+ *   3.50s  the scroll cue, opacity only, as in the export
+ *   3.55s  the block under the hero, where one shows above the fold
+ *
+ * Two departures from the export. IX2 started the headline at 3.00s,
+ * overlapping the last 250ms of the collapse; the text now waits for the
+ * panel to land, so nothing moves against a panel still moving. And the nav
+ * was not in `a-75` at all — it was simply there from the first frame — but a
+ * bar sitting over a full-screen gradient for three seconds reads as a
+ * mistake, so it arrives with the lead.
+ *
+ * Keyframes rather than `Utility/Reveal`'s JS-toggled classes. Reveal hides an
+ * element only once its module script has run, which is after first paint: the
+ * hero text painted in place and then disappeared for three seconds. Keyframes
+ * make the opening state the first thing painted, and they still play with
+ * JavaScript off.
+ *
+ * Rendered by the hero playing it, which puts the role classes below on its
+ * own elements — the panel that collapses, the backdrop that narrows, the lead
+ * and whatever follows it. It draws nothing itself.
+ */
+---
+
+<style is:global>
+  @layer components {
+    @keyframes hero-intro-fade {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes hero-intro-collapse {
+      from {
+        height: 100vh;
+      }
+      to {
+        height: 68vh;
+      }
+    }
+
+    @keyframes hero-intro-uncover {
+      from {
+        width: 100%;
+      }
+      to {
+        width: 69.3%;
+      }
+    }
+
+    /* Distance is per-element: 104px for the lead, 40px for the rest. */
+    @keyframes hero-intro-rise {
+      from {
+        opacity: 0;
+        transform: translateY(var(--hero-intro-rise, 2.5rem));
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* The export animated width to `100vw`; `100%` is the same width for both
+       of these elements without risking a horizontal scrollbar. */
+    @media (width >= 62rem) {
+      .hero-intro_panel {
+        animation:
+          hero-intro-fade 1750ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 500ms both,
+          hero-intro-collapse 1000ms cubic-bezier(0.86, 0, 0.07, 1) 2250ms both;
+      }
+
+      .hero-intro_crop {
+        animation: hero-intro-uncover 1000ms cubic-bezier(0.86, 0, 0.07, 1)
+          2250ms both;
+      }
+
+      .hero-intro_lead {
+        --hero-intro-rise: 6.5rem;
+
+        animation: hero-intro-rise 500ms cubic-bezier(0.39, 0.575, 0.565, 1)
+          3250ms both;
+      }
+
+      /* Each one sets its own delay and duration; these are the first. */
+      .hero-intro_item {
+        animation: hero-intro-rise var(--hero-intro-duration, 250ms)
+          cubic-bezier(0.39, 0.575, 0.565, 1) var(--hero-intro-delay, 3350ms)
+          both;
+      }
+
+      .hero-intro_cue {
+        animation: hero-intro-fade 500ms cubic-bezier(0.39, 0.575, 0.565, 1)
+          3500ms both;
+      }
+
+      /* A hero shorter than the viewport leaves the top of the next block on
+         screen, where `Utility/Reveal` finds it already in view and fades it
+         up at once — over a panel that is still full-bleed and sitting behind
+         it. Delaying Reveal is not enough: it hides an element only once its
+         script has run, so the block still paints in place for the first
+         frames. This takes the element over on the same terms as the rest of
+         the timeline, and cancels the transition Reveal would otherwise run,
+         which outranks an animation and would fade the block in early.
+
+         The element keeps its `.fade-in-bottom`: below the breakpoint, where
+         it sits under the fold and there is no intro, Reveal has it back. */
+      body:has(.hero-intro_panel) .hero-intro_wait {
+        animation: hero-intro-rise 500ms cubic-bezier(0.39, 0.575, 0.565, 1)
+          3550ms both;
+        transition: none;
+      }
+
+      /* The nav is outside the hero, and above it in the document, so there is
+         no sibling to reach it by — `:has()` keys off the panel, which only a
+         hero playing this intro carries. */
+      body:has(.hero-intro_panel) .nav_wrap {
+        animation: hero-intro-fade 500ms cubic-bezier(0.39, 0.575, 0.565, 1)
+          3250ms both;
+      }
+
+      /* Tab straight into the page and the links are focused before they are
+         visible; skip the wait for anyone doing that. */
+      body:has(.hero-intro_panel) .nav_wrap:focus-within {
+        animation: none;
+      }
+    }
+
+    /* IX2 played this regardless; here everything simply starts where it ends.
+       `.nav_wrap` is matched unguarded on purpose — it has no other animation
+       to cancel. */
+    @media (prefers-reduced-motion: reduce) {
+      .nav_wrap,
+      .hero-intro_panel,
+      .hero-intro_crop,
+      .hero-intro_lead,
+      .hero-intro_item,
+      .hero-intro_cue,
+      .hero-intro_wait {
+        animation: none;
+      }
+    }
+  }
+</style>

@@ -1,17 +1,58 @@
-/* The gap under a heading that is followed by body copy.
-   `patterns` already declares this rule, but it can never win: the export's own
-   `h1`, `h2` and `h3` rules in `webflow/site.css` set `margin-bottom: 0`, and
-   `webflow` sits above `patterns` in the cascade — so a `Heading` above a
-   `Paragraph` rendered with the two literally touching, whatever the
-   `--*-margin-bottom` tokens said.
+/* The gap under a heading, or a lead-in label, that is followed by body copy.
+
+   `patterns` already declares this for the framework's own components, but it
+   can never win: the export's `h1`, `h2` and `h3` rules in `webflow/site.css`
+   set `margin-bottom: 0`, and `webflow` sits above `patterns` in the cascade —
+   so a heading above a paragraph rendered with the two literally touching,
+   whatever the `--*-margin-bottom` tokens said. Leading trim makes it worse
+   than it sounds: it shrinks each box to its cap height, so a label that wraps
+   to two lines visually overlaps the paragraph beneath it.
 
    Re-asserted here in `components`: above `webflow`, so it beats those element
-   rules, and below `utilities`, so a page that sets its own `.margin-bottom-*`
-   still wins. It matches only the Lumos component pairing — `.heading`
-   immediately followed by `.text` — which the export's markup never produces,
-   so pass-1 pages carrying the export's classes are untouched.
+   rules. Anything the design has already spaced is skipped by hand, via the
+   `[class*="margin-bottom"]` guard — the export's numeric utilities
+   (`margin-bottom-16`, `margin-bottom-32`, `no-margin-bottom`) live in the
+   `webflow` layer too, so being above it means this rule would otherwise
+   overwrite the very values the design set. This is only the default for pairs
+   nobody has spaced.
 
-   The size of the gap lives with the type scale, in `base.css`. */
-.heading:has(+ .text) {
+   Rich text is left alone. `.rich-text-block` sets its own rhythm in the
+   `webflow` layer and posts are laid out around it; `components` would
+   otherwise override those values and reflow every article. */
+
+:is(
+    h1, h2, h3, h4, h5, h6,
+    .text-s, .text-medium, .text-large, .text-xl, .text-2xl,
+    .text-3xl, .text-4xl, .text-5xl, .text-7xl
+  ):has(+ :is(p, ul, ol)):not(
+    [class*="margin-bottom"],
+    [class*="margin-block"],
+    :is(.rich-text-block, .rich-text) *
+  ) {
   margin-bottom: var(--_margin-bottom);
+}
+
+/* The export's type classes predate the framework's scale, so they carry no
+   `--_margin-bottom` of their own. Map each onto the same step a heading of
+   that size gets, so a 72px `.text-3xl` is spaced like an `h1` and a 20px
+   `.text-medium` like an `h6` — see the tokens in `base.css`. */
+.text-s,
+.text-medium,
+.text-large {
+  --_margin-bottom: var(--space-3);
+}
+
+.text-xl {
+  --_margin-bottom: var(--space-4);
+}
+
+.text-2xl {
+  --_margin-bottom: var(--space-5);
+}
+
+.text-3xl,
+.text-4xl,
+.text-5xl,
+.text-7xl {
+  --_margin-bottom: var(--space-6);
 }
