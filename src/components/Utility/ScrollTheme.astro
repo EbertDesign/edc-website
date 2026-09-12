@@ -1,0 +1,176 @@
+---
+/**
+ * Recolours the whole page as it scrolls, the way the Webflow demo this was
+ * modelled on does: the colour tokens themselves change, so backgrounds,
+ * headings, body copy and accents all move together and no section is left
+ * sitting at its old colour against a new one.
+ *
+ * Mark the element that should bring a colour in with `data-scroll-theme-to`,
+ * and the page takes that theme once the element passes a line across the
+ * screen — its top against a line 80% of the way down by default, so the
+ * change happens as the block arrives rather than long before it.
+ * `data-scroll-theme-offset` moves that line per element, `0` being the top of
+ * the window, and `data-scroll-theme-edge="bottom"` watches the element's
+ * bottom edge rather than its top — the two together are how "once this has
+ * scrolled out of view" is spelt. The last marker the scroll has passed wins,
+ * so going back up puts the earlier colour back.
+ *
+ * The tokens are `@property`-registered as colours, which is what lets them
+ * be transitioned at all: CSS can only interpolate a custom property whose
+ * type it knows. Everything reading them through `var()` — including the
+ * export's own swatches, which paint the page background, the links and the
+ * hover states — then fades without needing a transition of its own.
+ *
+ * With no JavaScript the page keeps the theme it was authored in.
+ */
+---
+
+<style is:global>
+  @property --background {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #f4cfcc;
+  }
+  @property --background-2 {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #fff9f4;
+  }
+  @property --background-3 {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #ffffff;
+  }
+  @property --text {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #0e0e0f;
+  }
+  @property --accent {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #ef4e1c;
+  }
+  @property --light-grey {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #ffffff99;
+  }
+  @property --dark-grey {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #333333;
+  }
+  @property --black {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #0e0e0f;
+  }
+  @property --white {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #ffffff;
+  }
+
+  @layer components {
+    :root {
+      --_scroll-theme-transition: 800ms ease;
+
+      transition:
+        --background var(--_scroll-theme-transition),
+        --background-2 var(--_scroll-theme-transition),
+        --background-3 var(--_scroll-theme-transition),
+        --text var(--_scroll-theme-transition),
+        --accent var(--_scroll-theme-transition),
+        --light-grey var(--_scroll-theme-transition),
+        --dark-grey var(--_scroll-theme-transition),
+        --black var(--_scroll-theme-transition),
+        --white var(--_scroll-theme-transition);
+    }
+
+    /* Orange page, inverted to dark text, with the accents that were orange
+       turning white so they still read. The export's own `--black` and
+       `--white` are inverted with it: the page background, links and the
+       hover states are painted from those two rather than from the theme
+       tokens, and would otherwise stay behind. */
+    :root[data-scroll-theme="brand"] {
+      --background: var(--brand-500);
+      --background-2: var(--brand-500);
+      --background-3: color-mix(in lab, var(--brand-500) 90%, var(--dark-900));
+      --text: var(--dark-900);
+      --accent: var(--light-100);
+      --light-grey: color-mix(in lab, var(--dark-900) 75%, transparent);
+      --dark-grey: color-mix(in lab, var(--dark-900) 30%, transparent);
+      --black: var(--brand-500);
+      --white: var(--dark-900);
+    }
+
+    /* The eyebrow marker is the one accent painted from the brand swatch
+       rather than a theme token, so it is turned over by hand. */
+    .eyebrow_marker {
+      transition: background-color var(--_scroll-theme-transition);
+    }
+
+    :root[data-scroll-theme="brand"] .eyebrow_wrap .eyebrow_marker {
+      background-color: var(--accent);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :root,
+      .eyebrow_marker {
+        transition: none;
+      }
+    }
+  }
+</style>
+
+<script>
+  const triggers = document.querySelectorAll<HTMLElement>(
+    "[data-scroll-theme-to]",
+  );
+
+  if (triggers.length) {
+    const root = document.documentElement;
+    const DEFAULT_OFFSET = 80;
+    let frame = 0;
+
+    /* The theme of the last marker whose top has crossed its line. Read from
+       position rather than remembered from events, so it is right after a
+       resize, a reload part-way down, or a jump to an anchor. */
+    const update = () => {
+      frame = 0;
+
+      let theme = "";
+
+      for (const trigger of triggers) {
+        const offset = Number(trigger.dataset.scrollThemeOffset);
+        const line =
+          (window.innerHeight *
+            (Number.isFinite(offset) ? offset : DEFAULT_OFFSET)) /
+          100;
+
+        const rect = trigger.getBoundingClientRect();
+        const edge =
+          trigger.dataset.scrollThemeEdge === "bottom" ? rect.bottom : rect.top;
+
+        if (edge <= line) {
+          theme = trigger.dataset.scrollThemeTo ?? "";
+        }
+      }
+
+      if (theme) {
+        root.setAttribute("data-scroll-theme", theme);
+      } else {
+        root.removeAttribute("data-scroll-theme");
+      }
+    };
+
+    const schedule = () => {
+      frame ||= requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    update();
+  }
+</script>

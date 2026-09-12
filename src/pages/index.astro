@@ -1,121 +1,14 @@
 ---
 /**
- * The homepage. Pass 2 in progress: the chrome is now the framework's own
- * `Nav` and `Footer`, and the entrance animations are `Utility/Reveal`
- * rather than Webflow's IX2 — so `webflow.js` and jQuery are gone and the
- * `data-w-id` handles they keyed off went with them.
+ * The `/` route, and nothing else. The homepage itself is `Home.astro` —
+ * kept under that name because the site calls this page Home — and since
+ * Astro routes by filename, this file is what serves it from the site root.
  *
- * The seven sections below are still the export's markup, becoming
- * components one at a time against the pass-1 baseline.
+ * `Home.astro` stays a page of its own, so `/Home` answers with the same
+ * markup. It is listed in `NOINDEX_ROUTES` so the copy at `/` is the only
+ * one indexed or listed in the sitemap.
  */
-import BaseLayout from "@/layouts/BaseLayout.astro";
-import Eyebrow from "@/components/Typography/Eyebrow.astro";
-import Button from "@/components/Button.astro";
-import SectionHeroHome from "@/components/SectionHeroHome.astro";
-import CaseCard from "@/components/Item/CaseCard.astro";
-import ServiceItem from "@/components/Item/ServiceItem.astro";
-import CtaContact from "@/components/ContentCtaContact.astro";
-import Section from "@/components/Wrapper/Section.astro";
-import { sanityClient, CASES_LIST_QUERY, SERVICES_LIST_QUERY } from "@/utils/sanity.ts";
-
-const [cases, services] = await Promise.all([
-  sanityClient.fetch(CASES_LIST_QUERY),
-  sanityClient.fetch(SERVICES_LIST_QUERY),
-]);
+import Home from "./Home.astro";
 ---
 
-<BaseLayout
-  title="A Branding Agency Here For Good"
-  description="Ebert Design is a fluid brand identity design agency helping Nonprofits, B Corps, and Purpose-Driven Brands develop identities as unique as they are meaningful."
-  theme="dark"
-  overlap
->
-  <SectionHeroHome />
-
-  <Section id="Welcome" paddingTop="none" containerClass="fade-in-bottom" gap="0">
-    <div class="_12-column-grid">
-      <div id="w-node-dd42f271-cd32-2455-63d8-0f531ea1191b-08125e4c">
-        <Eyebrow tag="h2">Welcome</Eyebrow>
-        <p class="text-4xl">We work with brands on purpose.</p>
-      </div>
-      <div id="w-node-_553609b7-844a-a432-39f5-ff22067293e2-08125e4c" class="w-layout-grid _2-column-grid">
-        <p id="w-node-a3daa308-2736-660e-de4c-0f6a0bbcf6d5-08125e4c" class="text-xl">We strive to create brands that are as unique as they are meaningful. By crafting authentic and inspiring brand stories, we help our clients connect with their audiences on a deeper level and inspire meaningful action.</p>
-        <div id="w-node-bb29d3da-06da-8ee6-826a-6e6f6375da46-08125e4c" class="lead-column-container">
-          <p class="text-medium">Contact Us</p>
-          <p class="light-grey-text">At Ebert Design, we&#x27;re more than a branding agency – we&#x27;re purpose-driven brand architects. Learn about our values and the team making it happen.</p>
-          <Button element="link" href="/contact">Get in touch</Button>
-        </div>
-        <div id="w-node-_7f3e6006-60cf-7f3e-f4d2-28d6eb5b33a9-08125e4c" class="lead-column-container">
-          <p class="text-medium">About Us</p>
-          <p class="light-grey-text">At Ebert Design, we&#x27;re more than a branding agency – we&#x27;re purpose-driven brand architects. Learn about our values and the team making it happen.</p>
-          <Button element="link" href="/journal">Read more</Button>
-        </div>
-      </div>
-      <img class="lead-image" src="/images/sigmund-rJnx12RKrd4-unsplash-min.jpg" alt="" sizes="(max-width: 3314px) 100vw, 3314px" id="w-node-_19665838-910f-3f74-f4c9-831752420cf2-08125e4c" loading="lazy" srcset="/images/sigmund-rJnx12RKrd4-unsplash-min-p-500.jpeg 500w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-800.jpeg 800w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1080.jpeg 1080w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1600.jpeg 1600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2000.jpeg 2000w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2600.jpeg 2600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-3200.jpeg 3200w, /images/sigmund-rJnx12RKrd4-unsplash-min.jpg 3314w" />
-    </div>
-  </Section>
-
-  <Section paddingTop="none" gap="0">
-    <div class="w-layout-grid _12-column-grid">
-      <Eyebrow id="w-node-_5a409e38-8910-ad0d-6c5e-baf282ad2ffa-08125e4c" tag="h2" class="no-margin-bottom sticky-rotated">Case Studies</Eyebrow>
-      <div class="projects w-dyn-list cases-cell cases-cell-home">
-        <div role="list" class="projects-list w-dyn-items">
-          {cases.map((c) => <CaseCard case={c} variant="home" />)}
-        </div>
-      </div>
-    </div>
-    <div class="_12-column-grid">
-      <Button element="link" href="/work" id="w-node-_917f04f8-36b4-9205-5144-030db4b0909a-08125e4c" class="no-margin-top">All cases</Button>
-    </div>
-  </Section>
-
-  <Section class="black-800-background" paddingTop="large" paddingBottom="large" gap="0">
-    <div class="w-layout-grid _12-column-grid grid-large">
-      <div id="w-node-_7dd433f2-c6e7-8972-0f2e-91c8cfa88743-08125e4c" class="approach-item-container fade-in-bottom">
-        <p class="text-4xl primary-text">01</p>
-        <div class="divider margin-top-24 margin-bottom-32"></div>
-        <p class="text-xl margin-bottom-32">Finding Your Organization&#x27;s Unique Purpose.</p>
-        <p class="light-grey-text">Discover your brand&#x27;s essence through our collaborative process. We explore your mission, values, and goals to uncover your unique purpose, laying the foundation for an authentic and inspiring brand identity.<br /></p>
-      </div>
-      <div id="w-node-e95c69b0-cc1d-1bd9-1e22-86b6ce35043b-08125e4c" class="approach-item-container fade-in-bottom-100ms">
-        <p class="text-4xl primary-text">02</p>
-        <div class="divider margin-top-24 margin-bottom-32"></div>
-        <p class="text-xl margin-bottom-32">Designing a Purpose-Driven Identity.</p>
-        <p class="light-grey-text">We specialize in crafting a purpose-driven brand identity that captivates your audience, from logos to visuals. We ensure your brand communicates its core values, leaving a lasting impression on all who encounter it.</p>
-      </div>
-      <Eyebrow id="w-node-_5de4a0d6-f964-8bcd-5c88-3e32614b1ab6-08125e4c" tag="h2" class="eyebrow-offset">Approach</Eyebrow>
-      <div id="w-node-f8e2fe27-44a8-c67f-9556-93d9a49bc8c4-08125e4c" class="approach-item-container fade-in-bottom">
-        <p class="text-4xl primary-text">03</p>
-        <div class="divider margin-top-24 margin-bottom-32"></div>
-        <p class="text-xl margin-bottom-32">Creating Internal and External Alignment.</p>
-        <p class="light-grey-text">Experience the strength of a united purpose as we align your brand&#x27;s narrative with its visual representation. Through seamless integration of messaging and design, we ensure your internal team and external audience share a cohesive understanding of your organization&#x27;s impact.</p>
-      </div>
-      <div id="w-node-d314dd8d-253a-cd50-fde0-d0257599b3a9-08125e4c" class="approach-item-container fade-in-bottom-100ms">
-        <p class="text-4xl primary-text">04</p>
-        <div class="divider margin-top-24 margin-bottom-32"></div>
-        <p class="text-xl margin-bottom-32">Developing a Brand You&#x27;re Proud Of</p>
-        <p class="light-grey-text">Achieve a brand that reflects your passion and purpose, embodying everything you stand for. With Ebert Design, you&#x27;ll have a purpose-driven brand you can proudly showcase to the world, empowering you to make a meaningful difference with every interaction.</p>
-      </div>
-    </div>
-  </Section>
-
-  <Section class="black-800-background" paddingTop="none" gap="0">
-    <Fragment slot="background">
-      <div class="black-900-background"></div>
-      <div class="large-image-container">
-        <img src="/images/tripoint-style-sheet.png" loading="lazy" sizes="100vw" srcset="/images/tripoint-style-sheet-p-500.png 500w, /images/tripoint-style-sheet-p-800.png 800w, /images/tripoint-style-sheet-p-1080.png 1080w, /images/tripoint-style-sheet-p-1600.png 1600w, /images/tripoint-style-sheet-p-2000.png 2000w, /images/tripoint-style-sheet-p-2600.png 2600w, /images/tripoint-style-sheet.png 2750w" alt="" class="image" />
-      </div>
-    </Fragment>
-  </Section>
-
-  <Section paddingTop="none" gap="0">
-    <Eyebrow tag="h2">Services</Eyebrow>
-    <div class="services-list-container fade-in-bottom w-dyn-list">
-      <div role="list" class="w-dyn-items">
-        {services.map((s) => <ServiceItem service={s} />)}
-      </div>
-    </div>
-  </Section>
-
-  <CtaContact />
-</BaseLayout>
+<Home />

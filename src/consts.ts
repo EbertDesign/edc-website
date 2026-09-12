@@ -14,4 +14,4 @@ export const SITE_LOCALE = "en-US";
  * Surrounding slashes are optional: `"/thanks"`, `"thanks"` and `"/thanks/"`
  * all match the same route.
  */
-export const NOINDEX_ROUTES: string[] = ["/404", "/test"];
+export const NOINDEX_ROUTES: string[] = ["/404", "/test", "/Home"];

@@ -1,0 +1,373 @@
+---
+/**
+ * The homepage's Approach, as a pinned sequence rather than a grid.
+ *
+ * The four steps used to sit in a 12-column grid, all four readable at once.
+ * Here the image column pins to the screen and the steps scroll past it one
+ * at a time: whichever step is crossing the middle of the viewport is the
+ * live one, the others dim back, and the image behind swaps to match. With
+ * each step a screen tall, the section takes four screens of scroll to get
+ * through — the "lock" is the sticky column, not a hijacked wheel, so the
+ * scrollbar, keyboard, trackpad and find-in-page all keep working.
+ *
+ * The photographs are placeholders, borrowed from elsewhere on the site.
+ * Swap the `image` entries below when the real ones exist; nothing else has
+ * to change.
+ *
+ * The step that is live is read from position on every frame rather than
+ * remembered from an event, the same way `Utility/ScrollTheme` does it, so
+ * it is right after a resize, a reload part-way down, or a jump to an
+ * anchor. With no JavaScript the steps all stay at full strength and the
+ * first image shows — the dimming only applies once the script has said it
+ * can undo it.
+ */
+import type { ComponentProps, HTMLAttributes } from "astro/types";
+import Section from "@/components/Wrapper/Section.astro";
+import Eyebrow from "@/components/Typography/Eyebrow.astro";
+
+type Props = Pick<
+  ComponentProps<typeof Section>,
+  "render" | "theme" | "paddingTop" | "paddingBottom"
+> &
+  HTMLAttributes<"section">;
+
+const {
+  render = true,
+  theme = "inherit",
+  paddingTop = "large",
+  paddingBottom = "large",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const steps = [
+  {
+    title: "Finding Your Organization's Unique Purpose.",
+    text: "Discover your brand's essence through our collaborative process. We explore your mission, values, and goals to uncover your unique purpose, laying the foundation for an authentic and inspiring brand identity.",
+    image: "/images/kaleidico-26MJGnCM0Wc-unsplash.jpg",
+    srcset:
+      "/images/kaleidico-26MJGnCM0Wc-unsplash-p-500.jpg 500w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-800.jpg 800w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-1080.jpg 1080w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-1600.jpg 1600w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-2000.jpg 2000w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-2600.jpg 2600w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-3200.jpg 3200w, /images/kaleidico-26MJGnCM0Wc-unsplash.jpg 5029w",
+  },
+  {
+    title: "Designing a Purpose-Driven Identity.",
+    text: "We specialize in crafting a purpose-driven brand identity that captivates your audience, from logos to visuals. We ensure your brand communicates its core values, leaving a lasting impression on all who encounter it.",
+    image: "/images/jason-goodman-vbxyFxlgpjM-unsplash.jpg",
+    srcset:
+      "/images/jason-goodman-vbxyFxlgpjM-unsplash-p-500.jpg 500w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-800.jpg 800w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1080.jpg 1080w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1600.jpg 1600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2000.jpg 2000w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2600.jpg 2600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-3200.jpg 3200w, /images/jason-goodman-vbxyFxlgpjM-unsplash.jpg 3600w",
+  },
+  {
+    title: "Creating Internal and External Alignment.",
+    text: "Experience the strength of a united purpose as we align your brand's narrative with its visual representation. Through seamless integration of messaging and design, we ensure your internal team and external audience share a cohesive understanding of your organization's impact.",
+    image: "/images/jason-goodman-Oalh2MojUuk-unsplash.jpg",
+    srcset:
+      "/images/jason-goodman-Oalh2MojUuk-unsplash-p-500.jpg 500w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-800.jpg 800w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-1080.jpg 1080w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-1600.jpg 1600w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-2000.jpg 2000w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-2600.jpg 2600w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-3200.jpg 3200w, /images/jason-goodman-Oalh2MojUuk-unsplash.jpg 3600w",
+  },
+  {
+    title: "Developing a Brand You're Proud Of.",
+    text: "Achieve a brand that reflects your passion and purpose, embodying everything you stand for. With Ebert Design, you'll have a purpose-driven brand you can proudly showcase to the world, empowering you to make a meaningful difference with every interaction.",
+    image: "/images/sigmund-rJnx12RKrd4-unsplash-min.jpg",
+    srcset:
+      "/images/sigmund-rJnx12RKrd4-unsplash-min-p-500.jpeg 500w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-800.jpeg 800w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1080.jpeg 1080w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1600.jpeg 1600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2000.jpeg 2000w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2600.jpeg 2600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-3200.jpeg 3200w, /images/sigmund-rJnx12RKrd4-unsplash-min.jpg 3314w",
+  },
+];
+
+const sizes = "(min-width: 62rem) 45vw, 92vw";
+---
+
+<Section
+  render={render}
+  theme={theme}
+  paddingTop={paddingTop}
+  paddingBottom={paddingBottom}
+  class={["approach_wrap", className].filter(Boolean).join(" ")}
+  containerClass="approach_layout"
+  {...rest}
+>
+  <div class="approach_media">
+    <div class="approach_frame">
+      <div class="approach_figure">
+        {
+          steps.map((step, index) => (
+            <img
+              class:list={["approach_image", index === 0 && "is-active"]}
+              src={step.image}
+              srcset={step.srcset}
+              sizes={sizes}
+              alt=""
+              loading={index === 0 ? "eager" : "lazy"}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="approach_content">
+    <Eyebrow tag="h2" class="approach_label no-margin-bottom">Approach</Eyebrow>
+
+    <ol class="approach_steps">
+      {
+        steps.map((step, index) => (
+          <li class:list={["approach_step", index === 0 && "is-active"]}>
+            <p class="approach_number text-4xl primary-text">
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <div class="divider margin-top-24 margin-bottom-32" />
+            <p class="approach_title text-xl margin-bottom-32">{step.title}</p>
+            <p class="approach_text light-grey-text">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</Section>
+
+<style is:global>
+  @layer components {
+    /* Both breakpoints share one idea — a column that pins while the steps
+       scroll past — so the media column carries the sticky itself while it
+       is stacked, and hands it to the frame inside once there are two
+       columns to pin between. */
+    .approach_layout {
+      /* How long the picture takes to cross to the next one. The text is
+         not eased with it: its strength is read straight off the scroll. */
+      --_approach-fade: 600ms ease;
+      --_step-height: 62svh;
+      display: grid;
+
+      @media (width >= 62rem) {
+        --_step-height: 65svh;
+
+        /* The picture and its text stand a section's-worth of space apart,
+           off the same token `.gap-small` reads. The site gutter is sized
+           for twelve narrow columns and leaves the two of these touching.
+           Set here rather than through the section's `gap` prop: that prop
+           writes a `.gap-*` utility, and the utilities layer would take the
+           row gap with it. */
+        grid-template-columns: 1fr 1fr;
+        column-gap: var(--section-space-small);
+      }
+    }
+
+    .approach_media {
+      /* Stacked, the image holds the top of the screen and the steps run
+         beneath it, so it needs the page's own colour behind it — the theme
+         token, which the scroll recolouring moves with the rest of the page. */
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background-color: var(--background);
+      padding-bottom: var(--space-5);
+
+      @media (width >= 62rem) {
+        position: static;
+        background-color: transparent;
+        padding-bottom: 0;
+      }
+    }
+
+    .approach_frame {
+      display: flex;
+      flex-direction: column;
+
+      @media (width >= 62rem) {
+        position: sticky;
+        top: 0;
+        height: 100svh;
+        justify-content: center;
+        padding-block: var(--space-7);
+      }
+    }
+
+    .approach_figure {
+      position: relative;
+      overflow: hidden;
+      height: 38svh;
+      border-radius: var(--radius-main);
+      background-color: var(--background-3);
+
+      @media (width >= 62rem) {
+        /* A ratio off the framework's own scale — the `ratio-4-5` step —
+           rather than filling whatever the label leaves of the pinned
+           frame, which ran the card to nearly the height of the screen.
+           `max-height` holds it inside the frame on a short one, where the
+           picture crops a little further rather than overflowing. */
+        aspect-ratio: 4 / 5;
+        max-height: 100%;
+        height: auto;
+      }
+    }
+
+    .approach_image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity var(--_approach-fade);
+
+      &.is-active {
+        opacity: 1;
+      }
+    }
+
+    /* The label stands off the outer edge of the text, mirroring where it
+       stood off the outer edge of the picture — in a track of its own, so
+       the steps pass beside it rather than through it. */
+    .approach_content {
+      @media (width >= 62rem) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: var(--site-gutter);
+      }
+    }
+
+    /* Pinned for the length of the sequence: its grid area is the whole
+       height the steps run down, so it is held from the first to the last
+       and released with them. Stacked, the picture already holds the top of
+       the screen, so the label sits above the steps and scrolls with them. */
+    .approach_label {
+      @media (width >= 62rem) {
+        grid-area: 1 / 2;
+        align-self: start;
+        position: sticky;
+        top: var(--space-7);
+      }
+    }
+
+    .approach_steps {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      @media (width >= 62rem) {
+        grid-area: 1 / 1;
+        /* The first step has nothing above it to arrive from and the last
+           nothing to give way to, so without this the sequence would open
+           with the text flush to the top of the pinned frame and let the
+           picture go before the last step had finished arriving — both
+           sitting wrong against a picture whose middle is the middle of the
+           screen. Half of what a step leaves over from the screen at each
+           end lines the two up: the picture takes hold with the first step
+           centred on it and lets go on the last step reaching the same
+           place. */
+        padding-block: calc((100svh - var(--_step-height)) / 2);
+      }
+    }
+
+    .approach_step {
+      /* Spaced by about half again what a step's text takes up, which is
+         what keeps the pinned column holding for the length of the sequence
+         while leaving two steps on the screen at once: the one going out
+         still has a few lines showing at the top as the one coming in
+         arrives at the bottom, so both ends of the fade are seen. A screen
+         apiece put them a screen apart, and only ever one in view. */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: var(--_step-height);
+    }
+
+    /* The text fades on the same timing as the picture, and on the same
+       crossing, so the two change as one. Timed rather than tied to the
+       scroll: a value read straight off the scroll snaps when the scroll
+       does, and a flick of the wheel showed no fade at all.
+
+       Only dims once the script has said it can undo it — with no
+       JavaScript every step stays at full. */
+    .approach_step {
+      transition: opacity var(--_approach-fade);
+    }
+
+    .approach_wrap[data-approach-ready] .approach_step:not(.is-active) {
+      opacity: 0.35;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .approach_image,
+      .approach_step {
+        transition: none;
+      }
+    }
+  }
+</style>
+
+<script>
+  const WIDE = "(width >= 62rem)";
+
+  /* How far below the reading line a step takes over, as a share of its own
+     height. It is lit while its middle is between this and a whole step
+     above, and the steps are spaced by exactly their own height, so one is
+     always lit and never two. Half a step below puts that window squarely
+     around the line, which is where a step is framed against the picture:
+     the one coming up lights as it clears the bottom of the screen, and the
+     one going out is still almost whole at the top as it gives way, so both
+     ends of the fade run well inside the screen rather than off the edge. */
+  const LIT_BELOW = 0.5;
+
+  for (const section of document.querySelectorAll<HTMLElement>(
+    ".approach_wrap",
+  )) {
+    const steps = [...section.querySelectorAll<HTMLElement>(".approach_step")];
+    const images = [
+      ...section.querySelectorAll<HTMLElement>(".approach_image"),
+    ];
+
+    if (steps.length < 2) continue;
+
+    /* Claim the dimmed state only now that there is something to undo it. */
+    section.setAttribute("data-approach-ready", "");
+
+    const wide = window.matchMedia(WIDE);
+    let active = 0;
+    let frame = 0;
+
+    const activate = (index: number) => {
+      if (index === active) return;
+      active = index;
+
+      steps.forEach((step, i) =>
+        step.classList.toggle("is-active", i === index),
+      );
+      images.forEach((img, i) =>
+        img.classList.toggle("is-active", i === index),
+      );
+    };
+
+    /* The last step whose middle has come up past the line — the middle of
+       the screen with the columns side by side, lower down once the picture
+       is holding the top — plus the head start `LIT_BELOW` gives it.
+
+       The middle, not the top: a step is a screen tall with its text centred
+       in it, so a step whose top is on the line has its text at the very
+       bottom edge and the one before it has left the screen entirely.
+       Crossing over there spends the fade where neither can be seen. */
+    const update = () => {
+      frame = 0;
+
+      const line = window.innerHeight * (wide.matches ? 0.5 : 0.72);
+      let index = 0;
+
+      steps.forEach((step, i) => {
+        const box = step.getBoundingClientRect();
+        const middle = box.top + box.height / 2;
+
+        if (middle - line < box.height * LIT_BELOW) index = i;
+      });
+
+      activate(index);
+    };
+
+    const schedule = () => {
+      frame ||= requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    /* The steps move as the images and fonts land, and a page restored
+       part-way down gets no scroll event to notice with. */
+    window.addEventListener("load", schedule);
+    update();
+  }
+</script>
