@@ -21,7 +21,10 @@
 @import "./base.css" layer(base);
 @import "./patterns.css" layer(patterns);
 
-@import "./webflow/normalize.css" layer(webflow);
+/* Pruned to the rules something in `src/` still uses. The export's
+   normalize.css is gone; the two rules of it still doing work moved to
+   `base.css` (form controls inherit color) and `site.css` (`main` stays a
+   block). */
 @import "./webflow/webflow.css" layer(webflow);
 @import "./webflow/site.css" layer(webflow);
 
