@@ -160,16 +160,37 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
 
     .hero-usp-container {
       max-width: 85%;
+
+      /* The export's own type classes, still defined in `webflow/site.css`
+         where they name Inter and `--light-grey`. Overridden here only, so
+         the pages that share these classes keep their current look until the
+         typography step moves the scale wholesale. */
+      .text-medium {
+        font-family: var(--font-grotesk);
+        color: var(--ink);
+      }
+
+      .light-grey-text {
+        font-family: var(--font-grotesk);
+        color: var(--ink-muted);
+      }
     }
 
     .home-hero-text {
-      color: var(--white);
+      /* The size stays the export's 8vw — see the file header; the token
+         scale would cap it and leave it undersized on a wide screen. Only
+         the face and the colour move. `font-family` has to be said here
+         because `webflow`'s own `h1` rule names Syne directly, and Astro's
+         font variables are injected unlayered, so the variable itself
+         cannot be overridden — only the rule that reads it. */
+      color: var(--ink);
+      font-family: var(--font-grotesk);
       margin-bottom: 48px;
       font-size: 8vw;
     }
 
     .icon-button {
-      background-color: #ffffff1a;
+      background-color: var(--ground-raised);
       border-radius: 100vw;
       justify-content: center;
       align-items: center;
@@ -187,7 +208,9 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
     .icon-button .button-arrow {
       width: 28px;
       height: 28px;
-      color: var(--accent);
+      /* The hero's one system mark — green on the Signal ground, `--ink` in
+         Field. Orange stays with the CTA. */
+      color: var(--system);
       margin-top: 0;
     }
 

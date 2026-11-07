@@ -5,6 +5,7 @@ import { slotContent } from "@/utils/slots.ts";
 type HeadingTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 type HeadingStyle =
   | "inherit"
+  | "display-xl"
   | "display"
   | "h1"
   | "h2"
@@ -12,9 +13,15 @@ type HeadingStyle =
   | "h4"
   | "h5"
   | "h6"
+  | "lead"
+  | "body"
   | "large"
   | "main"
-  | "small";
+  | "small"
+  | "tech"
+  | "caption"
+  | "label"
+  | "label-lg";
 
 interface Props extends HTMLAttributes<"div"> {
   /** Set to `false` to skip rendering this component and its children. */
@@ -25,8 +32,11 @@ interface Props extends HTMLAttributes<"div"> {
    * Type style, chosen apart from `tag` so a heading can change level without
    * changing size. Defaults to matching `tag`.
    *
-   * - `display`, `h1`–`h6` — the heading sizes
-   * - `large`, `main`, `small` — the body sizes
+   * - `display-xl`, `display`, `h1`–`h6` — the heading sizes
+   * - `lead`, `body`, `small` — the body sizes
+   * - `tech`, `caption` — mono, for readouts and figures
+   * - `label`, `label-lg` — Departure, uppercase
+   * - `large`, `main` — the previous names for `lead` and `body`
    * - `inherit` — take the style from its surroundings
    */
   variant?: HeadingStyle;

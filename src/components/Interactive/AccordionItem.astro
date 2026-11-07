@@ -56,7 +56,7 @@ const content = await slotContent(Astro.slots);
   @layer components {
     .accordion_item {
       interpolate-size: allow-keywords;
-      border-bottom: var(--border-width) solid var(--border);
+      border-bottom: var(--border-width) solid var(--rule);
       transition: border-color var(--hover-duration) var(--hover-ease);
       @media (hover: hover) {
         &:hover {

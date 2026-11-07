@@ -218,7 +218,7 @@ const text = label ?? wording.label;
       appearance: none;
       padding-inline-end: 3em;
       &:has(option[value=""]:checked) {
-        color: var(--text-2);
+        color: var(--ink-muted);
       }
     }
 
@@ -229,7 +229,7 @@ const text = label ?? wording.label;
       translate: 0 -50%;
       rotate: 90deg;
       pointer-events: none;
-      color: var(--text-2);
+      color: var(--ink-muted);
     }
 
     /* The list the browser draws itself, where it will */
@@ -261,7 +261,7 @@ const text = label ?? wording.label;
       }
 
       .form-select_field:open {
-        background-color: var(--background-3);
+        background-color: var(--ground-raised);
         border-end-start-radius: 0;
         border-end-end-radius: 0;
       }
@@ -272,7 +272,7 @@ const text = label ?? wording.label;
         max-height: min(18rem, calc(100dvh - 6rem));
         position-try-order: normal;
         overscroll-behavior: contain;
-        background-color: var(--background-3);
+        background-color: var(--ground-raised);
         border: 0;
         border-radius: var(--radius-small);
         border-start-start-radius: 0;
@@ -305,14 +305,18 @@ const text = label ?? wording.label;
         padding: var(--space-1) var(--space-2);
         font-size: var(--text-small);
         line-height: var(--line-height-large);
-        color: var(--text);
+        color: var(--ink);
         background-color: transparent;
         border-radius: var(--radius-small);
         cursor: pointer;
         transition: background-color var(--hover-duration) var(--hover-ease);
         &:hover,
         &:focus {
-          background-color: var(--background-2);
+          background-color: color-mix(
+            in srgb,
+            var(--ground-raised),
+            var(--ink) 8%
+          );
           outline: 0;
         }
       }
@@ -324,7 +328,7 @@ const text = label ?? wording.label;
       .form-select_field option::checkmark {
         order: 1;
         margin-inline-start: auto;
-        color: var(--text-2);
+        color: var(--system);
       }
     }
   }

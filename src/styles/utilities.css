@@ -862,17 +862,17 @@
 }
 
 .weight-regular {
-  font-family: var(--primary-family);
+  font-family: var(--font-grotesk);
   font-weight: var(--primary-regular);
 }
 
 .weight-medium {
-  font-family: var(--primary-family);
+  font-family: var(--font-grotesk);
   font-weight: var(--primary-medium);
 }
 
 .weight-bold {
-  font-family: var(--primary-family);
+  font-family: var(--font-grotesk);
   font-weight: var(--primary-bold);
 }
 
@@ -918,15 +918,15 @@
 }
 
 .background-1 {
-  background-color: var(--background);
+  background-color: var(--ground);
 }
 
 .background-2 {
-  background-color: var(--background-2);
+  background-color: var(--ground-raised);
 }
 
 .background-skeleton {
-  background-color: var(--background-skeleton);
+  background-color: color-mix(in srgb, var(--ink) 10%, transparent);
 }
 
 .radius-none {

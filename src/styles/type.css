@@ -1,0 +1,323 @@
+/* The 2026 type scale.
+   
+   Sizes are written as a clamp between the brief's mobile and desktop values,
+   over the 320–1440px range `base.css` already uses. Styles the old scale
+   also had keep their token names, so the element rules in `base.css`, the
+   `.text-style-*` utilities and the `Heading` / `Paragraph` variants all pick
+   the new scale up without being rewritten — only the values that actually
+   change are restated here.
+
+   One deliberate extension: the brief names three heading levels, and this
+   site has six in use (`variant="h4"` appears 8 times, `h5` twice). h4–h6
+   step down through the brief's own sizes at heading weight rather than
+   inventing new ones. Flagged in docs/brand.md. */
+
+:root {
+  /* display-xl — 120 / 56 */
+  --display-xl: clamp(3.5rem, 2.3571rem + 5.7143vw, 7.5rem);
+  --display-xl-font-family: var(--font-grotesk);
+  --display-xl-font-weight: 500;
+  --display-xl-line-height: 0.95;
+  --display-xl-letter-spacing: -0.03em;
+  --display-xl-text-transform: none;
+  --display-xl-text-wrap: balance;
+  --display-xl-margin-top: 0;
+  --display-xl-margin-bottom: var(--space-6);
+  --display-xl-trim-top: var(--primary-trim-top);
+  --display-xl-trim-bottom: var(--primary-trim-bottom);
+
+  /* display — 72 / 44. Takes the old `--display` slot. */
+  --display: clamp(2.75rem, 2.25rem + 2.5vw, 4.5rem);
+  --display-font-family: var(--font-grotesk);
+  --display-font-weight: 500;
+  --display-line-height: 1;
+  --display-letter-spacing: -0.02em;
+
+  /* h1 — 48 / 36 */
+  --h1: clamp(2.25rem, 2.0357rem + 1.0714vw, 3rem);
+  --h1-font-family: var(--font-grotesk);
+  --h1-font-weight: 500;
+  --h1-line-height: 1.08;
+  --h1-letter-spacing: -0.015em;
+
+  /* h2 — 32 / 28 */
+  --h2: clamp(1.75rem, 1.6786rem + 0.3571vw, 2rem);
+  --h2-font-family: var(--font-grotesk);
+  --h2-font-weight: 500;
+  --h2-line-height: 1.15;
+  --h2-letter-spacing: -0.01em;
+
+  /* h3 — 24 / 20 */
+  --h3: clamp(1.25rem, 1.1786rem + 0.3571vw, 1.5rem);
+  --h3-font-family: var(--font-grotesk);
+  --h3-font-weight: 500;
+  --h3-line-height: 1.25;
+  --h3-letter-spacing: -0.005em;
+
+  /* h4–h6 — the extension. The brief's lead, body and small sizes carrying
+     heading weight, so an existing six-level ladder still descends. */
+  --h4: clamp(1.125rem, 1.0893rem + 0.1786vw, 1.25rem);
+  --h4-font-family: var(--font-grotesk);
+  --h4-font-weight: 500;
+  --h4-line-height: 1.4;
+  --h4-letter-spacing: 0;
+
+  --h5: 1rem;
+  --h5-font-family: var(--font-grotesk);
+  --h5-font-weight: 500;
+  --h5-line-height: 1.55;
+  --h5-letter-spacing: 0;
+
+  --h6: 0.875rem;
+  --h6-font-family: var(--font-grotesk);
+  --h6-font-weight: 500;
+  --h6-line-height: 1.45;
+  --h6-letter-spacing: 0;
+
+  /* lead — 20 / 18. Takes the old `--text-large` slot. */
+  --text-large: clamp(1.125rem, 1.0893rem + 0.1786vw, 1.25rem);
+  --text-large-font-family: var(--font-grotesk);
+  --text-large-font-weight: 400;
+  --text-large-line-height: 1.4;
+  --text-large-letter-spacing: 0;
+
+  /* body — 16. Takes the old `--text-main` slot, down from 18. */
+  --text-main: 1rem;
+  --text-main-font-family: var(--font-grotesk);
+  --text-main-font-weight: 400;
+  --text-main-line-height: 1.55;
+  --text-main-letter-spacing: 0;
+
+  /* small — 14 */
+  --text-small: 0.875rem;
+  --text-small-font-family: var(--font-grotesk);
+  --text-small-font-weight: 400;
+  --text-small-line-height: 1.45;
+  --text-small-letter-spacing: 0;
+
+  /* tech — 14, mono. Readouts and data. */
+  --tech: 0.875rem;
+  --tech-font-family: var(--font-mono);
+  --tech-font-weight: 400;
+  --tech-line-height: 1.6;
+  --tech-letter-spacing: 0;
+  --tech-text-transform: none;
+  --tech-text-wrap: pretty;
+  --tech-margin-top: 0;
+  --tech-margin-bottom: var(--space-3);
+  --tech-trim-top: var(--primary-trim-top);
+  --tech-trim-bottom: var(--primary-trim-bottom);
+
+  /* caption — 12, mono */
+  --caption: 0.75rem;
+  --caption-font-family: var(--font-mono);
+  --caption-font-weight: 400;
+  --caption-line-height: 1.5;
+  --caption-letter-spacing: 0;
+  --caption-text-transform: none;
+  --caption-text-wrap: pretty;
+  --caption-margin-top: 0;
+  --caption-margin-bottom: var(--space-3);
+  --caption-trim-top: var(--primary-trim-top);
+  --caption-trim-bottom: var(--primary-trim-bottom);
+
+
+  /* Carried over from `base.css` with the rest of the scale: the trim,
+     margin and wrap values each style needs, which the element rules and the
+     `.text-style-*` utilities read alongside the size. */
+  --display-text-transform: none;
+  --display-text-wrap: balance;
+  --display-margin-top: 0;
+  --display-margin-bottom: var(--space-6);
+  --display-trim-top: var(--primary-trim-top);
+  --display-trim-bottom: var(--primary-trim-bottom);
+  --h1-text-transform: none;
+  --h1-text-wrap: balance;
+  --h1-margin-top: 0;
+  --h1-margin-bottom: var(--space-6);
+  --h1-trim-top: var(--primary-trim-top);
+  --h1-trim-bottom: var(--primary-trim-bottom);
+  --h2-text-transform: none;
+  --h2-text-wrap: balance;
+  --h2-margin-top: 0;
+  --h2-margin-bottom: var(--space-5);
+  --h2-trim-top: var(--primary-trim-top);
+  --h2-trim-bottom: var(--primary-trim-bottom);
+  --h3-text-transform: none;
+  --h3-text-wrap: balance;
+  --h3-margin-top: 0;
+  --h3-margin-bottom: var(--space-5);
+  --h3-trim-top: var(--primary-trim-top);
+  --h3-trim-bottom: var(--primary-trim-bottom);
+  --h4-text-transform: none;
+  --h4-text-wrap: balance;
+  --h4-margin-top: 0;
+  --h4-margin-bottom: var(--space-4);
+  --h4-trim-top: var(--primary-trim-top);
+  --h4-trim-bottom: var(--primary-trim-bottom);
+  --h5-text-transform: none;
+  --h5-text-wrap: balance;
+  --h5-margin-top: 0;
+  --h5-margin-bottom: var(--space-4);
+  --h5-trim-top: var(--primary-trim-top);
+  --h5-trim-bottom: var(--primary-trim-bottom);
+  --h6-text-transform: none;
+  --h6-text-wrap: balance;
+  --h6-margin-top: 0;
+  --h6-margin-bottom: var(--space-3);
+  --h6-trim-top: var(--primary-trim-top);
+  --h6-trim-bottom: var(--primary-trim-bottom);
+  --text-large-text-transform: none;
+  --text-large-text-wrap: pretty;
+  --text-large-margin-top: 0;
+  --text-large-margin-bottom: var(--space-4);
+  --text-large-trim-top: var(--primary-trim-top);
+  --text-large-trim-bottom: var(--primary-trim-bottom);
+  --text-main-text-transform: none;
+  --text-main-text-wrap: pretty;
+  --text-main-margin-top: 0;
+  --text-main-margin-bottom: var(--space-4);
+  --text-main-trim-top: var(--primary-trim-top);
+  --text-main-trim-bottom: var(--primary-trim-bottom);
+  --text-small-text-transform: none;
+  --text-small-text-wrap: pretty;
+  --text-small-margin-top: 0;
+  --text-small-margin-bottom: var(--space-3);
+  --text-small-trim-top: var(--primary-trim-top);
+  --text-small-trim-bottom: var(--primary-trim-bottom);
+
+  /* The two Departure labels. Sizes come from `--label` / `--label-lg` in
+     `brand.css`, which are px on purpose — see the note there. */
+  --label-font-family: var(--font-pixel);
+  --label-font-weight: 400;
+  --label-letter-spacing: 0;
+  --label-text-transform: uppercase;
+  --label-text-wrap: pretty;
+  --label-margin-top: 0;
+  --label-margin-bottom: var(--space-3);
+  --label-trim-top: 0;
+  --label-trim-bottom: 0;
+}
+
+/* "In signal mode, h1 to h3 drop to weight 400." The display sizes and the
+   extension levels keep theirs — the brief names h1 to h3 only. */
+[data-theme="signal"],
+.theme-dark,
+.theme-light .theme-invert {
+  --h1-font-weight: 400;
+  --h2-font-weight: 400;
+  --h3-font-weight: 400;
+}
+
+/* The export's own type classes, remapped onto the new scale rather than
+   edited out of 50-odd places in the markup. Removing the classes themselves
+   belongs with the cleanup commit that takes the whole `webflow` layer.
+
+   In the `brand` layer, not `utilities`: these have to beat the export's own
+   rules, but a migrated component still has to beat them. Most land exactly —
+   the export's 48, 32, 24, 20 and 14px steps are the new h1, h2, h3, lead and
+   small. The three above 104px collapse onto display-xl, because the new
+   scale stops at 120 and the old one had three sizes past it. */
+.text-7xl,
+.text-5xl {
+  font-family: var(--font-grotesk);
+  font-size: var(--display-xl);
+  font-weight: var(--display-xl-font-weight);
+  line-height: var(--display-xl-line-height);
+  letter-spacing: var(--display-xl-letter-spacing);
+}
+
+.text-4xl,
+.text-3xl {
+  font-family: var(--font-grotesk);
+  font-size: var(--display);
+  font-weight: var(--display-font-weight);
+  line-height: var(--display-line-height);
+  letter-spacing: var(--display-letter-spacing);
+}
+
+.text-2xl {
+  font-family: var(--font-grotesk);
+  font-size: var(--h1);
+  font-weight: var(--h1-font-weight);
+  line-height: var(--h1-line-height);
+  letter-spacing: var(--h1-letter-spacing);
+}
+
+.text-xl {
+  font-family: var(--font-grotesk);
+  font-size: var(--h2);
+  font-weight: var(--h2-font-weight);
+  line-height: var(--h2-line-height);
+  letter-spacing: var(--h2-letter-spacing);
+}
+
+.text-large {
+  font-family: var(--font-grotesk);
+  font-size: var(--h3);
+  font-weight: var(--h3-font-weight);
+  line-height: var(--h3-line-height);
+  letter-spacing: var(--h3-letter-spacing);
+}
+
+.text-medium {
+  font-family: var(--font-grotesk);
+  font-size: var(--text-large);
+  font-weight: 500;
+  line-height: var(--text-large-line-height);
+  letter-spacing: 0;
+}
+
+.text-s {
+  font-family: var(--font-grotesk);
+  font-size: var(--text-small);
+  font-weight: var(--text-small-font-weight);
+  line-height: var(--text-small-line-height);
+  letter-spacing: 0;
+}
+
+/* The export's muted body colour, which named `--light-grey` directly. */
+.light-grey-text {
+  font-family: var(--font-grotesk);
+  color: var(--ink-muted);
+}
+
+/* The export's own element rules name Syne and Inter directly, and Astro's
+   font variables are injected unlayered so the variables themselves cannot be
+   overridden — only the rules that read them. */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+blockquote,
+li,
+figcaption,
+input,
+textarea,
+select,
+button {
+  font-family: var(--font-grotesk);
+}
+
+/* The export also sets the body metrics — 1.125rem, 1.5 and -.25px tracking —
+   from that same layer, so `base.css` reading `--text-main` never reached
+   them. `p` is listed separately because the export carries a `p` rule of its
+   own at 1.125rem, which beats inheritance from `body`: without it every
+   paragraph on the site stays 18px while `body` says 16. Being in `brand`
+   also puts this above the export's `.rich-text-block p`, whatever its
+   specificity. */
+body,
+p,
+li,
+blockquote,
+figcaption {
+  font-size: var(--text-main);
+  font-weight: var(--text-main-font-weight);
+  line-height: var(--text-main-line-height);
+  letter-spacing: var(--text-main-letter-spacing);
+}

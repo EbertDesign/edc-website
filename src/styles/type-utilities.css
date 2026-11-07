@@ -1,0 +1,103 @@
+/* The 2026 scale as utilities, beside the ones `utilities.css` already
+   carries. The brief's own names — the styles the old scale had keep working
+   under their existing `.text-style-*` names, listed here where the two
+   differ so either spelling resolves to the same tokens. */
+
+.text-style-display-xl {
+  font-family: var(--display-xl-font-family);
+  font-size: var(--display-xl);
+  font-weight: var(--display-xl-font-weight);
+  line-height: var(--display-xl-line-height);
+  letter-spacing: var(--display-xl-letter-spacing);
+  text-wrap: var(--display-xl-text-wrap);
+  --_trim-top: var(--display-xl-trim-top);
+  --_trim-bottom: var(--display-xl-trim-bottom);
+  --_margin-top: var(--display-xl-margin-top);
+  --_margin-bottom: var(--display-xl-margin-bottom);
+}
+
+/* lead / body are the brief's names for the old large / main. */
+.text-style-lead {
+  font-family: var(--text-large-font-family);
+  font-size: var(--text-large);
+  font-weight: var(--text-large-font-weight);
+  line-height: var(--text-large-line-height);
+  letter-spacing: var(--text-large-letter-spacing);
+  text-wrap: var(--text-large-text-wrap);
+  --_trim-top: var(--text-large-trim-top);
+  --_trim-bottom: var(--text-large-trim-bottom);
+  --_margin-top: var(--text-large-margin-top);
+  --_margin-bottom: var(--text-large-margin-bottom);
+}
+
+.text-style-body {
+  font-family: var(--text-main-font-family);
+  font-size: var(--text-main);
+  font-weight: var(--text-main-font-weight);
+  line-height: var(--text-main-line-height);
+  letter-spacing: var(--text-main-letter-spacing);
+  text-wrap: var(--text-main-text-wrap);
+  --_trim-top: var(--text-main-trim-top);
+  --_trim-bottom: var(--text-main-trim-bottom);
+  --_margin-top: var(--text-main-margin-top);
+  --_margin-bottom: var(--text-main-margin-bottom);
+}
+
+.text-style-tech {
+  font-family: var(--tech-font-family);
+  font-size: var(--tech);
+  font-weight: var(--tech-font-weight);
+  line-height: var(--tech-line-height);
+  letter-spacing: var(--tech-letter-spacing);
+  text-wrap: var(--tech-text-wrap);
+  --_trim-top: var(--tech-trim-top);
+  --_trim-bottom: var(--tech-trim-bottom);
+  --_margin-top: var(--tech-margin-top);
+  --_margin-bottom: var(--tech-margin-bottom);
+}
+
+.text-style-caption {
+  font-family: var(--caption-font-family);
+  font-size: var(--caption);
+  font-weight: var(--caption-font-weight);
+  line-height: var(--caption-line-height);
+  letter-spacing: var(--caption-letter-spacing);
+  text-wrap: var(--caption-text-wrap);
+  --_trim-top: var(--caption-trim-top);
+  --_trim-bottom: var(--caption-trim-bottom);
+  --_margin-top: var(--caption-margin-top);
+  --_margin-bottom: var(--caption-margin-bottom);
+}
+
+/* Departure. Leading trim is off for these two: the labels are set at an
+   exact px line-height, and trimming to cap height would fight it. */
+.text-style-label,
+.text-style-label-lg {
+  font-family: var(--label-font-family);
+  font-weight: var(--label-font-weight);
+  letter-spacing: var(--label-letter-spacing);
+  text-transform: var(--label-text-transform);
+  text-wrap: var(--label-text-wrap);
+  --_trim-top: var(--label-trim-top);
+  --_trim-bottom: var(--label-trim-bottom);
+  --_margin-top: var(--label-margin-top);
+  --_margin-bottom: var(--label-margin-bottom);
+}
+
+.text-style-label {
+  font-size: var(--label);
+  line-height: var(--label-line-height);
+}
+
+.text-style-label-lg {
+  font-size: var(--label-lg);
+  line-height: var(--label-lg-line-height);
+}
+
+/* "Numbers in tables and stats use a mono font." `tabular-nums` as well, so
+   figures in a column line up on the digit. */
+table,
+.numeric {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

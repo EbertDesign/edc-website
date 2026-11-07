@@ -191,7 +191,7 @@ const named = {
       max-width: 100%;
       margin-top: 3rem;
       padding: 0.5rem 1.75rem 0.5rem 1.25rem;
-      color: var(--light-200);
+      color: var(--ink);
       background-color: transparent;
       border: 0;
       border-radius: 0;
@@ -207,7 +207,11 @@ const named = {
         inset-block: 0;
         inset-inline-start: 0;
         width: 4rem;
-        background-color: color-mix(in srgb, var(--light-100) 10%, transparent);
+        /* Orange at rest, not just on hover: safety-orange is "the human
+           moment — the primary CTA", and a CTA that shows no orange until
+           it is pointed at does not announce itself. It is a fill, which is
+           the only legal way to use orange on a light ground. */
+        background-color: var(--safety-orange);
         border-radius: var(--radius-round);
         transition:
           width calc(var(--hover-duration) * 2) var(--hover-ease),
@@ -222,32 +226,37 @@ const named = {
       .button_mark {
         --_size: 1.75rem;
         flex: none;
-        color: var(--brand-500);
+        /* On the orange fill in both states, so it never changes colour. */
+        color: var(--on-color);
         transition: color var(--hover-duration) var(--hover-ease);
       }
 
       .button_text {
-        /* The export set the case and weight on the button and let the label
-           inherit them, which is easy to miss when reading `.button-text`
-           alone: the labels are uppercase Syne 600, not sentence case. */
-        font-family: var(--display-family);
+        /* The export's labels were uppercase Syne 600 with tracking. All
+           three are gone: uppercase belongs to Departure labels alone, so a
+           CTA is sentence case, and the scale puts `small` at 14px with no
+           tracking. 500 rather than the scale's 400 because a CTA carries
+           more weight than body copy — it renders 400 until Medium is added
+           to the Adobe Fonts kit. `line-height: 1` is centring inside a fixed
+           4rem control, not the leading of a text block. */
+        font-family: var(--font-grotesk);
         font-size: 0.875rem;
-        font-weight: var(--primary-semibold);
-        letter-spacing: 0.05rem;
+        font-weight: var(--primary-medium);
         line-height: 1;
-        text-transform: uppercase;
       }
 
       @media (hover: hover) {
         &:hover:not(:disabled) {
           &::before {
             width: 100%;
-            background-color: var(--brand-500);
           }
-          .button_mark,
-          .button_text {
-            color: var(--dark-900);
-          }
+          /* Set on the wrap, not on `.button_text`: the label has no colour
+             of its own, so it inherits, and every other variant's own hover
+             rule — which carries one more class and so outranks this — can
+             still send it somewhere else. Pinning the label here instead
+             would have followed it into the variants that have no orange
+             fill, painting a dark label onto a dark one. */
+          color: var(--on-color);
         }
       }
 
@@ -258,23 +267,22 @@ const named = {
         height: auto;
         flex-direction: row;
         justify-content: center;
-        color: var(--button-text);
+        color: var(--ink);
         &::before {
           content: none;
+        }
+        /* No orange fill under it any more, so the arrow follows the label. */
+        .button_mark {
+          color: currentcolor;
         }
       }
 
       &.secondary {
-        --button-background: var(--button-2-background);
-        --button-text: var(--button-2-text);
-        --button-border: var(--button-2-border);
-        --button-background-hover: var(--button-2-background-hover);
-        --button-text-hover: var(--button-2-text-hover);
-        --button-border-hover: var(--button-2-border-hover);
-
+        /* The quiet one beside a primary, so it carries no accent at all —
+           a `--rule` outline that fills with `--ink` on hover. */
         padding: 0.75em 1.5em;
-        background-color: var(--button-background);
-        border: var(--border-width) solid var(--button-border);
+        background-color: transparent;
+        border: var(--border-width) solid var(--rule);
         border-radius: 0.5em;
         transition:
           background-color var(--hover-duration) var(--hover-ease),
@@ -282,23 +290,22 @@ const named = {
           border-color var(--hover-duration) var(--hover-ease);
         @media (hover: hover) {
           &:hover:not(:disabled) {
-            background-color: var(--button-background-hover);
-            color: var(--button-text-hover);
-            border-color: var(--button-border-hover);
+            background-color: var(--ink);
+            color: var(--ground);
+            border-color: var(--ink);
           }
         }
       }
 
       &.link {
-        --button-text: var(--link-text);
-        --button-border: var(--link-border);
-        --button-text-hover: var(--link-text-hover);
-
+        /* Text on a rule, the rule travelling across on hover. No orange
+           here — this variant is never the CTA — so `--system` is free
+           to be signal-green on a dark ground. */
         padding: 0.4em 0;
-        border-bottom: var(--border-width) solid var(--button-border);
+        border-bottom: var(--border-width) solid var(--rule);
         background-image: linear-gradient(
-          var(--link-border-hover),
-          var(--link-border-hover)
+          var(--system),
+          var(--system)
         );
         background-repeat: no-repeat;
         background-origin: border-box;
@@ -310,7 +317,7 @@ const named = {
           border-color var(--hover-duration) var(--hover-ease);
         @media (hover: hover) {
           &:hover:not(:disabled) {
-            color: var(--button-text-hover);
+            color: var(--system);
             background-position: 0 100%;
             background-size: 100% var(--border-width);
           }
@@ -327,9 +334,11 @@ const named = {
         height: auto;
         margin-top: 0;
         padding: 0.75em;
-        color: var(--button-text);
-        background-color: var(--button-background);
-        border: var(--border-width) solid var(--button-border);
+        /* Utility controls — a slider's arrows, a modal's close. They are
+           not CTAs, so they take the raised surface, not the accent. */
+        color: var(--ink);
+        background-color: var(--ground-raised);
+        border: var(--border-width) solid var(--rule);
         border-radius: var(--radius-round);
         transition:
           background-color var(--hover-duration) var(--hover-ease),
@@ -344,9 +353,9 @@ const named = {
         }
         @media (hover: hover) {
           &:hover:not(:disabled) {
-            background-color: var(--button-background-hover);
-            color: var(--button-text-hover);
-            border-color: var(--button-border-hover);
+            background-color: var(--ink);
+            color: var(--ground);
+            border-color: var(--ink);
           }
         }
       }

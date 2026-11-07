@@ -1,31 +1,13 @@
 /* 1. Design tokens */
 :root {
-  /* Swatches — ported from the Webflow site's 9 variables.
-     --light-grey (#fff9) is not a swatch: it is white at 60%, which the
-     themes below already express as --text-2. --black-801 was a duplicate
-     of --black and is gone. */
-  --light-100: #ffffff; /* --white */
-  --light-200: #fff9f4; /* --tan */
-  --light-300: #f4cfcc; /* --secondary */
-  --dark-700: #333333; /* --dark-grey */
-  --dark-800: #211e1e; /* --black-800 */
-  --dark-900: #0e0e0f; /* --black */
-  --brand-500: #ef4e1c; /* --accent */
-  --brand-text: var(--light-100);
-
-  /* Typography primitives */
-  /* Three families. Switzer is the body face everything inherits, Inter sets
-     h2-h6 and the UI, Syne is the display face used for h1, links and the
-     site's own .text-xl … .text-7xl scale. */
-  --primary-family: var(--font-switzer, system-ui, sans-serif);
-  --secondary-family: var(--font-inter, system-ui, sans-serif);
-  --display-family: var(--font-syne, system-ui, sans-serif);
+  /* Weights and the leading-trim pair. The families and the old brand
+     swatches are gone — `brand.css` holds the palette, `type.css` the scale. */
   --primary-regular: 400;
   --primary-medium: 500;
-  --primary-semibold: 600;
   --primary-bold: 700;
   --primary-trim-top: 0.4em;
   --primary-trim-bottom: 0.38em;
+
 
   /* Letter spacing */
   --letter-spacing-tight: -0.05em;
@@ -71,162 +53,6 @@
 
   /* Nav */
   --nav-height: 5rem;
-
-  /* Typography styles */
-  /* The `-margin-top` tokens are 0 on purpose. The imported design zeroes its
-     heading and paragraph margins (`h1`,`h2` and `p` all declare `margin: 0`)
-     and spaces blocks with explicit `.margin-bottom-*` utilities instead, so
-     the number to port is zero. Those utilities live in the `webflow` layer,
-     above `patterns`, so they keep winning over `.container > [class]`.
-     Rhythm between blocks comes from `Section`'s `gap`.
-
-     The `-margin-bottom` tokens are not zero, because zero was wrong: they are
-     what `patterns`' `.heading:has(+ .text)` reads for the gap under a heading
-     that is followed by body copy, so a `Heading` sat above a `Paragraph`
-     rendered with the two literally touching. They step down with the type
-     scale — a 112px `h1` needs more air beneath it than a 24px `h6`.
-     Only four rules read these: that `.heading:has(+ .text)`, the opt-in
-     `.margin-bottom-text` / `.margin-block-text` utilities, and `RichText`.
-     Nothing wearing the export's own classes is affected. */
-  --display: clamp(var(--display-min) / 16 * 1rem, ((var(--display-min) - ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--display-max) - var(--display-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--display-max) / 16 * 1rem);
-  --display-min: 45;
-  --display-max: 144;
-  --display-line-height: var(--line-height-small);
-  --display-letter-spacing: var(--letter-spacing-normal);
-  --display-text-transform: none;
-  --display-margin-top: 0;
-  --display-margin-bottom: var(--space-6);
-  --display-font-family: var(--display-family);
-  --display-font-weight: var(--primary-medium);
-  --display-trim-top: var(--primary-trim-top);
-  --display-trim-bottom: var(--primary-trim-bottom);
-  --display-text-wrap: balance;
-
-  --h1: clamp(var(--h1-min) / 16 * 1rem, ((var(--h1-min) - ((var(--h1-max) - var(--h1-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h1-max) - var(--h1-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h1-max) / 16 * 1rem);
-  --h1-min: 46;
-  --h1-max: 112;
-  --h1-line-height: var(--line-height-small);
-  --h1-letter-spacing: var(--letter-spacing-normal);
-  --h1-text-transform: none;
-  --h1-margin-top: 0;
-  --h1-margin-bottom: var(--space-6);
-  --h1-font-family: var(--display-family);
-  --h1-font-weight: var(--primary-medium);
-  --h1-trim-top: var(--primary-trim-top);
-  --h1-trim-bottom: var(--primary-trim-bottom);
-  --h1-text-wrap: balance;
-
-  --h2: clamp(var(--h2-min) / 16 * 1rem, ((var(--h2-min) - ((var(--h2-max) - var(--h2-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h2-max) - var(--h2-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h2-max) / 16 * 1rem);
-  --h2-min: 35;
-  --h2-max: 64;
-  --h2-line-height: var(--line-height-medium);
-  --h2-letter-spacing: var(--letter-spacing-tight);
-  --h2-text-transform: none;
-  --h2-margin-top: 0;
-  --h2-margin-bottom: var(--space-5);
-  --h2-font-family: var(--secondary-family);
-  --h2-font-weight: var(--primary-regular);
-  --h2-trim-top: var(--primary-trim-top);
-  --h2-trim-bottom: var(--primary-trim-bottom);
-  --h2-text-wrap: balance;
-
-  --h3: clamp(var(--h3-min) / 16 * 1rem, ((var(--h3-min) - ((var(--h3-max) - var(--h3-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h3-max) - var(--h3-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h3-max) / 16 * 1rem);
-  --h3-min: 28;
-  --h3-max: 48;
-  --h3-line-height: var(--line-height-large);
-  --h3-letter-spacing: var(--letter-spacing-slight);
-  --h3-text-transform: none;
-  --h3-margin-top: 0;
-  --h3-margin-bottom: var(--space-5);
-  --h3-font-family: var(--secondary-family);
-  --h3-font-weight: var(--primary-regular);
-  --h3-trim-top: var(--primary-trim-top);
-  --h3-trim-bottom: var(--primary-trim-bottom);
-  --h3-text-wrap: balance;
-
-  --h4: clamp(var(--h4-min) / 16 * 1rem, ((var(--h4-min) - ((var(--h4-max) - var(--h4-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h4-max) - var(--h4-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h4-max) / 16 * 1rem);
-  --h4-min: 32;
-  --h4-max: 32;
-  --h4-line-height: var(--line-height-large);
-  --h4-letter-spacing: var(--letter-spacing-normal);
-  --h4-text-transform: none;
-  --h4-margin-top: 0;
-  --h4-margin-bottom: var(--space-4);
-  --h4-font-family: var(--secondary-family);
-  --h4-font-weight: var(--primary-regular);
-  --h4-trim-top: var(--primary-trim-top);
-  --h4-trim-bottom: var(--primary-trim-bottom);
-  --h4-text-wrap: balance;
-
-  --h5: clamp(var(--h5-min) / 16 * 1rem, ((var(--h5-min) - ((var(--h5-max) - var(--h5-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h5-max) - var(--h5-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h5-max) / 16 * 1rem);
-  --h5-min: 28;
-  --h5-max: 28;
-  --h5-line-height: var(--line-height-large);
-  --h5-letter-spacing: var(--letter-spacing-normal);
-  --h5-text-transform: none;
-  --h5-margin-top: 0;
-  --h5-margin-bottom: var(--space-4);
-  --h5-font-family: var(--secondary-family);
-  --h5-font-weight: var(--primary-regular);
-  --h5-trim-top: var(--primary-trim-top);
-  --h5-trim-bottom: var(--primary-trim-bottom);
-  --h5-text-wrap: balance;
-
-  --h6: clamp(var(--h6-min) / 16 * 1rem, ((var(--h6-min) - ((var(--h6-max) - var(--h6-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--h6-max) - var(--h6-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--h6-max) / 16 * 1rem);
-  --h6-min: 24;
-  --h6-max: 24;
-  --h6-line-height: var(--line-height-large);
-  --h6-letter-spacing: var(--letter-spacing-normal);
-  --h6-text-transform: none;
-  --h6-margin-top: 0;
-  --h6-margin-bottom: var(--space-3);
-  --h6-font-family: var(--primary-family);
-  --h6-font-weight: var(--primary-regular);
-  --h6-trim-top: var(--primary-trim-top);
-  --h6-trim-bottom: var(--primary-trim-bottom);
-  --h6-text-wrap: balance;
-
-  --text-large: clamp(var(--text-large-min) / 16 * 1rem, ((var(--text-large-min) - ((var(--text-large-max) - var(--text-large-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-large-max) - var(--text-large-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-large-max) / 16 * 1rem);
-  --text-large-min: 20;
-  --text-large-max: 24;
-  --text-large-line-height: var(--line-height-huge);
-  --text-large-letter-spacing: var(--letter-spacing-slight);
-  --text-large-text-transform: none;
-  --text-large-margin-top: 0;
-  --text-large-margin-bottom: var(--space-4);
-  --text-large-font-family: var(--display-family);
-  --text-large-font-weight: var(--primary-regular);
-  --text-large-trim-top: var(--primary-trim-top);
-  --text-large-trim-bottom: var(--primary-trim-bottom);
-  --text-large-text-wrap: pretty;
-
-  --text-main: clamp(var(--text-main-min) / 16 * 1rem, ((var(--text-main-min) - ((var(--text-main-max) - var(--text-main-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-main-max) - var(--text-main-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-main-max) / 16 * 1rem);
-  --text-main-min: 18;
-  --text-main-max: 18;
-  --text-main-line-height: var(--line-height-body);
-  --text-main-letter-spacing: var(--letter-spacing-slight);
-  --text-main-text-transform: none;
-  --text-main-margin-top: 0;
-  --text-main-margin-bottom: var(--space-4);
-  --text-main-font-family: var(--primary-family);
-  --text-main-font-weight: var(--primary-regular);
-  --text-main-trim-top: var(--primary-trim-top);
-  --text-main-trim-bottom: var(--primary-trim-bottom);
-  --text-main-text-wrap: pretty;
-
-  --text-small: clamp(var(--text-small-min) / 16 * 1rem, ((var(--text-small-min) - ((var(--text-small-max) - var(--text-small-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--text-small-max) - var(--text-small-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--text-small-max) / 16 * 1rem);
-  --text-small-min: 14;
-  --text-small-max: 14;
-  --text-small-line-height: 1.1; /* the export's .text-s */
-  --text-small-letter-spacing: var(--letter-spacing-normal);
-  --text-small-text-transform: none;
-  --text-small-margin-top: 0;
-  --text-small-margin-bottom: var(--space-3);
-  --text-small-font-family: var(--secondary-family);
-  --text-small-font-weight: var(--primary-regular);
-  --text-small-trim-top: var(--primary-trim-top);
-  --text-small-trim-bottom: var(--primary-trim-bottom);
-  --text-small-text-wrap: pretty;
 
   /* Site layout */
   --site-margin: clamp(var(--site-margin-min) / 16 * 1rem, ((var(--site-margin-min) - ((var(--site-margin-max) - var(--site-margin-min)) / (var(--viewport-max) - var(--viewport-min)) * var(--viewport-min))) / 16 * 1rem + ((var(--site-margin-max) - var(--site-margin-min)) / (var(--viewport-max) - var(--viewport-min))) * 100vw), var(--site-margin-max) / 16 * 1rem);
@@ -327,120 +153,14 @@ body {
   }
 }
 
-/* 2. Color themes */
-:root,
-.theme-light,
-.theme-dark .theme-invert,
-.theme-brand .theme-invert {
-  color-scheme: light;
+/* 2. Page surface */
 
-  --background: var(--light-300);
-  --background-2: var(--light-200);
-  --background-3: var(--light-100);
-  --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
-  --text: var(--dark-900);
-  --text-2: color-mix(in lab, currentcolor 60%, transparent);
-  --border: color-mix(in lab, var(--text) 20%, transparent);
-  --heading-accent: color-mix(in srgb, var(--brand-500), black 20%);
-
-  --selection-background: var(--text);
-  --selection-text: var(--background);
-
-  --button-background: var(--brand-500);
-  --button-border: var(--button-background);
-  --button-text: var(--brand-text);
-  --button-background-hover: var(--text);
-  --button-border-hover: var(--button-background-hover);
-  --button-text-hover: var(--background);
-
-  --button-2-background: transparent;
-  --button-2-border: var(--border);
-  --button-2-text: var(--text);
-  --button-2-background-hover: var(--text);
-  --button-2-border-hover: var(--button-2-background-hover);
-  --button-2-text-hover: var(--background);
-
-  --link-text: var(--text);
-  --link-border: var(--border);
-  --link-text-hover: var(--brand-500);
-  --link-border-hover: var(--brand-500);
-}
-
-.theme-dark,
-.theme-light .theme-invert {
-  color-scheme: dark;
-
-  --background: var(--dark-900);
-  --background-2: var(--dark-800);
-  --background-3: var(--dark-700);
-  --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
-  --text: var(--light-100);
-  --text-2: color-mix(in lab, currentcolor 60%, transparent);
-  --border: color-mix(in lab, var(--text) 20%, transparent);
-  --heading-accent: var(--brand-500);
-
-  --selection-background: var(--text);
-  --selection-text: var(--background);
-
-  --button-background: var(--brand-500);
-  --button-border: var(--button-background);
-  --button-text: var(--brand-text);
-  --button-background-hover: var(--text);
-  --button-border-hover: var(--button-background-hover);
-  --button-text-hover: var(--background);
-
-  --button-2-background: transparent;
-  --button-2-border: var(--border);
-  --button-2-text: var(--text);
-  --button-2-background-hover: var(--text);
-  --button-2-border-hover: var(--button-2-background-hover);
-  --button-2-text-hover: var(--background);
-
-  --link-text: var(--text);
-  --link-border: var(--border);
-  --link-text-hover: var(--brand-500);
-  --link-border-hover: var(--text);
-}
-
-.theme-brand {
-  color-scheme: dark;
-
-  --background: var(--brand-500);
-  --background-2: color-mix(in lab, var(--background) 90%, var(--text));
-  --background-3: color-mix(in lab, var(--background) 80%, var(--text));
-  --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
-  --text: var(--brand-text);
-  --text-2: color-mix(in lab, currentcolor 60%, transparent);
-  --border: color-mix(in lab, var(--text) 20%, transparent);
-  --heading-accent: color-mix(in srgb, var(--text), white 20%);
-
-  --selection-background: var(--text);
-  --selection-text: var(--background);
-
-  --button-background: var(--brand-text);
-  --button-border: var(--button-background);
-  --button-text: var(--background);
-  --button-background-hover: var(--light-100);
-  --button-border-hover: var(--button-background-hover);
-  --button-text-hover: var(--dark-900);
-
-  --button-2-background: transparent;
-  --button-2-border: var(--border);
-  --button-2-text: var(--text);
-  --button-2-background-hover: var(--light-100);
-  --button-2-border-hover: var(--button-2-background-hover);
-  --button-2-text-hover: var(--dark-900);
-
-  --link-text: var(--text);
-  --link-border: var(--border);
-  --link-text-hover: var(--brand-500);
-  --link-border-hover: var(--text);
-}
-
-:root,
-[class*="theme-"] {
-  background-color: var(--background);
-  color: var(--text);
+/* A section that names a theme paints from it. The modes themselves live in
+   `brand.css`; this is only what reads them. */
+[class*="theme-"],
+[data-theme] {
+  background-color: var(--ground);
+  color: var(--ink);
 }
 
 /* When the root element is transparent the canvas takes its colour from
@@ -452,15 +172,20 @@ body {
    The imported design relies on exactly that idiom (the homepage's mesh
    gradient is a z-index:-10 child of the hero), and on Webflow it worked
    because only <body> carried a background. Keep that arrangement: the root
-   carries `color-scheme` and the page theme paints through <body>. */
-html[class*="theme-"] {
+   carries `color-scheme`, and the page theme paints through <body> — which
+   `brand.css` does, from above the export's own `body` rule.
+
+   `::selection` follows the mode rather than a pair of tokens of its own. */
+html[class*="theme-"],
+html[data-theme] {
   background-color: transparent;
 }
 
-html[class*="theme-"] > body {
-  background-color: var(--background);
-  color: var(--text);
+::selection {
+  background-color: var(--ink);
+  color: var(--ground);
 }
+
 
 /* 3. Reset & base */
 *,
@@ -574,15 +299,10 @@ select:has(option[value=""]:checked) {
 }
 
 :focus-visible {
-  outline-color: var(--text);
+  outline-color: var(--ink);
   outline-offset: var(--focus-offset);
   outline-width: var(--focus-width);
   outline-style: solid;
-}
-
-::selection {
-  background-color: var(--selection-background);
-  color: var(--selection-text);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -26,26 +26,46 @@
 ---
 
 <style is:global>
-  @property --background {
+  /* The 2026 tokens. A custom property can only be transitioned once CSS
+     knows its type, so each is registered as a colour. The initial values are
+     Field's, since Field is the default mode — they are only the fallback for
+     an invalid value, not the authored theme.
+
+     The export's own swatches stay registered below them: the `webflow`
+     layer still paints what has not been migrated and reads `--black`,
+     `--white`, `--accent` and the two greys directly. They go when it does.
+     The framework's old `--background` / `--text` pair is gone already. */
+  @property --ground {
     syntax: "<color>";
     inherits: true;
-    initial-value: #f4cfcc;
+    initial-value: #f8f7f3;
   }
-  @property --background-2 {
+  @property --ground-raised {
     syntax: "<color>";
     inherits: true;
-    initial-value: #fff9f4;
+    initial-value: #efeee8;
   }
-  @property --background-3 {
+  @property --ink {
     syntax: "<color>";
     inherits: true;
-    initial-value: #ffffff;
+    initial-value: #161616;
   }
-  @property --text {
+  @property --ink-muted {
     syntax: "<color>";
     inherits: true;
-    initial-value: #0e0e0f;
+    initial-value: #5e625f;
   }
+  @property --rule {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #d6d8d2;
+  }
+  @property --system {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #161616;
+  }
+
   @property --accent {
     syntax: "<color>";
     inherits: true;
@@ -77,10 +97,12 @@
       --_scroll-theme-transition: 800ms ease;
 
       transition:
-        --background var(--_scroll-theme-transition),
-        --background-2 var(--_scroll-theme-transition),
-        --background-3 var(--_scroll-theme-transition),
-        --text var(--_scroll-theme-transition),
+        --ground var(--_scroll-theme-transition),
+        --ground-raised var(--_scroll-theme-transition),
+        --ink var(--_scroll-theme-transition),
+        --ink-muted var(--_scroll-theme-transition),
+        --rule var(--_scroll-theme-transition),
+        --system var(--_scroll-theme-transition),
         --accent var(--_scroll-theme-transition),
         --light-grey var(--_scroll-theme-transition),
         --dark-grey var(--_scroll-theme-transition),
@@ -88,31 +110,29 @@
         --white var(--_scroll-theme-transition);
     }
 
-    /* Orange page, inverted to dark text, with the accents that were orange
-       turning white so they still read. The export's own `--black` and
-       `--white` are inverted with it: the page background, links and the
-       hover states are painted from those two rather than from the theme
-       tokens, and would otherwise stay behind. */
+    /* The fill state, for everything still painted by the `webflow` layer.
+       Its own `--black` and `--white` are inverted with it: the page
+       background, links and hover states come from those two rather than
+       from the theme tokens, and would otherwise stay behind.
+
+       The 2026 tokens for this state are not here — `brand.css` lists
+       `:root[data-scroll-theme="brand"]` beside the signal-green fill, so
+       the fill is defined in one place and a migrated component picks it up
+       with no help from this file. This block shrinks to nothing when the
+       export does. */
     :root[data-scroll-theme="brand"] {
-      --background: var(--brand-500);
-      --background-2: var(--brand-500);
-      --background-3: color-mix(in lab, var(--brand-500) 90%, var(--dark-900));
-      --text: var(--dark-900);
-      --accent: var(--light-100);
-      --light-grey: color-mix(in lab, var(--dark-900) 75%, transparent);
-      --dark-grey: color-mix(in lab, var(--dark-900) 30%, transparent);
-      --black: var(--brand-500);
-      --white: var(--dark-900);
+      --accent: var(--on-color);
+      --light-grey: color-mix(in lab, var(--on-color) 70%, transparent);
+      --dark-grey: color-mix(in lab, var(--on-color) 30%, transparent);
+      --black: var(--signal-green);
+      --white: var(--on-color);
     }
 
-    /* The eyebrow marker is the one accent painted from the brand swatch
-       rather than a theme token, so it is turned over by hand. */
+    /* The marker reads `--system`, which `brand.css` already resolves for
+       this state, so it no longer has to be turned over by hand — it only
+       needs to fade with everything else. */
     .eyebrow_marker {
       transition: background-color var(--_scroll-theme-transition);
-    }
-
-    :root[data-scroll-theme="brand"] .eyebrow_wrap .eyebrow_marker {
-      background-color: var(--accent);
     }
 
     @media (prefers-reduced-motion: reduce) {

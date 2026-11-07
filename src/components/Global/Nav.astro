@@ -2,18 +2,18 @@
 /**
  * The site nav. Structure and behaviour are the framework's — a real
  * disclosure button, `aria-expanded`, Escape and outside-click to close, and
- * `aria-current` derived from the route by `NavLink`. The design is the
- * imported one: a transparent bar laid over the hero, Syne links that go to
- * the brand colour, and a two-line hamburger below the large breakpoint.
+ * `aria-current` derived from the route by `NavLink`. The structure is the
+ * imported one — a transparent bar laid over the hero and a two-line
+ * hamburger below the large breakpoint — wearing the 2026 brand: grotesk
+ * links on `--ground`, stating themselves with `--system`.
  *
  * Replaces Webflow's `w-nav` widget, so nothing here needs jQuery or
  * `webflow.js`. The export's `.navbar`, `.nav-container`, `.nav-menu`,
  * `.nav-link`, `.nav-logo`, `.menu-button`, `.top-line`, `.bottom-line` and
  * `.logo` rules have moved into this file and are gone from `site.css`.
  */
-import Icon from "@/components/Media/Icon.astro";
+import Logo from "@/components/Global/Logo.astro";
 import NavLink from "@/components/Global/NavLink.astro";
-import logo from "@/assets/logo/edc-logo.svg";
 import { SITE_NAME } from "@/consts.ts";
 
 interface Props {
@@ -35,7 +35,7 @@ const { render = true, overlap = false } = Astro.props;
     <header class:list={["nav_wrap", overlap && "overlap"]}>
       <div class="nav_inner">
         <a class="nav_logo" href="/" aria-label={SITE_NAME}>
-          <Icon src={logo} variant="full-width" />
+          <Logo />
         </a>
         <button
           class="nav_toggle"
@@ -131,8 +131,8 @@ const { render = true, overlap = false } = Astro.props;
       display: flex;
       justify-content: center;
       width: 100%;
-      background-color: var(--background);
-      color: var(--text);
+      background-color: var(--ground);
+      color: var(--ink);
     }
 
     .nav_inner {
@@ -157,6 +157,10 @@ const { render = true, overlap = false } = Astro.props;
       align-items: center;
       width: 100%;
       max-width: 5.625rem;
+      /* The export pins every anchor to `--white` from the `webflow` layer
+         (`a { color: var(--white) }`), which inheritance cannot get past —
+         so the logo's `currentColor` has to be re-pointed at the bar. */
+      color: inherit;
       transition: opacity var(--hover-duration) var(--hover-ease);
       @media (hover: hover) {
         &:hover {
@@ -230,7 +234,7 @@ const { render = true, overlap = false } = Astro.props;
       overflow-x: clip;
       overflow-y: auto;
       overscroll-behavior: contain;
-      background-color: var(--background);
+      background-color: var(--ground);
       transition:
         grid-template-rows var(--open-duration) var(--open-ease),
         visibility var(--open-duration) var(--open-ease);
@@ -263,17 +267,22 @@ const { render = true, overlap = false } = Astro.props;
     .nav_link {
       display: block;
       padding-block: var(--space-3);
-      color: var(--text);
-      font-family: var(--display-family);
+      /* Resting links sit at `--ink-muted` so the current one has somewhere
+         to go in both modes. Keyed to the active colour rather than a hue:
+         in Signal that is signal-green, in Field it is full `--ink`, where
+         neither accent is legal as text. Muted against either ground is
+         6.86:1 and 5.78:1. */
+      color: var(--ink-muted);
+      font-family: var(--font-grotesk);
       font-size: 1.125rem;
       text-decoration: none;
       transition: color var(--hover-duration) var(--hover-ease);
       &[aria-current="page"] {
-        color: var(--brand-500);
+        color: var(--system);
       }
       @media (hover: hover) {
         &:hover {
-          color: var(--brand-500);
+          color: var(--system);
         }
       }
     }

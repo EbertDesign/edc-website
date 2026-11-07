@@ -1,5 +1,4 @@
 ---
-import { Font } from "astro:assets";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/consts.ts";
 import { isNoindexRoute } from "@/utils/seo.ts";
 import type { SeoProps } from "@/types.ts";
@@ -22,13 +21,22 @@ const socialImage = new URL(image, Astro.site);
 ---
 
 <meta charset="utf-8" />
+{/* Establishes the layer order before any stylesheet loads. Layers are
+    sorted by first appearance, so this statement — not `global.css` — is the
+    one that decides, and a name missing here is appended at the very end
+    rather than taking the position `global.css` gives it. Keep the two
+    identical. */}
 <style is:inline>
-  @layer base, patterns, webflow, components, utilities;
+  @layer base, patterns, webflow, brand, components, utilities;
 </style>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<Font cssVariable="--font-syne" preload />
-<Font cssVariable="--font-inter" preload />
-<Font cssVariable="--font-switzer" preload />
+<link
+  rel="preload"
+  href="/fonts/DepartureMono-Regular.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />

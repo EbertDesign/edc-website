@@ -6,7 +6,17 @@
    during pass 2 outranks whatever site rules have not been moved yet, and a
    half-migrated page never has the old CSS fighting the new component.
    The layer empties as blocks become components; when it is gone, so is this. */
-@layer base, patterns, webflow, components, utilities;
+/* `brand` sits above `webflow` because the 2026 tokens collide with the
+   export's own: it declares `--black` and `--white` in a `:root` of its own,
+   and custom properties cascade by layer like anything else. Below
+   `components`, so a migrated component can still override a token locally.
+   It folds into `base` once the export is gone. */
+/* This same list is declared inline at the top of `BaseHead.astro`, which is
+   what actually fixes the order — it is seen first. Change one, change both. */
+@layer base, patterns, webflow, brand, components, utilities;
+
+/* Unlayered: @font-face carries no declarations that cascade. */
+@import "./fonts.css";
 
 @import "./base.css" layer(base);
 @import "./patterns.css" layer(patterns);
@@ -14,6 +24,14 @@
 @import "./webflow/normalize.css" layer(webflow);
 @import "./webflow/webflow.css" layer(webflow);
 @import "./webflow/site.css" layer(webflow);
+
+/* The 2026 tokens. Values only — nothing here paints yet. */
+@import "./brand.css" layer(brand);
+
+/* The 2026 type scale, and the export's type classes remapped onto it.
+   `brand`, so it outranks the export's own rules while a migrated component
+   can still outrank it. */
+@import "./type.css" layer(brand);
 
 /* Grid placement for the CMS detail routes. `components`, so it sits above
    the export's leftovers but below the utilities a page may override with. */
@@ -23,6 +41,9 @@
 @import "./typography.css" layer(components);
 
 @import "./utilities.css" layer(utilities);
+
+/* The scale's new names as utilities, beside the ones above. */
+@import "./type-utilities.css" layer(utilities);
 
 /* After `utilities`, because the framework's form components apply
    `text-style-main` to their own labels and controls — a utility this site

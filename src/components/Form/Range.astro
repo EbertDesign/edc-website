@@ -168,7 +168,7 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
         background: var(--_handle-face);
       }
       &:focus-visible ~ .form-range_handle {
-        outline: var(--focus-width) solid var(--text);
+        outline: var(--focus-width) solid var(--ink);
         outline-offset: var(--focus-offset);
       }
     }
@@ -184,14 +184,15 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
 
     .form-range_track {
       inset-inline-end: 0;
-      background-color: var(--border);
+      background-color: var(--rule);
     }
 
     .form-range_fill {
       width: calc(
         var(--_progress, 0) * (100% - var(--_handle)) + var(--_handle) / 2
       );
-      background-color: var(--text);
+      /* The filled part is a value readout, which is `--system`'s job. */
+      background-color: var(--system);
     }
 
     .form-range_handle {
@@ -202,9 +203,9 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
       translate: -50% 0;
       width: var(--_handle);
       height: var(--_handle);
-      border: calc(var(--border-width) * 2) solid var(--text);
+      border: calc(var(--border-width) * 2) solid var(--ink);
       border-radius: var(--radius-round);
-      background-color: var(--background);
+      background-color: var(--ground);
       pointer-events: none;
     }
 
@@ -216,7 +217,7 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
       );
       translate: -50% 0;
       padding: var(--space-1) var(--space-3);
-      background-color: var(--background-2);
+      background-color: var(--ground-raised);
       border-radius: var(--radius-small);
       white-space: nowrap;
     }

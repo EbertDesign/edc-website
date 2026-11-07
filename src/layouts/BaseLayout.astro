@@ -1,5 +1,12 @@
 ---
 import "@/styles/global.css";
+/* IBM Plex Mono from Fontsource rather than Astro's font API, which hashes
+   the family name it generates. `--font-pixel` and `--font-mono` in
+   `brand.css` name their families literally, so the real name is required.
+   Latin only: the full entrypoint also ships Cyrillic, Cyrillic-ext and
+   Vietnamese subsets, which this site has no copy for. */
+import "@fontsource/ibm-plex-mono/latin-400.css";
+import "@fontsource/ibm-plex-mono/latin-500.css";
 import BaseHead from "@/components/Utility/BaseHead.astro";
 import SkipLink from "@/components/Global/SkipLink.astro";
 import Nav from "@/components/Global/Nav.astro";
@@ -20,11 +27,29 @@ type Props = SeoProps & {
 
 // The imported design is dark by default; pages opt out rather than in.
 const { theme = "dark", overlap = false, ...seo } = Astro.props;
+
+/* Aktiv Grotesk ships from an Adobe Fonts web project, which is a hosted
+   stylesheet rather than files we can self-host — so it is the one family
+   loaded by `<link>`. The kit ID is an env var because the kit belongs to an
+   account, not to the repository; with it unset the `<link>` is dropped and
+   `--font-grotesk` falls through to Helvetica. */
+const adobeFontsKitId = import.meta.env.PUBLIC_ADOBE_FONTS_KIT_ID;
 ---
 
 <!doctype html>
 <html lang="en" class:list={[theme !== "inherit" && `theme-${theme}`]}>
   <head>
+    {
+      adobeFontsKitId && (
+        <Fragment>
+          <link rel="preconnect" href="https://use.typekit.net" crossorigin />
+          <link
+            rel="stylesheet"
+            href={`https://use.typekit.net/${adobeFontsKitId}.css`}
+          />
+        </Fragment>
+      )
+    }
     <BaseHead {...seo} />
     <slot name="head" />
   </head>

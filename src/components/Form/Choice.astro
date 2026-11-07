@@ -108,10 +108,16 @@ const {
     }
 
     .form-choice_mark {
-      --_mark: var(--background-2);
-      --_mark-hover: var(--background-3);
-      --_mark-chosen: var(--text);
-      --_ink: var(--background);
+      /* A tick box is a small state mark, so a chosen one takes
+         `--system`: signal-green on a dark ground, `--ink` on a light one.
+         The tick itself is `--ground`, which contrasts with either — 14.64:1
+         on the green, 16.88:1 on the ink. Large filled surfaces (the chip
+         below, a side tab, a button) stay neutral; green is an indicator
+         here, not a surface. */
+      --_mark: var(--ground-raised);
+      --_mark-hover: color-mix(in srgb, var(--ground-raised), var(--ink) 8%);
+      --_mark-chosen: var(--system);
+      --_ink: var(--ground);
 
       flex: none;
       display: grid;
@@ -164,7 +170,7 @@ const {
     }
 
     .form-choice_input:focus-visible ~ .form-choice_mark {
-      outline: var(--focus-width) solid var(--text);
+      outline: var(--focus-width) solid var(--ink);
       outline-offset: var(--focus-offset);
     }
 
@@ -185,7 +191,7 @@ const {
         width: 1.1em;
         height: 1.1em;
         border-radius: var(--radius-round);
-        background-color: var(--text);
+        background-color: var(--ink);
         transition:
           translate var(--hover-duration) var(--hover-ease),
           background-color var(--hover-duration) var(--hover-ease);
@@ -199,7 +205,7 @@ const {
     /* Chip */
     .form-choice.chip {
       padding: 0.75em 1.5em;
-      background-color: var(--background-2);
+      background-color: var(--ground-raised);
       border: var(--border-width) solid transparent;
       border-radius: var(--radius-round);
       transition:
@@ -207,25 +213,31 @@ const {
         color var(--hover-duration) var(--hover-ease),
         border-color var(--hover-duration) var(--hover-ease);
       & .form-choice_mark {
-        --_mark: var(--background);
-        --_mark-hover: var(--background);
-        --_mark-chosen: var(--background);
-        --_ink: var(--text);
+        --_mark: var(--ground);
+        --_mark-hover: var(--ground);
+        --_mark-chosen: var(--ground);
+        --_ink: var(--ink);
       }
       @media (hover: hover) {
         &:hover:not(:has(:checked)) {
-          background-color: var(--background-3);
+          background-color: color-mix(
+            in srgb,
+            var(--ground-raised),
+            var(--ink) 8%
+          );
         }
       }
+      /* Neutral, not green: a chip is a filled surface the size of a
+         button, and a green one would read as a second accent. */
       &:has(:checked) {
-        background-color: var(--text);
-        color: var(--background);
+        background-color: var(--ink);
+        color: var(--ground);
       }
       & .form-choice_input:focus-visible ~ .form-choice_mark {
         outline: 0;
       }
       &:has(.form-choice_input:focus-visible) {
-        outline: var(--focus-width) solid var(--text);
+        outline: var(--focus-width) solid var(--ink);
         outline-offset: var(--focus-offset);
       }
     }

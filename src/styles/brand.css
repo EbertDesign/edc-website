@@ -1,0 +1,181 @@
+/* 2026 brand tokens.
+
+   A layer of its own, above `webflow`, because the names collide: the export
+   declares `--black` and `--white` in a `:root` of its own, and custom
+   properties cascade by layer like any other declaration. Declared down in
+   `base`, `--black` would lose to the export and quietly resolve to the old
+   brand's #0e0e0f — silently, because a `var()` that finds a value never
+   reaches its fallback.
+
+   The old tokens in `base.css` are untouched. Both sets stay live until the
+   last component has moved over; the cleanup commit takes the old ones and
+   this layer's reason for existing at the same time.
+
+   The page surface moved here with the typography step: the export paints
+   `body` from its own `--black` and `--white` in the `webflow` layer, which
+   outranks `base`, so neither the old theme tokens nor the new ones reached
+   it. That rule is now overridden at the bottom of this file, and the
+   export's remaining swatches are pointed at the new palette so the parts of
+   the page it still paints follow the mode too. */
+
+:root {
+  /* Fixed swatches — identical in both modes */
+  --paper: #f8f7f3;
+  --black: #161616;
+  --sage: #ccd3cf;
+  --canopy: #bfdd9e;
+  --signal-green: #a6ff3d;
+  --safety-orange: #ff5500;
+  /* Text on any accent fill */
+  --on-color: #161616;
+
+  /* The tint behind an image or video while it loads. Built from
+     `currentcolor`, so it needs no per-mode value — but it is defined here
+     rather than only inside the old `.theme-*` blocks, where a page using
+     `data-theme` alone would leave it unset and the placeholder transparent. */
+  --background-skeleton: color-mix(in lab, currentcolor 10%, transparent);
+
+  /* The Webflow export's own swatches, aimed at the new palette. The
+     `webflow` layer still paints everything not yet migrated and reads these
+     names directly; without this, un-migrated copy stays pure white and
+     would be invisible the moment a page moves to Field. They go when the
+     layer does. `--black` is a brand token in its own right, above. */
+  /* The export names Syne, Inter and Switzer directly in 29 `font-family`
+     declarations. Those families are no longer loaded, so the names are
+     aimed at the brand face instead — explicitly, rather than leaving the
+     declarations invalid and relying on what they inherit. Astro used to
+     define these unlayered, which outranks every layer; removing them from
+     `astro.config.mjs` is what makes these reachable. */
+  --font-syne: var(--font-grotesk);
+  --font-inter: var(--font-grotesk);
+  --font-switzer: var(--font-grotesk);
+
+  --white: var(--ink);
+  --light-grey: var(--ink-muted);
+  --dark-grey: var(--rule);
+  --accent: var(--safety-orange);
+  --tan: var(--ground-raised);
+  --secondary: var(--sage);
+  --black-800: var(--ground-raised);
+
+  /* Departure Mono is set at exactly 11px or 22px, with no letter-spacing;
+     any other size blurs it. Tokens rather than literals so nobody types
+     12px, and `px` rather than `rem` so a browser text-zoom cannot land it
+     between the two sizes it is legible at. This is the one exception to
+     LUMOS.md's no-px rule — see docs/brand.md. */
+  --label: 11px;
+  --label-line-height: 16px;
+  --label-lg: 22px;
+  --label-lg-line-height: 24px;
+
+  /* Font stacks. Aktiv Grotesk is loaded by the Adobe Fonts kit in
+     `BaseLayout.astro`, Departure Mono by `fonts.css`, IBM Plex Mono by
+     Fontsource — each under its real family name, so these stacks resolve as
+     written and each fallback in them is reachable. */
+  /* `aktiv-grotesk` — lowercase and hyphenated — is the name the Adobe Fonts
+     kit actually declares its @font-face under; "Aktiv Grotesk" is only the
+     display name in Adobe's UI and matches nothing. Named that way round, the
+     brand face would never load and every grotesk style would quietly render
+     in Helvetica. The display name is kept after it so a locally installed or
+     later self-hosted copy is still found.
+
+     The kit currently serves weights 400 and 700 only. The type scale asks
+     for 500 on display-xl through h3; until Medium is added to the web
+     project, CSS font matching resolves 500 down to 400 and those styles
+     render a step light. */
+  --font-grotesk:
+    aktiv-grotesk, "Aktiv Grotesk", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  --font-pixel: "Departure Mono", "IBM Plex Mono", ui-monospace, monospace;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+
+/* The old `.theme-*` classes are listed beside the new `data-theme` values so
+   a migrated component reads the right mode before the pages themselves move
+   over: `BaseLayout` still writes `class="theme-dark"`, and a component on
+   `--ground` would otherwise take the Field default and render a light bar on
+   a dark page. `.theme-dark` is Signal, `.theme-light` is Field. The class
+   halves of these selectors go in the cleanup commit. */
+
+/* Field — warm and editorial, and the default. `:root` carries the values so
+   a page naming no theme is already in Field, but not `color-scheme`: that
+   would outrank `.theme-dark` from the layer below and strip the dark
+   scrollbars off a site that is still dark. It joins the paint rule later. */
+:root,
+[data-theme="field"],
+.theme-light,
+.theme-dark .theme-invert,
+.theme-brand .theme-invert {
+  --ground: #f8f7f3;
+  --ground-raised: #efeee8;
+  --ink: #161616;
+  --ink-muted: #5e625f;
+  --rule: #d6d8d2;
+  /* "signal-green is the system: data, annotations, states and links on
+     dark." On a light ground green is legal only as a fill and would be
+     invisible anyway (1.15:1), and orange belongs to the CTA — so in Field
+     the system colour is full `--ink`, and a marker or a link states itself
+     by weight rather than by hue. */
+  --system: var(--ink);
+}
+
+[data-theme="field"],
+.theme-light {
+  color-scheme: light;
+}
+
+/* Signal — black grounds, Departure labels, Plex readouts; the home hero,
+   case results, stats and motion.
+
+   After Field on purpose. On `<html data-theme="signal">` or
+   `class="theme-dark"` both blocks match at equal specificity — `:root`, an
+   attribute and a class are all 0-1-0 — so source order is the only thing
+   making Signal win. Keep it below Field. */
+[data-theme="signal"],
+.theme-dark,
+.theme-light .theme-invert {
+  color-scheme: dark;
+
+  --ground: #161616;
+  --ground-raised: #1f2120;
+  --ink: #f8f7f3;
+  --ink-muted: #9aa19d;
+  --rule: #2c2f2d;
+  /* The system colour proper: data, annotations, states and links.
+     14.64:1 on the Signal ground. */
+  --system: var(--signal-green);
+}
+
+/* A signal-green fill used as a ground. This is what `.theme-brand` — the
+   export's orange page — becomes: the brand's large fills are green, never
+   orange. Kept under the old class name while `Home.astro` still scrolls to
+   it; renamed in cleanup. */
+[data-theme="signal-fill"],
+.theme-brand,
+/* The homepage's scroll theme lands here too — `Home.astro` still marks it
+   `data-scroll-theme="brand"`, which `Utility/ScrollTheme` writes onto the
+   root. Listed here rather than restated there, so the fill is defined once.
+   At 0-2-0 it outranks the `.theme-dark` the page is authored in. */
+:root[data-scroll-theme="brand"] {
+  color-scheme: light;
+
+  --ground: var(--signal-green);
+  --ground-raised: color-mix(in srgb, var(--signal-green) 92%, var(--black));
+  --ink: var(--on-color);
+  --ink-muted: color-mix(in srgb, var(--on-color) 70%, var(--signal-green));
+  --rule: color-mix(in srgb, var(--on-color) 25%, var(--signal-green));
+  /* Already the darkest thing on the fill; a link states itself by weight. */
+  --system: var(--on-color);
+}
+
+/* The page surface. `base.css` already routes this through <body> rather
+   than <html> so the hero's negative-z-index backdrop still paints — see its
+   note — but the export's own `body` rule sits in the `webflow` layer above
+   it and wins. Restated here, from the mode's tokens.
+
+   Both have to move together: `--ink` on the export's `--black` background
+   is paper on near-black in Signal and black on black in Field. */
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+}

@@ -20,7 +20,7 @@
      Welcome lead image), and an opaque section hides them completely. */
   padding-top: var(--section-space-medium);
   padding-bottom: var(--section-space-medium);
-  color: var(--text);
+  color: var(--ink);
   /* A block, not a flex column. The imported design spaces everything with
      margins and relies on them collapsing — through the container, through
      the section, into the gap between sections. A flex parent stops that
@@ -171,8 +171,21 @@
   inset: 0%;
 }
 
+/* Emphasis inside a heading. A colour on its own cannot do this job in the
+   2026 palette: orange is 2.99:1 on paper and reserved for the CTA, green is
+   1.15:1 there and may only be a fill, and `--ink` is what the rest of the
+   heading already is. So the emphasis is a flat `--canopy` highlight behind
+   the words — one mechanism that works identically in both modes, at 12.11:1
+   either way, with no gradient or shadow.
+
+   `box-decoration-break: clone` so a phrase that wraps is painted on every
+   line rather than as one box behind the block. */
 .heading-accent strong {
-  color: var(--heading-accent);
+  color: var(--on-color);
+  background-color: var(--canopy);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding-inline: 0.12em;
   font-weight: inherit;
 }
 
@@ -195,7 +208,7 @@
 }
 
 .field-star {
-  color: var(--text-2);
+  color: var(--ink-muted);
 }
 
 .field-control {
@@ -204,7 +217,7 @@
   width: 100%;
   min-height: calc(1lh + var(--field-pad-block) * 2 + var(--border-width) * 2);
   padding: var(--field-pad-block) var(--field-pad-inline);
-  background-color: var(--background-2);
+  background-color: var(--ground-raised);
   color: inherit;
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-small);
@@ -212,15 +225,15 @@
     background-color var(--hover-duration) var(--hover-ease),
     border-color var(--hover-duration) var(--hover-ease);
   &::placeholder {
-    color: var(--text-2);
+    color: var(--ink-muted);
   }
   @media (hover: hover) {
     &:hover:not(:disabled) {
-      background-color: var(--background-3);
+      background-color: color-mix(in srgb, var(--ground-raised), var(--ink) 8%);
     }
   }
   &:focus-visible {
-    border-color: var(--text);
+    border-color: var(--ink);
     outline-offset: var(--focus-offset-inner);
   }
   &:disabled {

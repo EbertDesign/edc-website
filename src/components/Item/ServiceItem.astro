@@ -84,14 +84,18 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
 
     .service-list-item:focus-visible .service-cell-arrow {
       transform: translateX(calc(var(--service-item-shift) * -1));
-      background-color: var(--accent);
+      /* The same orange circle the primary Button uses, and for the same
+         reason: this row is a call to action, and orange as a fill is legal
+         on either ground. One row is lit at a time, so the section still
+         carries a single orange moment. */
+      background-color: var(--safety-orange);
     }
 
     /* Three classes, so the roll follows the row rather than the button:
        `SectionHeroHome` fires it from `.icon-button:hover`, which on a row
        this wide only caught a cursor already on the circle. */
     .service-list-item:focus-visible .service-cell-arrow .button-arrow {
-      color: var(--black);
+      color: var(--on-color);
       transform: translateY(var(--service-item-roll));
     }
 
@@ -102,11 +106,11 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
 
       .service-list-item:hover .service-cell-arrow {
         transform: translateX(calc(var(--service-item-shift) * -1));
-        background-color: var(--accent);
+        background-color: var(--safety-orange);
       }
 
       .service-list-item:hover .service-cell-arrow .button-arrow {
-        color: var(--black);
+        color: var(--on-color);
         transform: translateY(var(--service-item-roll));
       }
     }

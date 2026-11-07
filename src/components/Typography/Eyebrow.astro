@@ -45,7 +45,7 @@ const content = await slotContent(Astro.slots);
       {variant === "default" && (
         <span class="eyebrow_marker" aria-hidden="true" />
       )}
-      <Tag class="eyebrow_text text-style-small">
+      <Tag class="eyebrow_text">
         <Fragment set:html={content} />
       </Tag>
     </div>
@@ -55,11 +55,14 @@ const content = await slotContent(Astro.slots);
 <style is:global>
   @layer components {
     .eyebrow_wrap {
-      /* The imported design: an 8px brand dot, and 48px of air beneath —
-         the export carried both on a `.section-heading-container` wrapper
-         that this component replaces. `no-margin-bottom` and the rotated
-         sticky treatment are bare classes beside the root, as the export
-         had them. */
+      /* The imported design: an 8px dot, and 48px of air beneath — the
+         export carried both on a `.section-heading-container` wrapper that
+         this component replaces. `no-margin-bottom` and the rotated sticky
+         treatment are bare classes beside the root, as the export had them.
+
+         This is the brand's label: Departure Mono, uppercase, at one of the
+         two sizes it is legible at. Uppercase is set here rather than in the
+         copy, so the text stays as it was written. */
       display: flex;
       align-items: center;
       justify-content: var(--_alignment, start);
@@ -67,8 +70,8 @@ const content = await slotContent(Astro.slots);
       margin-bottom: 3rem;
 
       &.tag {
-        background-color: var(--text);
-        color: var(--background);
+        background-color: var(--ink);
+        color: var(--ground);
         padding: var(--space-1) var(--space-2);
         border-radius: var(--radius-small);
       }
@@ -81,8 +84,21 @@ const content = await slotContent(Astro.slots);
         flex: none;
         width: 0.5rem;
         height: 0.5rem;
-        background-color: var(--brand-500);
+        /* An annotation mark, so it takes the system colour rather than the
+           accent: signal-green on a dark ground, `--ink` on a light one,
+           where green would be both illegal as anything but a fill and
+           invisible at 1.15:1. Orange stays reserved for the one CTA. */
+        background-color: var(--system);
         border-radius: var(--radius-round);
+      }
+
+      .eyebrow_text {
+        font-family: var(--font-pixel);
+        font-size: var(--label);
+        font-weight: 400;
+        line-height: var(--label-line-height);
+        letter-spacing: 0;
+        text-transform: uppercase;
       }
     }
 

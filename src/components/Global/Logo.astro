@@ -1,0 +1,51 @@
+---
+/**
+ * The EDC lockup, in one place so the 2026 artwork can be swapped in by
+ * replacing two files and touching nothing else.
+ *
+ * Both SVGs are authored `fill="currentColor"`, so the lockup takes the
+ * colour of whatever it sits in and follows the theme with no token of its
+ * own. Keep that when the final artwork lands — a baked-in fill would have to
+ * be overridden once per mode, in every place the logo appears.
+ */
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/components/Media/Icon.astro";
+import wordmark from "@/assets/logo/edc-logo.svg";
+import compact from "@/assets/logo/edc-mark.svg";
+
+type Props = HTMLAttributes<"svg"> & {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /**
+   * Which lockup is drawn.
+   *
+   * - `full` — the wordmark, filling the width of its container (default)
+   * - `mark` — the compact mark, sized in `em` like an icon beside text
+   *
+   * Sizing follows the lockup because that is how each is used: the wordmark
+   * is given a width by whatever holds it, the mark sits inline. Override
+   * either from the consumer's own class.
+   */
+  variant?: "full" | "mark";
+};
+
+const {
+  render = true,
+  variant = "full",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const art = variant === "full" ? wordmark : compact;
+---
+
+{
+  render && (
+    <Icon
+      src={art}
+      variant={variant === "full" ? "full-width" : "medium"}
+      class:list={["logo", variant !== "full" && variant, className]}
+      {...rest}
+    />
+  )
+}

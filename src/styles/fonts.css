@@ -1,0 +1,20 @@
+/* Departure Mono, self-hosted from the 1.500 release.
+
+   Licensed under the SIL Open Font License 1.1, © Helena Zhang — not MIT,
+   which is what the repository's own LICENSE covers. The OFL requires the
+   license to travel with the font, so it ships beside it and is served at
+   /fonts/DepartureMono-LICENSE.txt.
+
+   Declared by hand rather than through Astro's font API, which hashes the
+   family it generates (`Syne-e8c9578f5e022bbe`) and can only be reached
+   through its own variable. The brand's stacks name their families literally,
+   and `--font-pixel` falls from Departure through to IBM Plex, so every
+   family in a stack has to answer to the name written there. IBM Plex Mono
+   comes from Fontsource for the same reason — see `BaseLayout.astro`. */
+@font-face {
+  font-family: "Departure Mono";
+  src: url("/fonts/DepartureMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

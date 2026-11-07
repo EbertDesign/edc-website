@@ -113,7 +113,7 @@ const content = await slotContent(Astro.slots);
     .form_note {
       display: none;
       padding: var(--space-4) var(--space-5);
-      border: var(--border-width) solid var(--border);
+      border: var(--border-width) solid var(--rule);
       border-radius: var(--radius-small);
     }
 
@@ -128,7 +128,7 @@ const content = await slotContent(Astro.slots);
 
     .form_wrap[data-state="failed"] .form_note-failed {
       display: block;
-      color: var(--text);
+      color: var(--ink);
     }
   }
 </style>

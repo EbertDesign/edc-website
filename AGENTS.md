@@ -37,6 +37,29 @@ Consult these guides before working on related tasks:
 Read [LUMOS.md](LUMOS.md) before adding pages, components, or styles. It
 covers the conventions that keep a Lumos site consistent as it grows.
 
+## Brand
+
+The site is moving to EDC's 2026 brand. Read [docs/brand.md](docs/brand.md)
+before changing anything visual — color, type, surfaces, motion or spacing.
+The short version:
+
+- Tokens live in `src/styles/brand.css`. Never hardcode a hex, a family or a
+  type size; if no token carries the value, the token is missing.
+- Theme is `data-theme="field"` (light, the default) or `data-theme="signal"`
+  (dark), on `<html>` or on any section.
+- `--signal-green` is data, state and links on dark. `--safety-orange` is the
+  one human moment per section. They never share a component, and neither is
+  ever text on a light ground.
+- Flat: no shadows or glows. The gradients still in the tree are a documented
+  exception — don't strip them, don't add more.
+- Departure Mono is set only at 11px or 22px. It is the one place `px` is
+  correct, against `LUMOS.md`'s general rule.
+- Headings are sentence case; uppercase belongs to Departure labels alone.
+  Don't change copy unless asked.
+- The migration is unfinished by design: the old tokens, the `.theme-*`
+  classes and the `webflow` layer are all still live. brand.md records what is
+  still provisional.
+
 ## Skills
 
 Task-specific procedures live in `.claude/skills/`, one folder each, with a
