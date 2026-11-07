@@ -84,14 +84,21 @@ fallback in those stacks is reachable:
   and matches nothing. Written the other way round the brand face never loads
   and every grotesk style renders in Helvetica, with no error anywhere.
 
-  ⚠️ **The kit serves weights 400 and 700 only** (plus 200 as a separate
-  `aktiv-grotesk-thin` family). The type scale asks for **500** on display-xl
-  through h3. Until Medium is added to the web project, CSS font matching
-  resolves 500 down to 400 and those five styles render a step light. Adding
-  it is a change in the Adobe Fonts project, not in this repo.
+  The kit in use is **`nrt5nbz`** ("EDC 2026 — Aktiv Grotesk"), created
+  2026-11-07 for `ebertdesign.co`, `www.ebertdesign.co`, `localhost` and
+  `127.0.0.1`. It carries six styles — 400, 500 and 700, each roman and
+  italic — which covers the scale's weights with italics for rich text.
 
-  The kit also ships `font-display: auto`, which can flash invisible text.
-  `swap` is settable in the kit's own settings and worth turning on.
+  It replaced kit `svb0fpq`, which served 400 and 700 only: the scale asks for
+  500 on display-xl through h3, and CSS font matching was quietly resolving
+  that down to 400, so five styles rendered a step light. The Adobe Fonts API
+  can create a kit but not add a font to an existing one, hence a new kit
+  rather than an edit. **`svb0fpq` is still live** — retire it once nothing
+  else points at it.
+
+  ⚠️ The kit ships `font-display: auto`, which can flash invisible text.
+  `swap` is a toggle in the kit's own settings at fonts.adobe.com and is not
+  settable through the API — worth turning on.
 - **Departure Mono** — self-hosted from the 1.500 release at
   `public/fonts/`, declared in [`fonts.css`](../src/styles/fonts.css).
   Licensed **SIL OFL 1.1**, © Helena Zhang — *not* MIT, which is what the
