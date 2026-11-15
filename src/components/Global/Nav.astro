@@ -146,17 +146,18 @@ const { render = true, overlap = false } = Astro.props;
     }
 
     .nav_logo {
-      /* The export's `.logo { width: 50%; max-width: 180px }` sits in a
-         shrink-to-fit brand link, so the 50% resolves against the capped
-         180px and the mark actually renders 90px wide at every width down
-         to 480px. Below that the export's `max-height: 24px` shrinks it to
-         ~43px; kept at 90px here on purpose so it stays legible on phones.
-         The bar's height is unchanged either way. */
+      /* The 2026 lockup is stacked and close to square, so it needs more
+         width than the old horizontal wordmark for "Ebert Design Company"
+         to stay legible. 7.5rem on desktop, 6rem on phones, where the bar
+         height matters more. */
       z-index: 99;
       display: flex;
       align-items: center;
       width: 100%;
-      max-width: 5.625rem;
+      max-width: 6rem;
+      @media (width >= 48rem) {
+        max-width: 7.5rem;
+      }
       /* The export pins every anchor to `--white` from the `webflow` layer
          (`a { color: var(--white) }`), which inheritance cannot get past —
          so the logo's `currentColor` has to be re-pointed at the bar. */

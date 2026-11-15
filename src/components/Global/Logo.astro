@@ -49,3 +49,13 @@ const art = variant === "full" ? wordmark : compact;
     />
   )
 }
+
+<style is:global>
+  @layer components {
+    /* The 2026 lockup is two-tone: the wordmark stays `currentColor` and
+       follows the theme, the symbol is the brand's orange in both modes. */
+    .logo .logo_symbol {
+      fill: var(--safety-orange);
+    }
+  }
+</style>
