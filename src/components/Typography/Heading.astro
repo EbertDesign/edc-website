@@ -21,6 +21,7 @@ type HeadingStyle =
   | "tech"
   | "caption"
   | "label"
+  | "label-md"
   | "label-lg";
 
 interface Props extends HTMLAttributes<"div"> {
@@ -35,7 +36,7 @@ interface Props extends HTMLAttributes<"div"> {
    * - `display-xl`, `display`, `h1`–`h6` — the heading sizes
    * - `lead`, `body`, `small` — the body sizes
    * - `tech`, `caption` — mono, for readouts and figures
-   * - `label`, `label-lg` — Departure, uppercase
+   * - `label`, `label-md`, `label-lg` — Departure, uppercase
    * - `large`, `main` — the previous names for `lead` and `body`
    * - `inherit` — take the style from its surroundings
    */

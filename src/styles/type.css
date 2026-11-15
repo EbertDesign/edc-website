@@ -15,7 +15,7 @@
 :root {
   /* display-xl — 120 / 56 */
   --display-xl: clamp(3.5rem, 2.3571rem + 5.7143vw, 7.5rem);
-  --display-xl-font-family: var(--font-grotesk);
+  --display-xl-font-family: var(--font-grotesk-ex);
   --display-xl-font-weight: 500;
   --display-xl-line-height: 0.95;
   --display-xl-letter-spacing: -0.03em;
@@ -28,14 +28,14 @@
 
   /* display — 72 / 44. Takes the old `--display` slot. */
   --display: clamp(2.75rem, 2.25rem + 2.5vw, 4.5rem);
-  --display-font-family: var(--font-grotesk);
+  --display-font-family: var(--font-grotesk-ex);
   --display-font-weight: 500;
   --display-line-height: 1;
   --display-letter-spacing: -0.02em;
 
   /* h1 — 48 / 36 */
   --h1: clamp(2.25rem, 2.0357rem + 1.0714vw, 3rem);
-  --h1-font-family: var(--font-grotesk);
+  --h1-font-family: var(--font-grotesk-ex);
   --h1-font-weight: 500;
   --h1-line-height: 1.08;
   --h1-letter-spacing: -0.015em;
@@ -186,8 +186,9 @@
   --text-small-trim-top: var(--primary-trim-top);
   --text-small-trim-bottom: var(--primary-trim-bottom);
 
-  /* The two Departure labels. Sizes come from `--label` / `--label-lg` in
-     `brand.css`, which are px on purpose — see the note there. */
+  /* The three Departure labels. Sizes come from `--label` / `--label-md` /
+     `--label-lg` in `brand.css`, which are px on purpose — see the note
+     there. */
   --label-font-family: var(--font-pixel);
   --label-font-weight: 400;
   --label-letter-spacing: 0;
@@ -220,7 +221,7 @@
    scale stops at 120 and the old one had three sizes past it. */
 .text-7xl,
 .text-5xl {
-  font-family: var(--font-grotesk);
+  font-family: var(--display-xl-font-family);
   font-size: var(--display-xl);
   font-weight: var(--display-xl-font-weight);
   line-height: var(--display-xl-line-height);
@@ -229,7 +230,7 @@
 
 .text-4xl,
 .text-3xl {
-  font-family: var(--font-grotesk);
+  font-family: var(--display-font-family);
   font-size: var(--display);
   font-weight: var(--display-font-weight);
   line-height: var(--display-line-height);
@@ -237,7 +238,7 @@
 }
 
 .text-2xl {
-  font-family: var(--font-grotesk);
+  font-family: var(--h1-font-family);
   font-size: var(--h1);
   font-weight: var(--h1-font-weight);
   line-height: var(--h1-line-height);
@@ -286,7 +287,6 @@
    font variables are injected unlayered so the variables themselves cannot be
    overridden — only the rules that read them. */
 body,
-h1,
 h2,
 h3,
 h4,
@@ -302,6 +302,10 @@ textarea,
 select,
 button {
   font-family: var(--font-grotesk);
+}
+
+h1 {
+  font-family: var(--h1-font-family);
 }
 
 /* The export also sets the body metrics — 1.125rem, 1.5 and -.25px tracking —

@@ -74,7 +74,7 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
         </div>
         <div class="case-info-wrapper">
           <div class="case-info-container">
-            <h3 class="text-3xl margin-bottom-1">{c.title}</h3>
+            <h3 class="text-3xl margin-bottom-4">{c.title}</h3>
             {c.service?.title && <p class="case-service">{c.service.title}</p>}
           </div>
         </div>
@@ -90,6 +90,17 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
       --case-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
       --case-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
       --case-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    /* The service name is a Departure label. Set here rather than in the
+       `webflow` layer, where the brand `p` rule outranks it. */
+    .case-service {
+      font-family: var(--label-font-family);
+      font-weight: var(--label-font-weight);
+      font-size: var(--label-md);
+      line-height: var(--label-md-line-height);
+      letter-spacing: var(--label-letter-spacing);
+      text-transform: var(--label-text-transform);
     }
 
     /* Base state is the hover-out half of the pair: `a-59` returns both

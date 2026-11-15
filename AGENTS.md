@@ -52,8 +52,9 @@ The short version:
   ever text on a light ground.
 - Flat: no shadows or glows. The gradients still in the tree are a documented
   exception — don't strip them, don't add more.
-- Departure Mono is set only at 11px or 22px. It is the one place `px` is
-  correct, against `LUMOS.md`'s general rule.
+- Departure Mono is set only at 11px, 16px or 22px (`--label`,
+  `--label-md`, `--label-lg`). It is the one place `px` is correct, against
+  `LUMOS.md`'s general rule.
 - Headings are sentence case; uppercase belongs to Departure labels alone.
   Don't change copy unless asked.
 - The migration is unfinished by design: the old tokens, the `.theme-*`

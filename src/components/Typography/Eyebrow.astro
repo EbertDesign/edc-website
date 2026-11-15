@@ -89,7 +89,8 @@ const content = await slotContent(Astro.slots);
            where green would be both illegal as anything but a fill and
            invisible at 1.15:1. Orange stays reserved for the one CTA. */
         background-color: var(--system);
-        border-radius: var(--radius-round);
+        /* Square, to echo the pixel grid of Departure Mono beside it. */
+        border-radius: 0;
       }
 
       .eyebrow_text {

@@ -1,0 +1,309 @@
+---
+import Layout from "@/layouts/BaseLayout.astro";
+import Section from "@/components/Wrapper/Section.astro";
+import ContentWrapper from "@/components/Wrapper/ContentWrapper.astro";
+import Grid from "@/components/Wrapper/Grid.astro";
+import Eyebrow from "@/components/Typography/Eyebrow.astro";
+import Heading from "@/components/Typography/Heading.astro";
+import Paragraph from "@/components/Typography/Paragraph.astro";
+import RichText from "@/components/Typography/RichText.astro";
+import ButtonWrapper from "@/components/Wrapper/ButtonWrapper.astro";
+import Button from "@/components/Button.astro";
+import ContentStyleColor from "@/components/ContentStyleColor.astro";
+import ContentStyleType from "@/components/ContentStyleType.astro";
+import ContentStyleScale from "@/components/ContentStyleScale.astro";
+
+const fixedSwatches = [
+  { name: "Paper", token: "--paper" },
+  { name: "Black", token: "--black" },
+  { name: "Sage", token: "--sage" },
+  { name: "Canopy", token: "--canopy", note: "Panels, Field emphasis fill" },
+  { name: "Signal green", token: "--signal-green", note: "The system: data, states, links on dark" },
+  { name: "Safety orange", token: "--safety-orange", note: "The human moment: one per section" },
+  { name: "On color", token: "--on-color", note: "Text on any accent fill" },
+];
+
+const modeSwatches = [
+  { name: "Ground", token: "--ground" },
+  { name: "Ground raised", token: "--ground-raised" },
+  { name: "Ink", token: "--ink" },
+  { name: "Ink muted", token: "--ink-muted" },
+  { name: "Rule", token: "--rule" },
+  { name: "System", token: "--system" },
+];
+
+const contrastPairs = [
+  { fg: "--ink", bg: "--ground" },
+  { fg: "--ink", bg: "--ground-raised" },
+  { fg: "--ink-muted", bg: "--ground" },
+  { fg: "--ink-muted", bg: "--ground-raised" },
+  { fg: "--on-color", bg: "--signal-green", note: "Fill only in Field" },
+  { fg: "--on-color", bg: "--safety-orange", note: "Primary CTA" },
+  { fg: "--on-color", bg: "--canopy" },
+  { fg: "--signal-green", bg: "--ground", note: "Text on dark only", modes: ["signal" as const] },
+  { fg: "--safety-orange", bg: "--ground", note: "Text on dark only", modes: ["signal" as const] },
+];
+
+const families = [
+  {
+    name: "Aktiv Grotesk",
+    token: "--font-grotesk",
+    source: "Adobe Fonts kit nrt5nbz",
+    use: "Headings, body and everything set in sentence case.",
+    specimen: "display",
+    text: "lead",
+    weights: [
+      { label: "Regular 400", token: "--primary-regular" },
+      { label: "Regular 400 italic", token: "--primary-regular", italic: true },
+      { label: "Medium 500", token: "--primary-medium" },
+      { label: "Bold 700", token: "--primary-bold" },
+    ],
+  },
+  {
+    name: "Departure Mono",
+    token: "--font-pixel",
+    source: "Self-hosted, SIL OFL 1.1",
+    use: "Uppercase labels only, at exactly 11px, 16px or 22px.",
+    specimen: "label-lg",
+    text: "label",
+    weights: [{ label: "Regular 400 · 11px only", token: "--primary-regular" }],
+  },
+  {
+    name: "IBM Plex Mono",
+    token: "--font-mono",
+    source: "Fontsource, 400 and 500",
+    use: "Readouts, captions, and numbers in tables and stats.",
+    specimen: "display",
+    text: "tech",
+    weights: [
+      { label: "Regular 400", token: "--primary-regular" },
+      { label: "Medium 500", token: "--primary-medium" },
+    ],
+  },
+];
+
+const typeScale = [
+  { name: "display-xl", utility: "display-xl", font: "Grotesk", size: "120 / 56", weight: "500", lineHeight: "0.95", tracking: "-0.03em", sample: "Built to last" },
+  { name: "display", utility: "display", font: "Grotesk", size: "72 / 44", weight: "500", lineHeight: "1.0", tracking: "-0.02em", sample: "Built to be understood" },
+  { name: "h1", utility: "h1", font: "Grotesk", size: "48 / 36", weight: "500", lineHeight: "1.08", tracking: "-0.015em" },
+  { name: "h2", utility: "h2", font: "Grotesk", size: "32 / 28", weight: "500", lineHeight: "1.15", tracking: "-0.01em" },
+  { name: "h3", utility: "h3", font: "Grotesk", size: "24 / 20", weight: "500", lineHeight: "1.25", tracking: "-0.005em" },
+  { name: "h4", utility: "h4", font: "Grotesk", size: "20 / 18", weight: "500", lineHeight: "1.4", tracking: "0" },
+  { name: "h5", utility: "h5", font: "Grotesk", size: "16", weight: "500", lineHeight: "1.55", tracking: "0" },
+  { name: "h6", utility: "h6", font: "Grotesk", size: "14", weight: "500", lineHeight: "1.45", tracking: "0" },
+  { name: "lead", utility: "lead", font: "Grotesk", size: "20 / 18", weight: "400", lineHeight: "1.4", tracking: "0", sample: "We design systems, brands and tools for organizations doing work that matters." },
+  { name: "body", utility: "body", font: "Grotesk", size: "16", weight: "400", lineHeight: "1.55", tracking: "0", sample: "We design systems, brands and tools for organizations doing work that matters. Every project starts with listening." },
+  { name: "small", utility: "small", font: "Grotesk", size: "14", weight: "400", lineHeight: "1.45", tracking: "0", sample: "We design systems, brands and tools for organizations doing work that matters." },
+  { name: "tech", utility: "tech", font: "Plex Mono", size: "14", weight: "400", lineHeight: "1.6", tracking: "0", sample: "LAT 35.7796 · LON -78.6382 · 2026-11-07" },
+  { name: "caption", utility: "caption", font: "Plex Mono", size: "12", weight: "400", lineHeight: "1.5", tracking: "0", sample: "Fig. 03 — Wayfinding system, Raleigh NC" },
+  { name: "label-lg", utility: "label-lg", font: "Departure", size: "22", weight: "400", lineHeight: "24px", tracking: "0", sample: "Case study" },
+  { name: "label-md", utility: "label-md", font: "Departure", size: "16", weight: "400", lineHeight: "20px", tracking: "0", sample: "Brand identity" },
+  { name: "label", utility: "label", font: "Departure", size: "11", weight: "400", lineHeight: "16px", tracking: "0", sample: "Brand identity" },
+];
+
+const supportingType = [
+  { token: "--primary-regular", value: "400" },
+  { token: "--primary-medium", value: "500" },
+  { token: "--primary-bold", value: "700" },
+  { token: "--primary-trim-top", value: "0.4em", note: "Leading trim above" },
+  { token: "--primary-trim-bottom", value: "0.38em", note: "Leading trim below" },
+  { token: "--label", value: "11px", note: "Departure, small" },
+  { token: "--label-md", value: "16px", note: "Departure, medium" },
+  { token: "--label-lg", value: "22px", note: "Departure, large" },
+  { token: "--letter-spacing-tight", value: "-0.05em", note: "Legacy" },
+  { token: "--letter-spacing-slight", value: "-0.014em", note: "Legacy" },
+  { token: "--line-height-body", value: "1.6", note: "Legacy" },
+];
+
+const space = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => {
+  const range = [
+    [6, 8], [10, 12], [14, 16], [20, 24], [28, 32], [32, 40], [36, 48], [40, 64],
+  ][n - 1];
+  return {
+    token: `--space-${n}`,
+    value: `${range[0]} → ${range[1]}px, fluid`,
+    preview: "bar" as const,
+    measure: "length" as const,
+  };
+});
+
+const sectionSpace = [
+  { token: "--section-space-small", value: "80 → 120px, fluid", preview: "bar" as const, measure: "length" as const },
+  { token: "--section-space-medium", value: "80 / 120 / 200px", note: "Steps at 30rem and 62rem. The default.", preview: "bar" as const, measure: "length" as const },
+  { token: "--section-space-large", value: "200px", preview: "bar" as const, measure: "length" as const },
+  { token: "--section-space-nav-overlap", value: "160 → 224px, fluid", note: "Clears a nav over the page", preview: "bar" as const, measure: "length" as const },
+];
+
+const layout = [
+  { token: "--container-margin", value: "1.5rem / 2.5rem / 3rem / 9.5vw", note: "The page gutter. Steps at 30, 48, 62rem.", preview: "bar" as const, measure: "length" as const },
+  { token: "--site-margin", value: "16 → 48px, fluid", note: "Padding inside modals and dropdowns", preview: "bar" as const, measure: "length" as const },
+  { token: "--site-gutter", value: "16 → 32px, fluid", note: "Gap between grid columns", preview: "bar" as const, measure: "length" as const },
+  { token: "--max-width-small", value: "70rem", measure: "length" as const },
+  { token: "--max-width-main", value: "90rem", measure: "length" as const },
+  { token: "--nav-height", value: "5rem", measure: "length" as const },
+];
+
+const breakpoints = [
+  { token: "small", value: "30rem · 480px", note: "Grid small, wider gutter", media: "(width >= 30rem)" },
+  { token: "medium", value: "48rem · 768px", note: "Grid medium, two-column layouts", media: "(width >= 48rem)" },
+  { token: "large", value: "62rem · 992px", note: "Grid large, 9.5vw gutter", media: "(width >= 62rem)" },
+  { token: "--viewport-min / max", value: "320 → 1440", note: "Range every fluid token scales across" },
+];
+
+const shape = [
+  { token: "--radius-small", value: "0.5rem", preview: "radius" as const, measure: "length" as const },
+  { token: "--radius-main", value: "1rem", preview: "radius" as const, measure: "length" as const },
+  { token: "--radius-round", value: "100vw", note: "Pills and dots", preview: "radius" as const },
+  { token: "--border-width", value: "0.0625rem", note: "Hairlines", preview: "line" as const, measure: "length" as const },
+  { token: "--focus-width", value: "0.125rem", note: "Focus outline", preview: "line" as const, measure: "length" as const },
+  { token: "--focus-offset", value: "0.1827rem", note: "Gap outside the element", measure: "length" as const },
+];
+
+const motion = [
+  { token: "--hover-duration", value: "200ms", note: "Hover the row to play", preview: "motion" as const, ease: "--hover-ease", measure: "time" as const },
+  { token: "--hover-ease", value: "ease" },
+  { token: "--open-duration", value: "var(--hover-duration)", note: "Accordions, dropdowns, modals", preview: "motion" as const, ease: "--open-ease", measure: "time" as const },
+  { token: "--open-ease", value: "var(--hover-ease)" },
+];
+---
+
+<Layout
+  title="Style Guide"
+  description="The tokens, type and rules behind EDC's 2026 brand."
+  theme="light"
+>
+  <!-- intro -->
+  <Section paddingTop="small" paddingBottom="small" gap="0">
+    <ContentWrapper>
+      <Eyebrow tag="span">EDC brand 2026</Eyebrow>
+      <Heading tag="h1" variant="display">Style guide</Heading>
+      <Paragraph variant="lead" maxWidth={52}>
+        Every token, type style and rule the site is built from. Values marked
+        live are read from this page as it renders, so they show what the
+        browser is using right now. Components have a page of their own.
+      </Paragraph>
+      <ButtonWrapper>
+        <Button element="link" href="/example-components">View components</Button>
+        <Button element="link" href="#color" emphasis="secondary">Color</Button>
+        <Button element="link" href="#type" emphasis="secondary">Type</Button>
+        <Button element="link" href="#space" emphasis="secondary">Space</Button>
+        <Button element="link" href="#layout" emphasis="secondary">Layout</Button>
+        <Button element="link" href="#shape" emphasis="secondary">Shape and motion</Button>
+      </ButtonWrapper>
+    </ContentWrapper>
+  </Section>
+
+  <!-- color -->
+  <Section id="color" paddingTop="small" paddingBottom="small" gap="0">
+    <Grid class="gap-7">
+      <ContentWrapper>
+        <Eyebrow>Color</Eyebrow>
+        <Heading tag="h2" variant="h1">Seven swatches, two modes</Heading>
+        <Paragraph maxWidth={60}>
+          Field is the warm, light default. Signal is the black mode for heroes,
+          results, stats and motion, set with <code>data-theme="signal"</code> on
+          any section. Ask for the role token, never the hue.
+        </Paragraph>
+      </ContentWrapper>
+      <ContentStyleColor title="Fixed · the same in both modes" swatches={fixedSwatches} />
+      <Grid large={3}>
+        <ContentStyleColor title="Field · default" theme="field" swatches={modeSwatches} />
+        <ContentStyleColor title="Signal" theme="signal" swatches={modeSwatches} />
+        <ContentStyleColor title="Signal fill · green ground" theme="signal-fill" swatches={modeSwatches} />
+      </Grid>
+      <RichText maxWidth={64}>
+        <h3>Color jobs</h3>
+        <ul>
+          <li><strong>Signal green is the system:</strong> data, annotations, states and links on dark. On light grounds it is a fill, never text.</li>
+          <li><strong>Safety orange is the human moment:</strong> the primary CTA or the one key number. One per section, never text on paper, never a large fill.</li>
+          <li>Green and orange never share a component.</li>
+          <li>Text on any accent fill is <code>--on-color</code>.</li>
+        </ul>
+      </RichText>
+      <ContentStyleColor variant="contrast" title="Contrast · measured live, 4.5:1 minimum" pairs={contrastPairs} />
+    </Grid>
+  </Section>
+
+  <!-- type -->
+  <Section id="type" paddingTop="small" paddingBottom="small" gap="0">
+    <Grid class="gap-7">
+      <ContentWrapper>
+        <Eyebrow>Typography</Eyebrow>
+        <Heading tag="h2" variant="h1">Three faces, one scale</Heading>
+        <Paragraph maxWidth={60}>
+          Sizes are fluid between mobile and desktop across 320 to 1440px. Apply
+          a style with its <code>.text-style-*</code> utility, or the
+          <code>variant</code> prop on <code>Heading</code> and
+          <code>Paragraph</code>.
+        </Paragraph>
+      </ContentWrapper>
+      <ContentStyleType variant="families" title="Typefaces" families={families} />
+      <ContentStyleType title="Type scale · desktop / mobile" styles={typeScale} />
+      <ContentStyleType
+        title="Signal · h1 to h3 drop to 400"
+        theme="signal"
+        styles={typeScale.filter((style) => ["h1", "h2", "h3"].includes(style.name)).map((style) => ({ ...style, weight: "400" }))}
+      />
+      <RichText maxWidth={64}>
+        <h3>Type rules</h3>
+        <ul>
+          <li>Headings are sentence case. Uppercase belongs to Departure labels alone.</li>
+          <li>Departure Mono is set at exactly 11px or 22px, with no letter spacing. Any other size blurs it.</li>
+          <li>No more than three grotesk sizes per section, plus labels.</li>
+          <li>Numbers in tables and stats use mono, with tabular figures.</li>
+        </ul>
+      </RichText>
+      <ContentStyleScale title="Supporting type tokens" rows={supportingType} />
+    </Grid>
+  </Section>
+
+  <!-- space -->
+  <Section id="space" paddingTop="small" paddingBottom="small" gap="0">
+    <Grid class="gap-7">
+      <ContentWrapper>
+        <Eyebrow>Spacing</Eyebrow>
+        <Heading tag="h2" variant="h1">Space</Heading>
+        <Paragraph maxWidth={60}>
+          Eight fluid steps for space inside components, and four for the space
+          between sections. Resize the window to watch the live values move.
+        </Paragraph>
+      </ContentWrapper>
+      <ContentStyleScale title="Space scale" rows={space} />
+      <ContentStyleScale title="Section space" rows={sectionSpace} />
+    </Grid>
+  </Section>
+
+  <!-- layout -->
+  <Section id="layout" paddingTop="small" paddingBottom="small" gap="0">
+    <Grid class="gap-7">
+      <ContentWrapper>
+        <Eyebrow>Layout</Eyebrow>
+        <Heading tag="h2" variant="h1">Layout</Heading>
+        <Paragraph maxWidth={60}>
+          Margins, widths and the three breakpoints <code>Grid</code> declares.
+          Read breakpoints from there rather than from memory.
+        </Paragraph>
+      </ContentWrapper>
+      <ContentStyleScale title="Margins and widths" rows={layout} />
+      <ContentStyleScale title="Breakpoints · live shows which are on" rows={breakpoints} />
+    </Grid>
+  </Section>
+
+  <!-- shape and motion -->
+  <Section id="shape" paddingTop="small" paddingBottom="medium" gap="0">
+    <Grid class="gap-7">
+      <ContentWrapper>
+        <Eyebrow>Shape and motion</Eyebrow>
+        <Heading tag="h2" variant="h1">Flat everywhere</Heading>
+        <Paragraph maxWidth={60}>
+          No shadows or glows. Panels use <code>--ground-raised</code> or
+          <code>--canopy</code> with no border, and lists and tables use
+          <code>--rule</code> hairlines. Motion is allowed, and all of it stops
+          under reduced motion.
+        </Paragraph>
+      </ContentWrapper>
+      <ContentStyleScale title="Radius, borders and focus" rows={shape} />
+      <ContentStyleScale title="Motion" rows={motion} />
+    </Grid>
+  </Section>
+</Layout>

@@ -26,10 +26,10 @@ import Eyebrow from "@/components/Typography/Eyebrow.astro";
   <Section paddingTop="none" paddingBottom="none" class="subpage-hero-section" gap="0">
         <div class="w-layout-grid _12-column-grid">
           <div id="w-node-_8fbd3dcc-fa3e-6813-474c-125f8b4765b3-4efe135b">
-            <h1 class="margin-bottom-16 fade-in-bottom">Grant-Funded Projects </h1>
+            <h1 class="grants-hero-title fade-in-bottom">Grant-Funded Projects </h1>
             <p class="text-large fade-in-bottom-100ms">Transform Your Nonprofit&#x27;s Brand Without Burdening Your Budget.</p>
           </div>
-          <p id="w-node-_8fbd3dcc-fa3e-6813-474c-125f8b4765b8-4efe135b" class="light-grey-text text-s fade-in-bottom-100ms">Grant Funded Marketing Services.</p>
+          <p id="w-node-_8fbd3dcc-fa3e-6813-474c-125f8b4765b8-4efe135b" class="light-grey-text text-style-label fade-in-bottom-100ms">Grant Funded Marketing Services.</p>
         </div>
   </Section>
 
@@ -158,3 +158,10 @@ import Eyebrow from "@/components/Typography/Eyebrow.astro";
         </div>
   </Section>
 </BaseLayout>
+
+<style>
+  /* Same room under the hero title as /journal, so the intro line clears it. */
+  .grants-hero-title {
+    margin-bottom: var(--space-6);
+  }
+</style>

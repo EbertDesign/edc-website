@@ -207,11 +207,9 @@ const named = {
         inset-block: 0;
         inset-inline-start: 0;
         width: 4rem;
-        /* Orange at rest, not just on hover: safety-orange is "the human
-           moment — the primary CTA", and a CTA that shows no orange until
-           it is pointed at does not announce itself. It is a fill, which is
-           the only legal way to use orange on a light ground. */
-        background-color: var(--safety-orange);
+        /* The raised surface at rest; it turns safety-orange as it grows
+           across the label on hover. Orange stays a fill, never a line. */
+        background-color: var(--ground-raised);
         border-radius: var(--radius-round);
         transition:
           width calc(var(--hover-duration) * 2) var(--hover-ease),
@@ -226,29 +224,31 @@ const named = {
       .button_mark {
         --_size: 1.75rem;
         flex: none;
-        /* On the orange fill in both states, so it never changes colour. */
-        color: var(--on-color);
+        /* Orange on the raised fill at rest, on-color once the fill turns
+           orange on hover. */
+        color: var(--safety-orange);
         transition: color var(--hover-duration) var(--hover-ease);
       }
 
       .button_text {
-        /* The export's labels were uppercase Syne 600 with tracking. All
-           three are gone: uppercase belongs to Departure labels alone, so a
-           CTA is sentence case, and the scale puts `small` at 14px with no
-           tracking. 500 rather than the scale's 400 because a CTA carries
-           more weight than body copy — it renders 400 until Medium is added
-           to the Adobe Fonts kit. `line-height: 1` is centring inside a fixed
-           4rem control, not the leading of a text block. */
-        font-family: var(--font-grotesk);
-        font-size: 0.875rem;
-        font-weight: var(--primary-medium);
-        line-height: 1;
+        /* A Departure label: the `label` style, uppercase at exactly 11px
+           with no letter-spacing, since any other size blurs the font. */
+        font-family: var(--font-pixel);
+        font-size: var(--label);
+        font-weight: 400;
+        line-height: var(--label-line-height);
+        letter-spacing: 0;
+        text-transform: uppercase;
       }
 
       @media (hover: hover) {
         &:hover:not(:disabled) {
           &::before {
             width: 100%;
+            background-color: var(--safety-orange);
+          }
+          .button_mark {
+            color: var(--on-color);
           }
           /* Set on the wrap, not on `.button_text`: the label has no colour
              of its own, so it inherits, and every other variant's own hover

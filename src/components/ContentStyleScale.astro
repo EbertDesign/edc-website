@@ -1,0 +1,243 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Row = {
+  /** The custom property, dashes included. */
+  token: string;
+  /** Its value as written in the source. */
+  value: string;
+  /** What it is for. */
+  note?: string;
+  /**
+   * How the value is drawn.
+   *
+   * - `bar` — a bar that long
+   * - `radius` — a box with those corners
+   * - `line` — a rule that thick
+   * - `motion` — a dot that moves on hover, at that duration
+   */
+  preview?: "bar" | "radius" | "line" | "motion";
+  /** Easing token the `motion` preview moves with. */
+  ease?: string;
+  /**
+   * What the live column reads.
+   *
+   * - `length` — the resolved size, in px
+   * - `time` — the resolved duration
+   */
+  measure?: "length" | "time";
+  /** Media query the live column reports as on or off. */
+  media?: string;
+};
+
+type Props = HTMLAttributes<"div"> & {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** Small label above the list. */
+  title?: string;
+  /** The tokens to show. */
+  rows: Row[];
+};
+
+const { render = true, title, rows = [], class: className, ...rest } =
+  Astro.props;
+
+const style = (row: Row) =>
+  [
+    `--_v: var(${row.token})`,
+    row.ease && `--_ease: var(${row.ease})`,
+  ]
+    .filter(Boolean)
+    .join("; ");
+---
+
+{
+  render && rows.length > 0 && (
+    <div class:list={["style-scale_wrap", className]} {...rest}>
+      {title && <p class="style-scale_title text-style-label">{title}</p>}
+      <ul class="style-scale_list" role="list">
+        {rows.map((row) => (
+          <li
+            class="style-scale_row"
+            style={style(row)}
+            data-measure={row.measure}
+            data-media={row.media}
+            tabindex={row.preview === "motion" ? 0 : undefined}
+          >
+            <div class="style-scale_name">
+              <code class="text-style-caption">{row.token}</code>
+              {row.note && (
+                <span class="style-scale_note text-style-caption">
+                  {row.note}
+                </span>
+              )}
+            </div>
+            <code class="style-scale_value text-style-caption">
+              {row.value}
+            </code>
+            <span
+              class="style-scale_live text-style-caption"
+              data-style-scale-live
+            >
+              {row.measure || row.media ? "—" : ""}
+            </span>
+            <span class="style-scale_preview" aria-hidden="true">
+              {row.preview && <span class:list={["style-scale_shape", row.preview]} />}
+            </span>
+            {row.measure && (
+              <span class="style-scale_probe" data-style-scale-probe />
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-scale_wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .style-scale_title,
+    .style-scale_note {
+      color: var(--ink-muted);
+    }
+
+    .style-scale_list {
+      /* The Webflow layer pads lists, above the base reset. */
+      padding-left: 0;
+      display: flex;
+      flex-direction: column;
+      border-top: var(--border-width) solid var(--rule);
+    }
+
+    .style-scale_row {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-2) var(--space-4);
+      align-items: center;
+      padding-block: var(--space-3);
+      border-bottom: var(--border-width) solid var(--rule);
+      font-variant-numeric: tabular-nums;
+
+      @media (width >= 48rem) {
+        grid-template-columns:
+          minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr)
+          minmax(0, 2fr);
+      }
+    }
+
+    .style-scale_name {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .style-scale_value {
+      overflow-wrap: anywhere;
+    }
+
+    .style-scale_live:empty {
+      display: none;
+    }
+
+    .style-scale_preview {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+
+      &:empty {
+        display: none;
+      }
+
+      @media (width >= 48rem) {
+        grid-column: auto;
+        &:empty {
+          display: flex;
+        }
+      }
+    }
+
+    .style-scale_shape {
+      display: block;
+      background-color: var(--ink);
+
+      &.bar {
+        width: var(--_v);
+        max-width: 100%;
+        height: var(--space-2);
+      }
+
+      &.radius {
+        width: 5rem;
+        height: 3rem;
+        border-radius: var(--_v);
+        background-color: var(--ground-raised);
+        outline: var(--border-width) solid var(--rule);
+        outline-offset: calc(var(--border-width) * -1);
+      }
+
+      &.line {
+        width: 5rem;
+        height: var(--_v);
+      }
+
+      &.motion {
+        width: var(--space-3);
+        aspect-ratio: 1;
+        border-radius: var(--radius-round);
+        transition: translate var(--_v) var(--_ease, ease);
+      }
+    }
+
+    .style-scale_row:is(:hover, :focus-visible) .style-scale_shape.motion {
+      translate: 6rem 0;
+    }
+
+    /* Measured by the script; never seen. */
+    .style-scale_probe {
+      position: absolute;
+      visibility: hidden;
+      pointer-events: none;
+      width: var(--_v);
+      transition-duration: var(--_v);
+    }
+  }
+</style>
+
+<script>
+  const update = () => {
+    document
+      .querySelectorAll<HTMLElement>(".style-scale_row")
+      .forEach((row) => {
+        const out = row.querySelector("[data-style-scale-live]");
+        if (!out) return;
+        const { measure, media } = row.dataset;
+
+        if (media) {
+          out.textContent = matchMedia(media).matches ? "● On" : "○ Off";
+          return;
+        }
+
+        const probe = row.querySelector<HTMLElement>("[data-style-scale-probe]");
+        if (!probe) return;
+        const style = getComputedStyle(probe);
+        if (measure === "length") {
+          out.textContent = `${Math.round(parseFloat(style.width) * 10) / 10}px`;
+        } else if (measure === "time") {
+          // Reduced motion zeroes durations globally, so this reads 0.01ms there.
+          out.textContent = style.transitionDuration;
+        }
+      });
+  };
+
+  update();
+  window.addEventListener("resize", update);
+  document.addEventListener("astro:page-load", update);
+</script>

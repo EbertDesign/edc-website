@@ -54,7 +54,7 @@ mode:
 | Token | Field | Signal | |
 |---|---|---|---|
 | `--system` | `--ink` | `--signal-green` | data, annotations, states, links |
-| `--label` / `--label-lg` | `11px` / `22px` | same | the two Departure sizes |
+| `--label` / `--label-md` / `--label-lg` | `11px` / `16px` / `22px` | same | the three Departure sizes |
 
 `--system` is the brief's own sentence made into a token: *"signal-green is the
 system: data, annotations, states and links on dark."* On a light ground green
@@ -68,6 +68,7 @@ at the call site.
 | Stack | Families |
 |---|---|
 | `--font-grotesk` | `aktiv-grotesk, "Aktiv Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif` |
+| `--font-grotesk-ex` | `aktiv-grotesk-extended, "Aktiv Grotesk Extended", "Aktiv Grotesk Ex", var(--font-grotesk)` — display-xl, display and h1 only. Kit serves 400/700, so their 500 renders at 400 until Extended Medium is added. |
 | `--font-pixel` | `"Departure Mono", "IBM Plex Mono", ui-monospace, monospace` |
 | `--font-mono` | `"IBM Plex Mono", ui-monospace, Menlo, monospace` |
 
@@ -118,9 +119,9 @@ Desktop / mobile.
 
 | Style | Font | Size | Weight | Line height | Tracking |
 |---|---|---|---|---|---|
-| display-xl | grotesk | 120 / 56 | 500 | 0.95 | -0.03em |
-| display | grotesk | 72 / 44 | 500 | 1.0 | -0.02em |
-| h1 | grotesk | 48 / 36 | 500 | 1.08 | -0.015em |
+| display-xl | grotesk-ex | 120 / 56 | 500 | 0.95 | -0.03em |
+| display | grotesk-ex | 72 / 44 | 500 | 1.0 | -0.02em |
+| h1 | grotesk-ex | 48 / 36 | 500 | 1.08 | -0.015em |
 | h2 | grotesk | 32 / 28 | 500 | 1.15 | -0.01em |
 | h3 | grotesk | 24 / 20 | 500 | 1.25 | -0.005em |
 | lead | grotesk | 20 / 18 | 400 | 1.4 | 0 |
@@ -129,15 +130,20 @@ Desktop / mobile.
 | tech | mono | 14 | 400 | 1.6 | 0 |
 | caption | mono | 12 | 400 | 1.5 | 0 |
 | label-lg | pixel | 22 | 400 | 24px | 0, uppercase |
+| label-md | pixel | 16 | 400 | 20px | 0, uppercase |
 | label | pixel | 11 | 400 | 16px | 0, uppercase |
 
-- **Departure Mono is set at exactly 11px or 22px, with no letter-spacing.**
-  Any other size blurs it. These two are the one place `px` is correct —
-  `LUMOS.md` otherwise forbids it, and this is the documented exception. Line
-  heights for the two label styles are px for the same reason. Use the
-  `--label` / `--label-lg` tokens rather than typing the numbers, and keep
-  them in `px`: a `rem` would let a browser text-zoom land the font between
-  the only two sizes it is legible at.
+- **Departure Mono is set at exactly 11px, 16px or 22px, with no
+  letter-spacing.** The font is drawn on an 11px grid, so 11px and 22px are
+  pixel-sharp. 16px (`label-md`) was added 2026-11-07 for labels that need
+  more presence than 11px without the weight of 22px — first used for the
+  service name on case cards. It sits off the grid and renders slightly soft
+  on 1x screens; that trade was accepted on purpose. Any other size is not.
+  These are the one place `px` is correct — `LUMOS.md` otherwise forbids it,
+  and this is the documented exception. Line heights for the label styles are
+  px for the same reason. Use the `--label` / `--label-md` / `--label-lg`
+  tokens rather than typing the numbers, and keep them in `px`: a `rem` would
+  let a browser text-zoom land the font on a size it was never approved at.
 - In Signal mode, **h1 to h3 drop to weight 400**. The display sizes and the
   extension levels below keep theirs — the brief names h1 to h3 only.
 
@@ -158,7 +164,7 @@ scale also had keep their token names, so the element rules, the
 scale up unchanged. The brief's names are available as utilities too —
 `.text-style-lead`, `.text-style-body`, `.text-style-display-xl`,
 `.text-style-tech`, `.text-style-caption`, `.text-style-label`,
-`.text-style-label-lg`.
+`.text-style-label-md`, `.text-style-label-lg`.
 - Use no more than **three grotesk sizes per section**, plus labels.
 - **Numbers in tables and stats use a mono font.**
 
@@ -185,12 +191,6 @@ scale up unchanged. The brief's names are available as utilities too —
 > `mesh-gradient.png` on the About hero, `Overlay variant="gradient"`, and the
 > `Marquee` edge mask. Do not strip them as a flat-rule cleanup. Add no new
 > ones.
-
-## Copy
-
-Headings are **sentence case**. Uppercase belongs only to Departure labels.
-**Don't change any copy unless asked.**
-
 >
 > The homepage hero left this list on 2026-11-15: its mesh gradient was
 > replaced by a live ASCII rendering of a forest-canopy video
@@ -199,6 +199,12 @@ Headings are **sentence case**. Uppercase belongs only to Departure labels.
 > the `--rule` → `--sage` → `--signal-green` colour ramp on `--ground-raised`
 > — was tuned in a prototype and is fixed; the values live in that script's
 > `CONFIG` and on `.hero-art`.
+
+## Copy
+
+Headings are **sentence case**. Uppercase belongs only to Departure labels.
+**Don't change any copy unless asked.**
+
 ## Motion
 
 Motion is allowed. All of it must respect `prefers-reduced-motion`.
@@ -257,8 +263,8 @@ not a mistake.
 
 **Provisional, pending review:**
 
-- CTA button labels become sentence-case grotesk at `small`; uppercase leaves
-  the button, since uppercase is Departure's alone.
+- CTA button labels are Departure Mono in the `label` style (11px,
+  uppercase).
 - In Field, link hover keeps `--ink` text and thickens its rule to
   `--safety-orange`; heading emphasis drops color for a flat `--canopy` fill.
   Both are `--signal-green` in Signal. This exists because orange and green

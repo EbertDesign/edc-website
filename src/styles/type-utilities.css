@@ -69,9 +69,10 @@
   --_margin-bottom: var(--caption-margin-bottom);
 }
 
-/* Departure. Leading trim is off for these two: the labels are set at an
+/* Departure. Leading trim is off for these three: the labels are set at an
    exact px line-height, and trimming to cap height would fight it. */
 .text-style-label,
+.text-style-label-md,
 .text-style-label-lg {
   font-family: var(--label-font-family);
   font-weight: var(--label-font-weight);
@@ -87,6 +88,11 @@
 .text-style-label {
   font-size: var(--label);
   line-height: var(--label-line-height);
+}
+
+.text-style-label-md {
+  font-size: var(--label-md);
+  line-height: var(--label-md-line-height);
 }
 
 .text-style-label-lg {

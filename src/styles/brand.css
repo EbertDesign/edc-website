@@ -58,13 +58,17 @@
   --secondary: var(--sage);
   --black-800: var(--ground-raised);
 
-  /* Departure Mono is set at exactly 11px or 22px, with no letter-spacing;
-     any other size blurs it. Tokens rather than literals so nobody types
-     12px, and `px` rather than `rem` so a browser text-zoom cannot land it
-     between the two sizes it is legible at. This is the one exception to
-     LUMOS.md's no-px rule — see docs/brand.md. */
+  /* Departure Mono is drawn on an 11px grid, so 11px and 22px are pixel-
+     sharp. 16px is the one sanctioned size between them: a little soft on
+     1x screens, accepted for labels that need more presence than 11px. No
+     other size, and no letter-spacing. Tokens rather than literals so nobody
+     types 12px, and `px` rather than `rem` so a browser text-zoom cannot land
+     it on an unsanctioned size. This is the one exception to LUMOS.md's
+     no-px rule — see docs/brand.md. */
   --label: 11px;
   --label-line-height: 16px;
+  --label-md: 16px;
+  --label-md-line-height: 20px;
   --label-lg: 22px;
   --label-lg-line-height: 24px;
 
@@ -86,6 +90,12 @@
   --font-grotesk:
     aktiv-grotesk, "Aktiv Grotesk", "Helvetica Neue", Helvetica, Arial,
     sans-serif;
+  /* Aktiv Grotesk Extended, from the same kit. Display XL, Display and H1
+     only. The kit serves it at 400 and 700, so the 500 those styles ask for
+     resolves down to 400 until Extended Medium is added to the web project. */
+  --font-grotesk-ex:
+    aktiv-grotesk-extended, "Aktiv Grotesk Extended", "Aktiv Grotesk Ex",
+    var(--font-grotesk);
   --font-pixel: "Departure Mono", "IBM Plex Mono", ui-monospace, monospace;
   --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }

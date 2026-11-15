@@ -1,0 +1,313 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Style = {
+  /** The style's name in the brief. */
+  name: string;
+  /** The `.text-style-*` utility that applies it, without the prefix. */
+  utility: string;
+  /** Which family it is set in. */
+  font: string;
+  /** Size in px, desktop / mobile. */
+  size: string;
+  /** Font weight. */
+  weight: string;
+  /** Line height. */
+  lineHeight: string;
+  /** Letter spacing. */
+  tracking: string;
+  /** Text shown in the style. Defaults to the component's `sample`. */
+  sample?: string;
+};
+
+type Weight = {
+  /** What the weight is called. */
+  label: string;
+  /** Token holding the numeric weight. */
+  token: string;
+  /** Sets the sample in italic. */
+  italic?: boolean;
+};
+
+type Family = {
+  /** The typeface's name. */
+  name: string;
+  /** The stack token it is set from. */
+  token: string;
+  /** Where the files come from. */
+  source: string;
+  /** What the face is for. */
+  use: string;
+  /** `.text-style-*` utility for the large specimen, without the prefix. */
+  specimen: string;
+  /** `.text-style-*` utility for the weight samples, without the prefix. */
+  text: string;
+  /** The weights loaded for it. */
+  weights: Weight[];
+};
+
+type Base = HTMLAttributes<"div"> & {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** Small label above the list. */
+  title?: string;
+};
+
+type Props = Base &
+  (
+    | {
+        /**
+         * What is shown.
+         *
+         * - `scale` — one row per type style, with its specs (default)
+         * - `families` — one panel per typeface, with its weights
+         */
+        variant?: "scale";
+        /** The type styles to show. */
+        styles: Style[];
+        /** Text shown in every style that doesn't set its own. */
+        sample?: string;
+        /** Mode the styles render in. Unset, they follow the page. */
+        theme?: "field" | "signal";
+        families?: never;
+      }
+    | {
+        variant: "families";
+        /** The typefaces to show. */
+        families: Family[];
+        styles?: never;
+        sample?: never;
+        theme?: never;
+      }
+  );
+
+type AllProps = Base & {
+  variant?: "scale" | "families";
+  styles?: Style[];
+  sample?: string;
+  theme?: "field" | "signal";
+  families?: Family[];
+};
+
+const {
+  render = true,
+  title,
+  variant = "scale",
+  styles = [],
+  sample = "Built to be understood",
+  theme,
+  families = [],
+  class: className,
+  ...rest
+} = Astro.props as AllProps;
+
+const hasContent =
+  variant === "scale" ? styles.length > 0 : families.length > 0;
+const pangram = "The quick brown fox jumps over the lazy dog 0123456789";
+---
+
+{
+  render && hasContent && (
+    <div
+      class:list={["style-type_wrap", variant, theme && "themed", className]}
+      data-theme={theme}
+      {...rest}
+    >
+      {title && <p class="style-type_title text-style-label">{title}</p>}
+
+      {variant === "scale" && (
+        <ul class="style-type_list" role="list">
+          {styles.map((style) => (
+            <li class="style-type_row">
+              <div class="style-type_meta">
+                <p class="text-style-label">{style.name}</p>
+                <code class="style-type_spec text-style-caption">
+                  .text-style-{style.utility}
+                </code>
+                <p class="style-type_spec text-style-caption">
+                  {style.font} · {style.size}px · {style.weight}
+                  <br />
+                  lh {style.lineHeight} · tracking {style.tracking}
+                </p>
+                <p class="text-style-caption">
+                  Live <span data-style-type-live>—</span>
+                </p>
+              </div>
+              <p
+                class={`style-type_sample text-style-${style.utility}`}
+                data-style-type-sample
+              >
+                {style.sample ?? sample}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {variant === "families" && (
+        <ul class="style-type_families" role="list">
+          {families.map((family) => (
+            <li class="style-type_family">
+              <p
+                class={`style-type_specimen text-style-${family.specimen}`}
+                style={`font-family: var(${family.token})`}
+              >
+                Aa
+              </p>
+              <div class="style-type_info">
+                <p class="text-style-h4">{family.name}</p>
+                <code class="style-type_spec text-style-caption">
+                  {family.token}
+                </code>
+                <p class="style-type_spec text-style-caption">
+                  {family.source}
+                </p>
+                <p class="text-style-small">{family.use}</p>
+              </div>
+              <ul class="style-type_weights" role="list">
+                {family.weights.map((weight) => (
+                  <li class="style-type_weight-item">
+                    <p class="style-type_spec text-style-caption">
+                      {weight.label}
+                    </p>
+                    <p
+                      class={`style-type_weight text-style-${family.text}`}
+                      style={`font-family: var(${family.token}); font-weight: var(${weight.token}); font-style: ${weight.italic ? "italic" : "normal"}`}
+                    >
+                      {pangram}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-type_wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+
+      &.themed {
+        padding: var(--space-5);
+      }
+    }
+
+    .style-type_title,
+    .style-type_spec {
+      color: var(--ink-muted);
+    }
+
+    .style-type_list {
+      padding-left: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .style-type_row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+      padding-block: var(--space-5);
+      border-bottom: var(--border-width) solid var(--rule);
+
+      &:first-child {
+        border-top: var(--border-width) solid var(--rule);
+      }
+
+      @media (width >= 48rem) {
+        grid-template-columns: 15rem minmax(0, 1fr);
+        align-items: baseline;
+        gap: var(--space-6);
+      }
+    }
+
+    .style-type_meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .style-type_sample {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .style-type_families {
+      padding-left: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--site-gutter);
+
+      @media (width >= 62rem) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .style-type_family {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      padding: var(--space-5);
+      background-color: var(--ground-raised);
+    }
+
+    /* Family and weight are inline: the `.text-style-*` utilities set them
+       too, from a layer above this one. */
+    .style-type_specimen {
+      margin: 0;
+    }
+
+    .style-type_info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .style-type_weights {
+      padding-left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      padding-top: var(--space-4);
+      border-top: var(--border-width) solid var(--rule);
+    }
+
+    .style-type_weight-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .style-type_weight {
+      margin: 0;
+    }
+  }
+</style>
+
+<script>
+  const update = () => {
+    document
+      .querySelectorAll<HTMLElement>("[data-style-type-sample]")
+      .forEach((sample) => {
+        const out = sample.parentElement?.querySelector(
+          "[data-style-type-live]",
+        );
+        if (!out) return;
+        const style = getComputedStyle(sample);
+        const size = Math.round(parseFloat(style.fontSize) * 10) / 10;
+        out.textContent = `${size}px · ${style.fontWeight}`;
+      });
+  };
+
+  update();
+  window.addEventListener("resize", update);
+  document.addEventListener("astro:page-load", update);
+</script>

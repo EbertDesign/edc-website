@@ -23,10 +23,10 @@ const posts = await sanityClient.fetch(POSTS_LIST_QUERY);
   <Section paddingTop="none" paddingBottom="none" class="subpage-hero-section" gap="0">
         <div class="w-layout-grid _12-column-grid fade-in-bottom">
           <div id="w-node-_7e2df456-056c-c30b-ccc3-318453d4a487-08125e5a">
-            <h1 class="margin-bottom-16">Our journal</h1>
+            <h1 class="journal-hero-title">Our journal</h1>
             <p class="text-large">Our thoughts on purpose, process, and the power of an agency that works for good.</p>
           </div>
-          <p id="w-node-_7e2df456-056c-c30b-ccc3-318453d4a48c-08125e5a" class="light-grey-text text-s">News and insights</p>
+          <p id="w-node-_7e2df456-056c-c30b-ccc3-318453d4a48c-08125e5a" class="light-grey-text text-style-label">News and insights</p>
         </div>
   </Section>
 
@@ -38,7 +38,7 @@ const posts = await sanityClient.fetch(POSTS_LIST_QUERY);
                 <a href={`/post/${p.slug}`} class="journal-post-container fade-in-bottom w-inline-block">
                   <div class="journal-post-heading-container">
                     <h2 class="journal-post_title">{p.title}</h2>
-                    <p class="margin-top-16 light-grey-text">{p.topic}</p>
+                    <p class="margin-top-16 light-grey-text text-style-label">{p.topic}</p>
                   </div>
                   <SanityImg image={p.mainImage} loading="eager" class="journal-post-image" sizes="(min-width: 62rem) 40vw, 100vw" />
                 </a>
@@ -57,3 +57,11 @@ const posts = await sanityClient.fetch(POSTS_LIST_QUERY);
         </div>
   </Section>
 </BaseLayout>
+
+<style>
+  /* Room between the hero title and its intro line; the descender on "j"
+     sat almost on top of the text at the export's 16px. */
+  .journal-hero-title {
+    margin-bottom: var(--space-6);
+  }
+</style>

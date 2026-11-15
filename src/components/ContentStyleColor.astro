@@ -1,0 +1,348 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Mode = "field" | "signal";
+
+type Swatch = {
+  /** What the colour is called. */
+  name: string;
+  /** The custom property it comes from, dashes included. */
+  token: string;
+  /** What the colour is for. */
+  note?: string;
+};
+
+type Pair = {
+  /** Token for the text colour. */
+  fg: string;
+  /** Token for the background colour. */
+  bg: string;
+  /** Where the pair is used. */
+  note?: string;
+  /** Modes the pair is allowed in. Defaults to both. */
+  modes?: Mode[];
+};
+
+type Base = HTMLAttributes<"div"> & {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** Small label above the list. */
+  title?: string;
+};
+
+type Props = Base &
+  (
+    | {
+        /**
+         * What is shown.
+         *
+         * - `swatches` — a chip per token, with its live value (default)
+         * - `contrast` — text and background pairs, measured in each mode
+         */
+        variant?: "swatches";
+        /** The colours to show. */
+        swatches: Swatch[];
+        /** Mode the swatches resolve in. Unset, they follow the page. */
+        theme?: Mode | "signal-fill";
+        pairs?: never;
+      }
+    | {
+        variant: "contrast";
+        /** The text and background pairs to measure. */
+        pairs: Pair[];
+        swatches?: never;
+        theme?: never;
+      }
+  );
+
+type AllProps = Base & {
+  variant?: "swatches" | "contrast";
+  swatches?: Swatch[];
+  theme?: Mode | "signal-fill";
+  pairs?: Pair[];
+};
+
+const {
+  render = true,
+  title,
+  variant = "swatches",
+  swatches = [],
+  theme,
+  pairs = [],
+  class: className,
+  ...rest
+} = Astro.props as AllProps;
+
+const modes: Mode[] = ["field", "signal"];
+const hasContent = variant === "swatches" ? swatches.length > 0 : pairs.length > 0;
+---
+
+{
+  render && hasContent && (
+    <div
+      class:list={["style-color_wrap", variant, theme && "themed", className]}
+      data-theme={theme}
+      {...rest}
+    >
+      {title && <p class="style-color_title text-style-label">{title}</p>}
+
+      {variant === "swatches" && (
+        <ul class="style-color_list" role="list">
+          {swatches.map((swatch) => (
+            <li class="style-color_item">
+              <span
+                class="style-color_chip"
+                style={`--_swatch: var(${swatch.token})`}
+                data-style-color-chip
+              />
+              <p class="style-color_name text-style-small">{swatch.name}</p>
+              <code class="style-color_meta text-style-caption">
+                {swatch.token}
+              </code>
+              <code
+                class="style-color_meta style-color_value text-style-caption"
+                data-style-color-value
+              >
+                —
+              </code>
+              {swatch.note && (
+                <p class="style-color_note text-style-caption">{swatch.note}</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {variant === "contrast" && (
+        <div class="style-color_table" role="table">
+          <div class="style-color_row is-head text-style-label" role="row">
+            <span role="columnheader">Pair</span>
+            {modes.map((mode) => (
+              <span role="columnheader">{mode}</span>
+            ))}
+          </div>
+          {pairs.map((pair) => (
+            <div class="style-color_row" role="row">
+              <div class="style-color_pair" role="cell">
+                <code class="text-style-caption">
+                  {pair.fg} on {pair.bg}
+                </code>
+                {pair.note && (
+                  <span class="style-color_note text-style-caption">
+                    {pair.note}
+                  </span>
+                )}
+              </div>
+              {modes.map((mode) =>
+                (pair.modes ?? modes).includes(mode) ? (
+                  <div class="style-color_cell" role="cell">
+                    <span
+                      class="style-color_sample text-style-h4"
+                      data-theme={mode}
+                      style={`--_fg: var(${pair.fg}); --_bg: var(${pair.bg})`}
+                      data-style-color-sample
+                    >
+                      Aa
+                    </span>
+                    <span
+                      class="style-color_ratio text-style-caption"
+                      data-style-color-ratio
+                    >
+                      —
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    class="style-color_cell is-unused text-style-caption"
+                    role="cell"
+                  >
+                    Not used
+                  </div>
+                ),
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .style-color_wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+
+      &.themed {
+        padding: var(--space-5);
+        outline: var(--border-width) solid var(--rule);
+        outline-offset: calc(var(--border-width) * -1);
+      }
+    }
+
+    .style-color_title {
+      color: var(--ink-muted);
+    }
+
+    .style-color_list {
+      /* The Webflow layer pads lists, above the base reset. */
+      padding-left: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+      gap: var(--space-5) var(--space-4);
+
+      .themed & {
+        grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+      }
+    }
+
+    .style-color_item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .style-color_chip {
+      display: block;
+      aspect-ratio: 4 / 3;
+      margin-bottom: var(--space-2);
+      background-color: var(--_swatch);
+      /* A hairline so paper on paper and black on black still read. */
+      outline: var(--border-width) solid var(--rule);
+      outline-offset: calc(var(--border-width) * -1);
+    }
+
+    .style-color_name {
+      font-weight: var(--primary-medium);
+    }
+
+    .style-color_meta,
+    .style-color_note {
+      color: var(--ink-muted);
+    }
+
+    .style-color_value {
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .style-color_table {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .style-color_row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+      padding-block: var(--space-3);
+      border-bottom: var(--border-width) solid var(--rule);
+
+      &.is-head {
+        display: none;
+        color: var(--ink-muted);
+      }
+
+      @media (width >= 48rem) {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+        align-items: center;
+        gap: var(--space-4);
+
+        &.is-head {
+          display: grid;
+        }
+      }
+    }
+
+    .style-color_pair {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .style-color_cell {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+
+      &.is-unused {
+        color: var(--ink-muted);
+      }
+    }
+
+    .style-color_sample {
+      display: grid;
+      place-items: center;
+      width: 3.5rem;
+      aspect-ratio: 1;
+      background-color: var(--_bg);
+      color: var(--_fg);
+      outline: var(--border-width) solid var(--rule);
+      outline-offset: calc(var(--border-width) * -1);
+      &::before,
+      &::after {
+        display: none;
+      }
+    }
+
+    .style-color_ratio {
+      font-variant-numeric: tabular-nums;
+    }
+  }
+</style>
+
+<script>
+  const channels = (value: string) => {
+    const numbers = value.match(/[\d.]+/g)?.map(Number);
+    if (!numbers || numbers.length < 3) return null;
+    // `color(srgb …)` reports 0–1; `rgb()` reports 0–255.
+    const scale = value.startsWith("color(") ? 255 : 1;
+    return numbers.slice(0, 3).map((n) => Math.round(n * scale));
+  };
+
+  const hex = (rgb: number[]) =>
+    "#" + rgb.map((n) => n.toString(16).padStart(2, "0")).join("").toUpperCase();
+
+  const luminance = (rgb: number[]) => {
+    const [r, g, b] = rgb.map((n) => {
+      const c = n / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+
+  const grade = (ratio: number) =>
+    ratio >= 4.5 ? "AA" : ratio >= 3 ? "AA large" : "Fails";
+
+  const update = () => {
+    document
+      .querySelectorAll<HTMLElement>("[data-style-color-chip]")
+      .forEach((chip) => {
+        const rgb = channels(getComputedStyle(chip).backgroundColor);
+        const out = chip.parentElement?.querySelector(
+          "[data-style-color-value]",
+        );
+        if (rgb && out) out.textContent = hex(rgb);
+      });
+
+    document
+      .querySelectorAll<HTMLElement>("[data-style-color-sample]")
+      .forEach((sample) => {
+        const style = getComputedStyle(sample);
+        const fg = channels(style.color);
+        const bg = channels(style.backgroundColor);
+        const out = sample.parentElement?.querySelector(
+          "[data-style-color-ratio]",
+        );
+        if (!fg || !bg || !out) return;
+        const [hi, lo] = [luminance(fg), luminance(bg)].sort((a, b) => b - a);
+        const ratio = (hi + 0.05) / (lo + 0.05);
+        out.textContent = `${ratio.toFixed(2)}:1 · ${grade(ratio)}`;
+      });
+  };
+
+  update();
+  document.addEventListener("astro:page-load", update);
+</script>
