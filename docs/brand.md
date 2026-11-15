@@ -181,8 +181,8 @@ scale up unchanged. The brief's names are available as utilities too —
 - where a blend is needed, use a bitmap dither rather than a gradient
 
 > **Gradient exception, 2026-11-07.** The rule is "no gradients", but EDC is
-> producing its own. The existing gradients stay until those land — the
-> homepage hero's `mesh-gradient.png`, `Overlay variant="gradient"`, and the
+> producing its own. The existing gradients stay until those land —
+> `mesh-gradient.png` on the About hero, `Overlay variant="gradient"`, and the
 > `Marquee` edge mask. Do not strip them as a flat-rule cleanup. Add no new
 > ones.
 
@@ -191,6 +191,14 @@ scale up unchanged. The brief's names are available as utilities too —
 Headings are **sentence case**. Uppercase belongs only to Departure labels.
 **Don't change any copy unless asked.**
 
+>
+> The homepage hero left this list on 2026-11-15: its mesh gradient was
+> replaced by a live ASCII rendering of a forest-canopy video
+> (`scripts/hero-ascii.ts`, footage by Dmitry Marchenkov via Pexels, free
+> licence). Its look — the character ramp, 7×11px cells of 11px Departure,
+> the `--rule` → `--sage` → `--signal-green` colour ramp on `--ground-raised`
+> — was tuned in a prototype and is fixed; the values live in that script's
+> `CONFIG` and on `.hero-art`.
 ## Motion
 
 Motion is allowed. All of it must respect `prefers-reduced-motion`.

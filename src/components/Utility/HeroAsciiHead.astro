@@ -1,0 +1,31 @@
+---
+/**
+ * The `<head>` half of the homepage hero (`SectionHeroHome`). Slot it into
+ * `BaseLayout`'s `head`.
+ *
+ * It decides, before anything is painted, whether the art plays at all — an
+ * inline script in the head rather than part of the hero's module script,
+ * so the choice is made before the video could start loading.
+ *
+ * `data-hero-mode="static"` is set under reduced motion or Save-Data: no
+ * playback, and the hero renders one ASCII frame from the poster. The intro
+ * itself is `Utility/HeroIntro`'s, and needs nothing from here.
+ *
+ * The poster is what the first ASCII frame is drawn from, so it is preloaded.
+ */
+---
+
+<link rel="preload" as="image" href="/video/canopy-ascii-poster.jpg" />
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    try {
+      if (
+        matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        (navigator.connection && navigator.connection.saveData)
+      ) {
+        root.dataset.heroMode = "static";
+      }
+    } catch {}
+  })();
+</script>

@@ -12,6 +12,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Eyebrow from "@/components/Typography/Eyebrow.astro";
 import Button from "@/components/Button.astro";
 import SectionHeroHome from "@/components/SectionHeroHome.astro";
+import HeroAsciiHead from "@/components/Utility/HeroAsciiHead.astro";
 import SectionApproachHome from "@/components/SectionApproachHome.astro";
 import CaseCard from "@/components/Item/CaseCard.astro";
 import ServiceItem from "@/components/Item/ServiceItem.astro";
@@ -32,6 +33,7 @@ const [cases, services] = await Promise.all([
   theme="dark"
   overlap
 >
+  <HeroAsciiHead slot="head" />
   <SectionHeroHome />
 
   <Section id="Welcome" paddingTop="none" containerClass="fade-in-bottom" gap="0">

@@ -6,9 +6,9 @@
  * values and max-width breakpoints, verbatim. Its look is intentional and
  * does not map onto the Lumos token scale:
  *
- * - The mesh gradient is a 69.3%-wide panel pinned to the right, giving a
- *   hard vertical edge across the hero. That edge is the design — an earlier
- *   pass mistook it for an unfinished IX2 state and stretched it full-bleed.
+ * - The art is a 69.3%-wide panel pinned to the right, giving a hard
+ *   vertical edge across the hero. That edge is the design — an earlier pass
+ *   mistook it for an unfinished IX2 state and stretched it full-bleed.
  * - The headline is `font-size: 8vw`, proportional to the viewport, stepping
  *   to 6.5 / 4.8 / 2.7rem below 992px. It fills the hero on any screen; the
  *   `h1` token would cap it and leave it undersized wide.
@@ -20,10 +20,22 @@
  * `._12-column-grid` are the site's own, still defined in
  * `styles/webflow/site.css`.
  *
- * The load intro — the gradient opening full-screen and collapsing into that
+ * The art is a forest-canopy video rendered live as ASCII by
+ * `scripts/hero-ascii.ts`; the video itself is never shown, only sampled.
+ * The canvas is the size of the viewport and pinned to the panel's top right
+ * corner; `.hero-art` is the panel's box and crops it. The script fits the
+ * footage to whatever size the panel is at that moment, as `object-fit:
+ * cover` did for the gradient image this replaced — so the art re-frames
+ * itself as the panel collapses, while the character cells stay put.
+ *
+ * The load intro — the art opening full-screen and collapsing into that
  * panel, then the nav and the hero text arriving behind it — is IX2's `a-75`,
  * shared with the case studies as `Utility/HeroIntro`. The elements below
  * wear its role classes; the timeline is documented there.
+ *
+ * Under reduced motion or Save-Data the art is one still frame —
+ * `Utility/HeroAsciiHead` decides before first paint, and has to be slotted
+ * into the page's `head`.
  */
 import HeroIntro from "@/components/Utility/HeroIntro.astro";
 
@@ -46,15 +58,25 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       <HeroIntro />
       <section class="hero-section">
         <div class="hero-home_top hero-intro_panel">
-          <div class="hero-image-container hero-intro_crop">
-            <img
-              src="/images/mesh-gradient.png"
-              loading="eager"
-              sizes="(max-width: 2000px) 100vw, 2000px"
-              srcset="/images/mesh-gradient-p-500.png 500w, /images/mesh-gradient-p-800.png 800w, /images/mesh-gradient-p-1080.png 1080w, /images/mesh-gradient-p-1600.png 1600w, /images/mesh-gradient.png 2000w"
-              alt=""
-              class="hero-image"
-            />
+          {/* Signal tokens are pinned here so the ramp and the ground do
+              not follow the page's scroll theme. */}
+          <div class="hero-image-container hero-art hero-intro_crop" data-hero-art data-theme="signal">
+            <video
+              class="hero-art_video"
+              muted
+              playsinline
+              loop
+              autoplay
+              preload="auto"
+              aria-hidden="true"
+              tabindex="-1"
+              disablepictureinpicture
+              data-poster="/video/canopy-ascii-poster.jpg"
+            >
+              <source data-src="/video/canopy-ascii.webm" type='video/webm; codecs="vp9"' />
+              <source data-src="/video/canopy-ascii.mp4" type="video/mp4" />
+            </video>
+            <canvas class="hero-art_canvas" aria-hidden="true" />
           </div>
           <div class="_12-column-grid">
             <h1 class="home-hero-text hero-cell-title hero-intro_lead">
@@ -100,6 +122,10 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
   )
 }
 
+<script>
+  import "@/scripts/hero-ascii.ts";
+</script>
+
 <style is:global>
   @layer components {
     /* Verbatim from the export. Left outside the Lumos token system on
@@ -130,32 +156,49 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       padding-inline: 9.5vw;
     }
 
-    /* The intentional hard edge: a 69.3%-wide panel pinned right. */
-    .hero-image-container {
+    /* The intentional hard edge: a 69.3%-wide panel pinned right. This box
+       is the panel; the canvas inside it is the size of the viewport, pinned
+       to the panel's top right corner and cropped by it. */
+    .hero-image-container.hero-art {
+      /* The character ramp: dark rule, sage at the midpoint, Signal Green at
+         the densest character. Read by `scripts/hero-ascii.ts`. */
+      --hero-art-low: var(--rule);
+      --hero-art-mid: var(--sage);
+      --hero-art-high: var(--signal-green);
+
       z-index: -10;
-      opacity: 1;
-      justify-content: center;
-      align-items: center;
       width: 69.3%;
       height: 100%;
-      margin-top: 0%;
-      margin-bottom: 0;
       margin-left: auto;
-      padding-bottom: 0;
-      display: flex;
       position: absolute;
       top: 0;
       right: 0;
       overflow: hidden;
+      background-color: var(--ground-raised);
     }
 
-    .hero-image {
-      z-index: -1;
-      opacity: 0.8;
-      object-fit: cover;
-      height: 100%;
-      margin-top: 0%;
-      position: static;
+    .hero-art_canvas {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100vw;
+      max-width: none;
+      height: 100vh;
+      /* The face the atlas is built from: Departure at its 11px grid size. */
+      font-family: var(--font-pixel);
+      font-size: var(--label);
+    }
+
+    /* Sampled, never shown. Not `display: none`, which can stop frames
+       decoding. */
+    .hero-art_video {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 2px;
+      height: 2px;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .hero-usp-container {
@@ -278,7 +321,7 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       .hero-section {
         height: auto;
       }
-      .hero-image-container {
+      .hero-image-container.hero-art {
         width: 100%;
         position: relative;
       }
@@ -308,9 +351,6 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       .hero-section {
         padding-top: 0;
       }
-      .hero-image-container {
-        margin-top: 0%;
-      }
       .hero-usp-container {
         max-width: 100%;
       }
@@ -323,9 +363,6 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
     @media screen and (max-width: 479px) {
       .hero-section {
         padding-top: 80px;
-      }
-      .hero-image-container {
-        margin-top: 0%;
       }
       .home-hero-text {
         margin-top: -19px;
