@@ -7,10 +7,10 @@
  *
  * Hovering the row draws its two ends toward each other — the title shifts
  * right, the arrow button left — and flips the button's colours, so the dark
- * circle with the accent arrow becomes an accent circle with a dark one. The
+ * square with the accent arrow becomes a Signal-green square with a dark one. The
  * arrow's own roll-over comes with it: `.icon-button` fires that from the
  * button, which on a row this wide only caught a cursor already on the
- * circle, so it is re-fired from the row and the three move as one.
+ * square, so it is re-fired from the row and the three move as one.
  */
 type Props = {
   /** Set to `false` to skip rendering this component and its children. */
@@ -53,9 +53,9 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
     /* One distance for both ends, so they always travel together.
        `--service-item-roll` is how far the arrows fall for the second to land
        where the first rests: `.second-arrow` is parked at `top: -42px` and the
-       resting arrow is centred at 18px in the 4rem circle, so 60px. IX2 moved
+       resting arrow is centred at 18px in the 4rem square, so 60px. IX2 moved
        them 42px, which leaves the incoming arrow 18px high — invisible while
-       the roll only fired from the circle itself, obvious now the whole row
+       the roll only fired from the square itself, obvious now the whole row
        fires it. */
     .service-list-item {
       --service-item-shift: 0.75rem;
@@ -72,6 +72,7 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
       line-height: var(--label-md-line-height);
       letter-spacing: var(--label-letter-spacing);
       text-transform: var(--label-text-transform);
+      color: var(--safety-orange);
     }
 
     .service-list-item .service-cell-title {
@@ -96,16 +97,14 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
 
     .service-list-item:focus-visible .service-cell-arrow {
       transform: translateX(calc(var(--service-item-shift) * -1));
-      /* The same orange circle the primary Button uses, and for the same
-         reason: this row is a call to action, and orange as a fill is legal
-         on either ground. One row is lit at a time, so the section still
-         carries a single orange moment. */
-      background-color: var(--safety-orange);
+      /* Signal green, the same fill every `.icon-button` takes on hover;
+         the orange in this row belongs to the label. */
+      background-color: var(--signal-green);
     }
 
     /* Three classes, so the roll follows the row rather than the button:
        `SectionHeroHome` fires it from `.icon-button:hover`, which on a row
-       this wide only caught a cursor already on the circle. */
+       this wide only caught a cursor already on the square. */
     .service-list-item:focus-visible .service-cell-arrow .button-arrow {
       color: var(--on-color);
       transform: translateY(var(--service-item-roll));
@@ -118,7 +117,7 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
 
       .service-list-item:hover .service-cell-arrow {
         transform: translateX(calc(var(--service-item-shift) * -1));
-        background-color: var(--safety-orange);
+        background-color: var(--signal-green);
       }
 
       .service-list-item:hover .service-cell-arrow .button-arrow {

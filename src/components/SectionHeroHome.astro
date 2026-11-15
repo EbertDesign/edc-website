@@ -234,7 +234,8 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
 
     .icon-button {
       background-color: var(--ground-raised);
-      border-radius: 100vw;
+      border-radius: 0;
+      transition: background-color var(--hover-duration) var(--hover-ease);
       justify-content: center;
       align-items: center;
       width: 4rem;
@@ -269,14 +270,23 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
 
        The fall is 60px, not the 42px IX2 used: `.second-arrow` is parked at
        `top: -42px` and the resting arrow is centred at 18px in the 4rem
-       circle, so 42px leaves the incoming arrow 18px high, near the top edge.
+       square, so 42px leaves the incoming arrow 18px high, near the top edge.
        `Item/ServiceItem` rolls the same button from its whole row and lands on
        the same number. */
     .icon-button .button-arrow {
-      transition: transform var(--open-duration) var(--open-ease);
+      transition:
+        transform var(--open-duration) var(--open-ease),
+        color var(--hover-duration) var(--hover-ease);
     }
+    /* The square fills Signal green on hover, and the arrow goes dark with
+       it — it is `--system` at rest, which is the same green on the Signal
+       ground and would vanish into the fill. */
     @media (hover: hover) {
+      .icon-button:hover {
+        background-color: var(--signal-green);
+      }
       .icon-button:hover .button-arrow {
+        color: var(--on-color);
         transform: translateY(3.75rem);
       }
     }
