@@ -7,25 +7,26 @@
  * The hover is the export's IX2 "Featured Case Hover" (`a-58`/`a-59`, bound by
  * `e-181`/`e-198`/`e-217`/`e-220` to the thumbnail frame on every page that
  * listed cases) plus "View Cirlce Move" (`a-54`, the `MOUSE_MOVE` continuous
- * action on the same element). Three things happen at once:
+ * action on the same element — the export's name, from when the mark was a
+ * circle; it is a signal-green square now). Three things happen at once:
  *
  *   - the title and service rise 8px (250ms, outSine, both ways)
  *   - the thumbnail scales to 1.05 and dims to 0.8 (500ms/250ms in,
  *     550ms out, outSine and inOutQuad)
- *   - the "View" circle fades in over 50ms (inOutQuart) and scales 0.6 → 1
+ *   - the "View" square fades in over 50ms (inOutQuart) and scales 0.6 → 1
  *     over 150ms (outSine), then trails the pointer across the frame
  *
- * All of it is CSS but the trailing circle, which needs a frame loop. IX2 gave
+ * All of it is CSS but the trailing square, which needs a frame loop. IX2 gave
  * it ±60px of travel on each axis, measured against the frame's own bounds,
  * with `smoothing: 95` and `restingState: 50` — a 0.05 lerp toward the pointer
  * each frame, settling at centre. The script below is that, made frame-rate
  * independent so it feels the same on a 120Hz display, and skipped entirely
  * under `prefers-reduced-motion` (IX2 ignored the setting).
  *
- * `.view-circle-track` is the one element the export did not have. The circle
+ * `.view-square-track` is the one element the export did not have. The square
  * cannot both follow the pointer and transition its scale off a single
- * `transform`, so the track carries the follow and the circle keeps the
- * scale. It reproduces the frame's own centring, so the circle sits where it
+ * `transform`, so the track carries the follow and the square keeps the
+ * scale. It reproduces the frame's own centring, so the square sits where it
  * always did.
  */
 import type { ComponentProps } from "astro/types";
@@ -68,8 +69,8 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
             sizes="(min-width: 62rem) 40vw, 100vw"
           />
           <div class="case-overlay"></div>
-          <div class="view-circle-track">
-            <div class="view-circle"><div>View</div></div>
+          <div class="view-square-track">
+            <div class="view-square"><div>View</div></div>
           </div>
         </div>
         <div class="case-info-wrapper">
@@ -117,7 +118,7 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
       transition: transform 250ms var(--case-out-sine);
     }
 
-    .case .view-circle-track {
+    .case .view-square-track {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -126,7 +127,7 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
       pointer-events: none;
     }
 
-    .case .view-circle {
+    .case .view-square {
       opacity: 0;
       transform: scale(0.6);
       transition:
@@ -147,11 +148,11 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
         transform: translateY(-0.5rem);
       }
 
-      .case-wrapper:hover .view-circle-track {
+      .case-wrapper:hover .view-square-track {
         will-change: transform;
       }
 
-      .case-wrapper:hover .view-circle {
+      .case-wrapper:hover .view-square {
         opacity: 1;
         transform: scale(1);
         transition:
@@ -160,15 +161,15 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
       }
     }
 
-    /* Show the circle, but move nothing: the scale and the rise are the
+    /* Show the square, but move nothing: the scale and the rise are the
        parts worth dropping, and the frame loop never starts. */
     @media (prefers-reduced-motion: reduce) {
       .case .project-thumbnail,
       .case .case-info-wrapper,
-      .case .view-circle,
+      .case .view-square,
       .case-wrapper:hover .project-thumbnail,
       .case-wrapper:hover .case-info-wrapper,
-      .case-wrapper:hover .view-circle {
+      .case-wrapper:hover .view-square {
         transform: none;
         transition: none;
       }
@@ -181,7 +182,7 @@ const { render = true, case: c, variant = "subpage" } = Astro.props;
      per frame) and `restingState: 50` (centre). Bundled once for the page
      however many cards are on it. */
   const FRAME = ".project-thumbnail-wrapper";
-  const TRACK = ".view-circle-track";
+  const TRACK = ".view-square-track";
   const REACH = 60;
   const SMOOTHING = 0.05;
   const FRAME_MS = 1000 / 60;

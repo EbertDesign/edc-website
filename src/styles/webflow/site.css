@@ -647,12 +647,12 @@ figcaption {
 .case-wrapper.fade-in-bottom {
   width: 100%;
 }
-.view-circle {
-  background-color: var(--accent);
+.view-square {
+  background-color: var(--signal-green);
   width: 8rem;
   height: 8rem;
-  color: var(--black);
-  border-radius: 100vw;
+  color: var(--on-color);
+  border-radius: 0;
   justify-content: center;
   align-items: center;
   display: flex;
@@ -891,7 +891,7 @@ figcaption {
     position: static;
   }
 
-  .view-circle {
+  .view-square {
     display: none;
   }
 
