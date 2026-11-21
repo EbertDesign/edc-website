@@ -43,6 +43,26 @@ const {
   intro = false,
 } = Astro.props;
 const content = await slotContent(Astro.slots);
+
+/* The width of the title's longest word, in em, so only a title that needs
+   to shrink does. An estimate from Aktiv Grotesk Extended's proportions; the
+   1.04 covers the widest real title, which ran 3.4% over. The last `h1` is
+   the title, since About's eyebrow is an `h1` too. */
+const titleHtml = [...content.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)].at(-1)?.[1] ?? "";
+const titleWord = 1.04 * Math.max(
+  1,
+  ...titleHtml
+    .replace(/<[^>]+>/g, "")
+    .replace(/&[#\w]+;/g, "x")
+    .split(/[\s-]+/)
+    .map((word) =>
+      [...word].reduce(
+        (width, char) =>
+          width + (/[mwMW]/.test(char) ? 1 : /[iljtfrI.,'’]/.test(char) ? 0.4 : 0.7),
+        0,
+      ),
+    ),
+);
 ---
 
 {
@@ -80,6 +100,7 @@ const content = await slotContent(Astro.slots);
                 "hero-subpage_content hero-cell-title",
                 intro ? "hero-intro_lead" : "fade-in-bottom",
               ]}
+              style={`--_title-word: ${titleWord.toFixed(2)}`}
             >
               <Fragment set:html={content} />
             </div>
@@ -154,12 +175,12 @@ const content = await slotContent(Astro.slots);
     .hero-subpage_content {
       --_title-size: 7rem;
       /* From the title's start line to the grid's right edge: 11 of 12. */
-      --_title-fit: 9.6cqi;
+      --_title-fit: calc(91.2cqi / var(--_title-word));
       min-width: 0;
     }
 
-    /* The export's sizes, capped so the longest word in any CMS title
-       ("Communications", 9.34em wide) still fits. Child combinator: on About
+    /* The export's sizes, capped only where this title's own longest word
+       would not otherwise fit. Child combinator: on About
        the `h1` is the eyebrow's, nested a level down. */
     .hero-subpage_content > h1 {
       font-size: min(var(--_title-size), var(--_title-fit));
@@ -186,7 +207,7 @@ const content = await slotContent(Astro.slots);
       .hero-subpage_content {
         --_title-size: 6.5rem;
         --_title-gutter: 3rem;
-        --_title-fit: calc((100cqi - 2 * var(--_title-gutter)) / 9.5);
+        --_title-fit: calc((100cqi - 2 * var(--_title-gutter)) / var(--_title-word));
         padding-block-start: var(--space-6);
         padding-inline: var(--_title-gutter);
       }
