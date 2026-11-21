@@ -57,8 +57,8 @@
   --_margin-bottom: var(--space-6);
 }
 
-/* The label-and-value sidebar on /contact and /grants. Leading trim leaves
-   stacked paragraphs touching, so the rhythm is set here, once, for both. */
+/* The label-and-value sidebar on /contact. Leading trim leaves stacked
+   paragraphs touching, so the rhythm is set here. */
 .contact-info_wrap {
   display: flex;
   flex-direction: column;
