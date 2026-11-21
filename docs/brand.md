@@ -54,14 +54,20 @@ mode:
 | Token | Field | Signal | |
 |---|---|---|---|
 | `--system` | `--ink` | `--signal-green` | data, annotations, states, links |
+| `--accent-fill` | `--safety-orange` | `--signal-green` | the mode's one accent, as a fill or graphic mark |
+| `--emphasis-fill` | `--canopy` | `--signal-green` | highlight behind emphasised words in a heading |
 | `--label` / `--label-md` / `--label-lg` | `11px` / `16px` / `22px` | same | the three Departure sizes |
 
 `--system` is the brief's own sentence made into a token: *"signal-green is the
-system: data, annotations, states and links on dark."* On a light ground green
-is legal only as a fill and is invisible anyway (1.15:1), and orange belongs to
-the CTA — so in Field the system colour is full `--ink` and a marker or a link
-states itself by weight rather than hue. Ask for `--system`; never name a hue
-at the call site.
+system: data, annotations, states and links on dark."* Green never appears on
+paper and orange is never text, so in Field the system colour is full `--ink`
+and a marker or a link states itself by weight rather than hue.
+
+`--accent-fill` is the mode's accent: anything that fills with the accent —
+a button, a tag, a key-stat block, a photo frame, a hover fill — asks for it,
+and gets orange on paper and green on black without knowing which.
+
+Ask for `--system` or `--accent-fill`; never name a hue at the call site.
 
 ## Fonts
 
@@ -170,14 +176,31 @@ scale up unchanged. The brief's names are available as utilities too —
 
 ## Color jobs
 
-- **signal-green is the system**: data, annotations, states and links on dark.
-  On light grounds use it **only as a fill, never as text** — it is 1.15:1 on
-  paper. Reach for `--system`, which resolves this per mode.
-- **safety-orange is the human moment**: the primary CTA, or the one key
-  number. **One orange moment per section.** Never as text on paper (2.99:1),
-  never as a large fill.
-- **Green and orange never share a component.**
+**Each mode has one accent.** Field (paper) uses safety-orange. Signal
+(black) uses signal-green. **Never mix them in the same section.** Reach for
+`--accent-fill`, which resolves this per mode.
+
+- **safety-orange is Field's accent, and only ever a fill or a graphic
+  accent**: buttons, tags, key-stat blocks, photo frames. **It is never text**,
+  in either mode. Text on it is `--on-color` (`#161616`).
+- **signal-green is Signal's accent.** It appears **only on black**, or as
+  annotation boxes and labels over photography. **Never on paper**, as text or
+  as fill. On black it is the system colour too — data, annotations, states and
+  links — which is what `--system` resolves to there.
+- **On paper, text is `--ink` or `--ink-muted` only.** Links in running text
+  use `--ink` with an underline. Navigation (nav and footer) is exempt from the
+  underline and states itself with `--ink-muted` → `--ink`.
+- **In Field, canopy and sage carry the green family** — panels, emphasis
+  fills, quiet surfaces. They do not cross into Signal.
 - **Text on any accent fill is `--on-color`.**
+
+**Exceptions, decided 2026-11-18.** Two, and nothing else borrows them:
+
+- The **logo symbol** is safety-orange in both modes (see [Logo](#logo)).
+- The homepage **approach step numbers** (`01`–`04`,
+  `SectionApproachHome`) are `--accent-fill` as *text*: signal-green on black,
+  safety-orange on paper. Chosen knowing orange text on paper is 2.99:1,
+  below even the 3:1 large-text minimum in [Accessibility](#accessibility).
 
 ## Flat everywhere
 
@@ -195,10 +218,13 @@ scale up unchanged. The brief's names are available as utilities too —
 > The homepage hero left this list on 2026-11-15: its mesh gradient was
 > replaced by a live ASCII rendering of a forest-canopy video
 > (`scripts/hero-ascii.ts`, footage by Dmitry Marchenkov via Pexels, free
-> licence). Its look — the character ramp, 7×11px cells of 11px Departure,
-> the `--rule` → `--sage` → `--signal-green` colour ramp on `--ground-raised`
-> — was tuned in a prototype and is fixed; the values live in that script's
-> `CONFIG` and on `.hero-art`.
+> licence). Its look — the character ramp ` ·+×#`, 6×7px cells of 9px
+> Departure (line spacing 0.8, so glyphs overlap their rows on purpose), the
+> `--rule` → `--sage` → `--signal-green` colour ramp on `--ground` — was
+> tuned in a prototype and is fixed; the values live in that script's
+> `CONFIG` and on `.hero-art`. Retuned 2026-11-16 for contrast and
+> legibility. The 9px face is the one exception to the three Departure
+> sizes above, and holds for this art only.
 
 ## Copy
 
@@ -224,11 +250,13 @@ Measured for the token set:
 | `--ink` on `--ground-raised` | 15.57 | 15.11 |
 | `--ink-muted` on `--ground` | 5.78 | 6.86 |
 | `--ink-muted` on `--ground-raised` | 5.33 | 6.14 |
-| `--on-color` on `--signal-green` | 14.64 | — |
 | `--on-color` on `--safety-orange` | 5.65 | — |
 | `--on-color` on `--canopy` / `--sage` | 12.11 / 11.88 | — |
+| `--on-color` on `--signal-green` | — | 14.64 |
 | `--signal-green` as text on `--ground` | — | 14.64 |
-| `--safety-orange` as text on `--ground` | — | 5.65 |
+
+Safety-orange as text is not in the table because it is never text, and
+signal-green has no Field column because it never appears on paper.
 
 `--rule` against `--ground` is 1.34:1 in both modes. That is fine for list and
 table hairlines, which are structural rather than informational, but it means
@@ -240,6 +268,11 @@ distinguished by a `--ground-raised` fill.
 The 2026 logo is not final. The current files stay in place, wrapped in one
 `Logo` component, so they can be swapped in one edit. Don't inline a logo
 anywhere else.
+
+**The logo is the one exception to one-accent-per-mode** (decided
+2026-11-18): its symbol is safety-orange in both modes, including on black.
+Nothing else borrows that exception. (The approach step numbers are a
+separate exception, to "orange is never text" — see Color jobs.)
 
 ## Implementation notes
 
@@ -265,7 +298,12 @@ not a mistake.
 
 - CTA button labels are Departure Mono in the `label` style (11px,
   uppercase).
-- In Field, link hover keeps `--ink` text and thickens its rule to
-  `--safety-orange`; heading emphasis drops color for a flat `--canopy` fill.
-  Both are `--signal-green` in Signal. This exists because orange and green
-  are both illegal as text on paper.
+- In Field, link hover keeps `--ink` text and thickens its underline to
+  `--safety-orange` — the underline is a graphic accent, so orange is legal
+  there. Heading emphasis is a flat `--canopy` fill. In Signal both are
+  `--signal-green`.
+
+**Rule change, 2026-11-18.** The accents were made one per mode (above).
+The signal-green ground (`signal-fill`) is gone: the homepage now scrolls to
+`data-scroll-theme="field"` (paper), and the framework's `theme="brand"`
+option resolves to Field. A scroll theme is always a mode name.

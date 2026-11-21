@@ -171,18 +171,17 @@
   inset: 0%;
 }
 
-/* Emphasis inside a heading. A colour on its own cannot do this job in the
-   2026 palette: orange is 2.99:1 on paper and reserved for the CTA, green is
-   1.15:1 there and may only be a fill, and `--ink` is what the rest of the
-   heading already is. So the emphasis is a flat `--canopy` highlight behind
-   the words — one mechanism that works identically in both modes, at 12.11:1
-   either way, with no gradient or shadow.
+/* Emphasis inside a heading. A colour on its own cannot do this job: accents
+   are never text on paper, and `--ink` is what the rest of the heading
+   already is. So the emphasis is a flat highlight behind the words, from
+   `--emphasis-fill` — canopy on paper (Field's green family), signal-green on
+   black — with `--on-color` text, no gradient or shadow.
 
    `box-decoration-break: clone` so a phrase that wraps is painted on every
    line rather than as one box behind the block. */
 .heading-accent strong {
   color: var(--on-color);
-  background-color: var(--canopy);
+  background-color: var(--emphasis-fill);
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   padding-inline: 0.12em;

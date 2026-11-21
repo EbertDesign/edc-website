@@ -5,8 +5,9 @@
  * cropped to the panel, into an offscreen canvas of one pixel per character
  * cell;
  * each pixel's luminance picks a character, and the character's position in
- * the ramp picks its colour. Glyphs are stamped from a pre-rendered atlas,
- * and only the cells whose character changed since the last tick are redrawn.
+ * the ramp picks its colour. Glyphs are stamped from a pre-rendered atlas.
+ * The rows are shorter than the face, so glyphs overlap; when any cell's
+ * character changes, the panel is cleared and stamped whole.
  *
  * The canvas is as big as the viewport and its grid never moves. The panel
  * crops it, and the footage is fitted to the panel's size of the moment — so
@@ -25,17 +26,19 @@
 /* ------------------------------------------------------------------ */
 const CONFIG = {
   /** Light to dense. The leading space is the blank. */
-  chars: " .:-=+*#%@",
-  /** Cell size in CSS px. Fixed at every screen size. */
-  cellWidth: 7,
-  cellHeight: 11,
+  chars: " ·+×#",
+  /** Cell size in CSS px. Fixed at every screen size. The row is shorter
+      than the 9px face (line spacing 0.8), so glyphs may overlap the rows
+      above and below — intended; they are not clipped to the cell. */
+  cellWidth: 6,
+  cellHeight: 7,
   /** `false`: bright sky takes the dense characters. */
   invert: false,
-  contrast: 1.4,
+  contrast: 1.95,
   brightness: 0,
-  gamma: 1.0,
+  gamma: 0.95,
   /** Cells at or below this luminance stay blank. */
-  cutoff: 0.12,
+  cutoff: 0.11,
   /** Render rate, and the rate below `smallQuery`. */
   fps: 24,
   fpsSmall: 12,
@@ -76,6 +79,10 @@ function start(
   let ratio = 1;
   let tileW = 0;
   let tileH = 0;
+  /* Where a tile sits relative to its cell's top left, in device px. Tiles
+     are sized to the glyphs' ink, so these can be negative. */
+  let tileX = 0;
+  let tileY = 0;
   let xs = new Int32Array(0); // device-px column edges, cols + 1 of them
   let ys = new Int32Array(0);
   let prev = new Uint8Array(0); // the character index last drawn per cell
@@ -84,6 +91,9 @@ function start(
   let r1 = 0;
 
   let atlasReady = false;
+  /* Set when the canvas was cleared, so the next draw repaints even if no
+     character changed. */
+  let dirty = true;
   let fontLoaded = false;
   let failed = false;
   let staticMode = html.dataset.heroMode === "static";
@@ -127,6 +137,7 @@ function start(
       ys[r] = Math.round(r * CONFIG.cellHeight * ratio);
     }
     prev = new Uint8Array(cols * rows);
+    dirty = true;
     c0 = cols;
     r1 = 0;
 
@@ -146,6 +157,7 @@ function start(
     if (a < c0 || d > r1) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       prev.fill(0);
+      dirty = true;
     }
     c0 = a;
     r1 = d;
@@ -172,19 +184,46 @@ function start(
     const mid = readColor("--hero-art-mid");
     const high = readColor("--hero-art-high");
 
-    tileW = Math.ceil(CONFIG.cellWidth * ratio);
-    tileH = Math.ceil(CONFIG.cellHeight * ratio);
-    atlas.width = tileW * charCount;
-    atlas.height = tileH;
-
+    const cellW = CONFIG.cellWidth * ratio;
+    const cellH = CONFIG.cellHeight * ratio;
     atlasCtx.font = `${fontSize * ratio}px ${style.fontFamily}`;
     atlasCtx.textBaseline = "alphabetic";
     atlasCtx.textAlign = "left";
-    /* Line spacing 1.0: the face's own line box, centred on the cell. */
+
+    /* Every glyph shares one baseline: the face's own line box, centred on
+       the row. The line box is taller than the 7px row, so ink can reach
+       into the neighbouring rows. */
     const m = atlasCtx.measureText("M");
     const ascent = m.fontBoundingBoxAscent ?? m.actualBoundingBoxAscent;
     const descent = m.fontBoundingBoxDescent ?? m.actualBoundingBoxDescent;
-    const baseline = Math.round((tileH - (ascent + descent)) / 2 + ascent);
+    const baseline = Math.round((cellH - (ascent + descent)) / 2 + ascent);
+    const advance = atlasCtx.measureText(CONFIG.chars.trim()[0]).width;
+    const pen = Math.round((cellW - advance) / 2);
+
+    /* The tile is the union of the glyphs' ink, measured from the cell's
+       top left, with a pixel of slack for antialiasing — not the cell. */
+    let left = Infinity;
+    let right = -Infinity;
+    let top = Infinity;
+    let bottom = -Infinity;
+    for (const ch of CONFIG.chars) {
+      if (ch === " ") continue;
+      const g = atlasCtx.measureText(ch);
+      left = Math.min(left, pen - g.actualBoundingBoxLeft);
+      right = Math.max(right, pen + g.actualBoundingBoxRight);
+      top = Math.min(top, baseline - g.actualBoundingBoxAscent);
+      bottom = Math.max(bottom, baseline + g.actualBoundingBoxDescent);
+    }
+    tileX = Math.floor(left) - 1;
+    tileY = Math.floor(top) - 1;
+    tileW = Math.ceil(right) + 1 - tileX;
+    tileH = Math.ceil(bottom) + 1 - tileY;
+    atlas.width = tileW * charCount;
+    atlas.height = tileH;
+    /* Resizing the canvas resets its state. */
+    atlasCtx.font = `${fontSize * ratio}px ${style.fontFamily}`;
+    atlasCtx.textBaseline = "alphabetic";
+    atlasCtx.textAlign = "left";
 
     for (let i = 0; i < charCount; i++) {
       const ch = CONFIG.chars[i];
@@ -195,18 +234,12 @@ function start(
       const [from, to, k] =
         t <= 0.5 ? [low, mid, t * 2] : [mid, high, (t - 0.5) * 2];
       const rgb = from.map((v, n) => Math.round(v + (to[n] - v) * k));
-      const dx = Math.round((tileW - atlasCtx.measureText(ch).width) / 2);
-
-      atlasCtx.save();
-      atlasCtx.beginPath();
-      atlasCtx.rect(i * tileW, 0, tileW, tileH);
-      atlasCtx.clip();
       atlasCtx.fillStyle = `rgb(${rgb[0]} ${rgb[1]} ${rgb[2]})`;
-      atlasCtx.fillText(ch, i * tileW + dx, baseline);
-      atlasCtx.restore();
+      atlasCtx.fillText(ch, i * tileW + pen - tileX, baseline - tileY);
     }
     atlasReady = true;
     prev.fill(0);
+    dirty = true;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -251,6 +284,10 @@ function start(
     const { contrast, brightness, gamma, cutoff, invert, chars } = CONFIG;
     const last = charCount - 1;
 
+    /* 6–7 for every cell first; glyphs overlap their neighbours, so a
+       changed cell cannot be repainted on its own. If anything changed, the
+       panel is cleared and stamped whole. */
+    let changed = false;
     for (let r = 0; r < r1; r++) {
       for (let c = c0; c < cols; c++) {
         const cell = r * cols + c;
@@ -268,14 +305,33 @@ function start(
           index = Math.round(Math.min(l, 1) * last);
           if (chars[index] === " ") index = 0;
         }
-        if (index === prev[cell]) continue;
-        prev[cell] = index;
-        /* 8. Stamp it. */
-        const x = xs[c];
-        const y = ys[r];
-        ctx.clearRect(x, y, xs[c + 1] - x, ys[r + 1] - y);
+        if (index !== prev[cell]) {
+          prev[cell] = index;
+          changed = true;
+        }
+      }
+    }
+    if (!changed && !dirty) return;
+    dirty = false;
+
+    /* 8. Stamp. */
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let r = 0; r < r1; r++) {
+      const y = ys[r] + tileY;
+      for (let c = c0; c < cols; c++) {
+        const index = prev[r * cols + c];
         if (index) {
-          ctx.drawImage(atlas, index * tileW, 0, tileW, tileH, x, y, tileW, tileH);
+          ctx.drawImage(
+            atlas,
+            index * tileW,
+            0,
+            tileW,
+            tileH,
+            xs[c] + tileX,
+            y,
+            tileW,
+            tileH,
+          );
         }
       }
     }

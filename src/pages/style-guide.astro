@@ -17,9 +17,9 @@ const fixedSwatches = [
   { name: "Paper", token: "--paper" },
   { name: "Black", token: "--black" },
   { name: "Sage", token: "--sage" },
-  { name: "Canopy", token: "--canopy", note: "Panels, Field emphasis fill" },
-  { name: "Signal green", token: "--signal-green", note: "The system: data, states, links on dark" },
-  { name: "Safety orange", token: "--safety-orange", note: "The human moment: one per section" },
+  { name: "Canopy", token: "--canopy", note: "Field's green family: panels, emphasis fill" },
+  { name: "Signal green", token: "--signal-green", note: "Signal's accent. Only on black or over photos" },
+  { name: "Safety orange", token: "--safety-orange", note: "Field's accent. Fills and graphic marks, never text" },
   { name: "On color", token: "--on-color", note: "Text on any accent fill" },
 ];
 
@@ -30,6 +30,8 @@ const modeSwatches = [
   { name: "Ink muted", token: "--ink-muted" },
   { name: "Rule", token: "--rule" },
   { name: "System", token: "--system" },
+  { name: "Accent fill", token: "--accent-fill" },
+  { name: "Emphasis fill", token: "--emphasis-fill" },
 ];
 
 const contrastPairs = [
@@ -37,11 +39,10 @@ const contrastPairs = [
   { fg: "--ink", bg: "--ground-raised" },
   { fg: "--ink-muted", bg: "--ground" },
   { fg: "--ink-muted", bg: "--ground-raised" },
-  { fg: "--on-color", bg: "--signal-green", note: "Fill only in Field" },
-  { fg: "--on-color", bg: "--safety-orange", note: "Primary CTA" },
-  { fg: "--on-color", bg: "--canopy" },
-  { fg: "--signal-green", bg: "--ground", note: "Text on dark only", modes: ["signal" as const] },
-  { fg: "--safety-orange", bg: "--ground", note: "Text on dark only", modes: ["signal" as const] },
+  { fg: "--on-color", bg: "--safety-orange", note: "Field accent fill", modes: ["field" as const] },
+  { fg: "--on-color", bg: "--canopy", note: "Field emphasis fill", modes: ["field" as const] },
+  { fg: "--on-color", bg: "--signal-green", note: "Signal accent fill", modes: ["signal" as const] },
+  { fg: "--signal-green", bg: "--ground", note: "Text on black only", modes: ["signal" as const] },
 ];
 
 const families = [
@@ -206,17 +207,18 @@ const motion = [
         </Paragraph>
       </ContentWrapper>
       <ContentStyleColor title="Fixed · the same in both modes" swatches={fixedSwatches} />
-      <Grid large={3}>
+      <Grid large={2}>
         <ContentStyleColor title="Field · default" theme="field" swatches={modeSwatches} />
         <ContentStyleColor title="Signal" theme="signal" swatches={modeSwatches} />
-        <ContentStyleColor title="Signal fill · green ground" theme="signal-fill" swatches={modeSwatches} />
       </Grid>
       <RichText maxWidth={64}>
         <h3>Color jobs</h3>
         <ul>
-          <li><strong>Signal green is the system:</strong> data, annotations, states and links on dark. On light grounds it is a fill, never text.</li>
-          <li><strong>Safety orange is the human moment:</strong> the primary CTA or the one key number. One per section, never text on paper, never a large fill.</li>
-          <li>Green and orange never share a component.</li>
+          <li><strong>Each mode has one accent.</strong> Field uses safety orange, Signal uses signal green. Never mix them in the same section.</li>
+          <li><strong>Safety orange is a fill or a graphic accent only:</strong> buttons, tags, key-stat blocks, photo frames. It is never text.</li>
+          <li><strong>Signal green appears only on black,</strong> or as annotation boxes and labels over photography. Never on paper.</li>
+          <li>On paper, text is <code>--ink</code> or <code>--ink-muted</code>. Links in running text are <code>--ink</code> with an underline.</li>
+          <li>In Field, canopy and sage carry the green family.</li>
           <li>Text on any accent fill is <code>--on-color</code>.</li>
         </ul>
       </RichText>

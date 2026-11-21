@@ -47,9 +47,14 @@ The short version:
   type size; if no token carries the value, the token is missing.
 - Theme is `data-theme="field"` (light, the default) or `data-theme="signal"`
   (dark), on `<html>` or on any section.
-- `--signal-green` is data, state and links on dark. `--safety-orange` is the
-  one human moment per section. They never share a component, and neither is
-  ever text on a light ground.
+- One accent per mode, never mixed in a section: Field uses
+  `--safety-orange`, Signal uses `--signal-green`. Ask for `--accent-fill`
+  (fills) or `--system` (data, states, links) rather than naming a hue.
+- Orange is only ever a fill or graphic mark, never text; text on it is
+  `--on-color`. Green appears only on black or as annotations over photos,
+  never on paper. On paper, text is `--ink` or `--ink-muted` only. Two
+  documented exceptions, nothing else: the logo's orange symbol, and the
+  homepage approach step numbers (orange text on paper).
 - Flat: no shadows or glows. The gradients still in the tree are a documented
   exception — don't strip them, don't add more.
 - Departure Mono is set only at 11px, 16px or 22px (`--label`,

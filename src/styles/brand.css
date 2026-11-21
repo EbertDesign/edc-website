@@ -50,13 +50,13 @@
   --font-inter: var(--font-grotesk);
   --font-switzer: var(--font-grotesk);
 
-  --white: var(--ink);
-  --light-grey: var(--ink-muted);
-  --dark-grey: var(--rule);
-  --accent: var(--safety-orange);
-  --tan: var(--ground-raised);
+  /* The colour aliases (`--white`, the greys, `--tan`, `--black-800`,
+     `--accent`) are not here but in the "Export aliases" block below the
+     modes. A custom property holding a `var()` inherits as the value it
+     computed where it was declared, so declared on `:root` alone they froze
+     at the page's mode: on a Signal page, `--white` stayed paper-coloured
+     inside every Field section and un-migrated copy went paper on paper. */
   --secondary: var(--sage);
-  --black-800: var(--ground-raised);
 
   /* Departure Mono is drawn on an 11px grid, so 11px and 22px are pixel-
      sharp. 16px is the one sanctioned size between them: a little soft on
@@ -110,12 +110,19 @@
 /* Field — warm and editorial, and the default. `:root` carries the values so
    a page naming no theme is already in Field, but not `color-scheme`: that
    would outrank `.theme-dark` from the layer below and strip the dark
-   scrollbars off a site that is still dark. It joins the paint rule later. */
+   scrollbars off a site that is still dark. It joins the paint rule later.
+
+   `.theme-brand` is the framework's old "brand" theme, which was a
+   signal-green ground. Green never appears as a ground on paper, so it now
+   resolves to Field. `:root[data-scroll-theme="field"]` is the homepage's
+   scroll change (`Utility/ScrollTheme`); at 0-2-0 it outranks the
+   `.theme-dark` the page is authored in, despite sitting above Signal. */
 :root,
 [data-theme="field"],
 .theme-light,
-.theme-dark .theme-invert,
-.theme-brand .theme-invert {
+.theme-brand,
+:root[data-scroll-theme="field"],
+.theme-dark .theme-invert {
   --ground: #f8f7f3;
   --ground-raised: #efeee8;
   --ink: #161616;
@@ -127,10 +134,20 @@
      the system colour is full `--ink`, and a marker or a link states itself
      by weight rather than by hue. */
   --system: var(--ink);
+  /* The mode's one accent. Field's is safety-orange, and it is only ever a
+     fill or a graphic mark — buttons, tags, key-stat blocks, photo frames —
+     with `--on-color` text on it. Never text, and never beside green in the
+     same section. Ask for this rather than naming a hue. */
+  --accent-fill: var(--safety-orange);
+  /* Highlight behind emphasised words in a heading. In Field the green
+     family is canopy and sage, never signal-green. */
+  --emphasis-fill: var(--canopy);
 }
 
 [data-theme="field"],
-.theme-light {
+.theme-light,
+.theme-brand,
+:root[data-scroll-theme="field"] {
   color-scheme: light;
 }
 
@@ -143,7 +160,8 @@
    making Signal win. Keep it below Field. */
 [data-theme="signal"],
 .theme-dark,
-.theme-light .theme-invert {
+.theme-light .theme-invert,
+.theme-brand .theme-invert {
   color-scheme: dark;
 
   --ground: #161616;
@@ -154,28 +172,32 @@
   /* The system colour proper: data, annotations, states and links.
      14.64:1 on the Signal ground. */
   --system: var(--signal-green);
+  /* Signal's one accent is signal-green; orange never appears on black. */
+  --accent-fill: var(--signal-green);
+  /* Canopy stays in Field; on black the emphasis takes Signal's accent. */
+  --emphasis-fill: var(--signal-green);
 }
 
-/* A signal-green fill used as a ground. This is what `.theme-brand` — the
-   export's orange page — becomes: the brand's large fills are green, never
-   orange. Kept under the old class name while `Home.astro` still scrolls to
-   it; renamed in cleanup. */
-[data-theme="signal-fill"],
-.theme-brand,
-/* The homepage's scroll theme lands here too — `Home.astro` still marks it
-   `data-scroll-theme="brand"`, which `Utility/ScrollTheme` writes onto the
-   root. Listed here rather than restated there, so the fill is defined once.
-   At 0-2-0 it outranks the `.theme-dark` the page is authored in. */
-:root[data-scroll-theme="brand"] {
-  color-scheme: light;
+/* Export aliases. The Webflow export's own swatch names, aimed at the new
+   palette, and re-declared on every element that sets a mode so each one
+   resolves against that element's own `--ink` and `--ground` rather than the
+   root's. The `webflow` layer still paints everything not yet migrated and
+   reads these names directly. They go when the layer does. `--black` is a
+   brand token in its own right, in `:root` above.
 
-  --ground: var(--signal-green);
-  --ground-raised: color-mix(in srgb, var(--signal-green) 92%, var(--black));
-  --ink: var(--on-color);
-  --ink-muted: color-mix(in srgb, var(--on-color) 70%, var(--signal-green));
-  --rule: color-mix(in srgb, var(--on-color) 25%, var(--signal-green));
-  /* Already the darkest thing on the fill; a link states itself by weight. */
-  --system: var(--on-color);
+   `--accent` is the export's text accent (`a:hover`, `.primary-text`,
+   `.case-service`, `.button-arrow`). Accents are never text on paper, so it
+   is `--system`: `--ink` in Field, signal-green in Signal. */
+:root,
+[data-theme],
+[class*="theme-"],
+:root[data-scroll-theme] {
+  --white: var(--ink);
+  --light-grey: var(--ink-muted);
+  --dark-grey: var(--rule);
+  --tan: var(--ground-raised);
+  --black-800: var(--ground-raised);
+  --accent: var(--system);
 }
 
 /* The page surface. `base.css` already routes this through <body> rather

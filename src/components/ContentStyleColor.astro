@@ -43,7 +43,7 @@ type Props = Base &
         /** The colours to show. */
         swatches: Swatch[];
         /** Mode the swatches resolve in. Unset, they follow the page. */
-        theme?: Mode | "signal-fill";
+        theme?: Mode;
         pairs?: never;
       }
     | {
@@ -58,7 +58,7 @@ type Props = Base &
 type AllProps = Base & {
   variant?: "swatches" | "contrast";
   swatches?: Swatch[];
-  theme?: Mode | "signal-fill";
+  theme?: Mode;
   pairs?: Pair[];
 };
 

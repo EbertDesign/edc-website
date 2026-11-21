@@ -269,6 +269,17 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
       min-height: var(--_step-height);
     }
 
+    /* The step numbers take the mode's accent as text: signal-green on
+       black, safety-orange on paper, fading between them with the homepage's
+       scroll change (`--accent-fill` is registered in `ScrollTheme`).
+
+       A documented exception, decided 2026-11-18 — orange is otherwise never
+       text, and on paper it is 2.99:1, under even the 3:1 large-text floor.
+       See docs/brand.md. Nothing else borrows it. */
+    .approach_number {
+      color: var(--accent-fill);
+    }
+
     /* The text fades on the same timing as the picture, and on the same
        crossing, so the two change as one. Timed rather than tied to the
        scroll: a value read straight off the scroll snaps when the scroll

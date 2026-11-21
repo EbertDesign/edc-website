@@ -648,7 +648,8 @@ figcaption {
   width: 100%;
 }
 .view-square {
-  background-color: var(--signal-green);
+  /* The mode's accent: orange on paper, green on black. */
+  background-color: var(--accent-fill);
   width: 8rem;
   height: 8rem;
   color: var(--on-color);

@@ -207,10 +207,11 @@ const named = {
         inset-block: 0;
         inset-inline-start: 0;
         width: 4rem;
-        /* The raised surface at rest; it turns safety-orange as it grows
-           across the label on hover. Orange stays a fill, never a line. */
+        /* The raised surface at rest; it turns the mode's accent as it grows
+           across the label on hover — orange on paper, green on black. The
+           accent stays a fill, never text. */
         background-color: var(--ground-raised);
-        border-radius: var(--radius-round);
+        border-radius: 0;
         transition:
           width calc(var(--hover-duration) * 2) var(--hover-ease),
           background-color var(--hover-duration) var(--hover-ease);
@@ -224,9 +225,10 @@ const named = {
       .button_mark {
         --_size: 1.75rem;
         flex: none;
-        /* Orange on the raised fill at rest, on-color once the fill turns
-           orange on hover. */
-        color: var(--safety-orange);
+        /* The accent as a graphic mark on the raised fill at rest, on-color
+           once the fill turns accent on hover. An icon, not text, so orange
+           is legal here in Field. */
+        color: var(--accent-fill);
         transition: color var(--hover-duration) var(--hover-ease);
       }
 
@@ -245,7 +247,7 @@ const named = {
         &:hover:not(:disabled) {
           &::before {
             width: 100%;
-            background-color: var(--safety-orange);
+            background-color: var(--accent-fill);
           }
           .button_mark {
             color: var(--on-color);
@@ -254,7 +256,7 @@ const named = {
              of its own, so it inherits, and every other variant's own hover
              rule — which carries one more class and so outranks this — can
              still send it somewhere else. Pinning the label here instead
-             would have followed it into the variants that have no orange
+             would have followed it into the variants that have no accent
              fill, painting a dark label onto a dark one. */
           color: var(--on-color);
         }
@@ -271,7 +273,7 @@ const named = {
         &::before {
           content: none;
         }
-        /* No orange fill under it any more, so the arrow follows the label. */
+        /* No accent fill under it any more, so the arrow follows the label. */
         .button_mark {
           color: currentcolor;
         }
@@ -298,9 +300,8 @@ const named = {
       }
 
       &.link {
-        /* Text on a rule, the rule travelling across on hover. No orange
-           here — this variant is never the CTA — so `--system` is free
-           to be signal-green on a dark ground. */
+        /* Text on a rule, the rule travelling across on hover, in
+           `--system`: `--ink` on paper, signal-green on black. */
         padding: 0.4em 0;
         border-bottom: var(--border-width) solid var(--rule);
         background-image: linear-gradient(
@@ -339,7 +340,7 @@ const named = {
         color: var(--ink);
         background-color: var(--ground-raised);
         border: var(--border-width) solid var(--rule);
-        border-radius: var(--radius-round);
+        border-radius: 0;
         transition:
           background-color var(--hover-duration) var(--hover-ease),
           color var(--hover-duration) var(--hover-ease),

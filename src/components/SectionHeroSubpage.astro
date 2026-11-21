@@ -143,6 +143,28 @@ const content = await slotContent(Astro.slots);
       opacity: 0.8;
     }
 
+    /* The grid is the container, not the title's own cell: a cell that is a
+       size container has no content width to resolve against and collapses
+       to zero. The backdrop sits outside it, so its stacking is untouched. */
+    .hero-subpage_inner > ._12-column-grid {
+      container-type: inline-size;
+      width: 100%;
+    }
+
+    .hero-subpage_content {
+      --_title-size: 7rem;
+      /* From the title's start line to the grid's right edge: 11 of 12. */
+      --_title-fit: 9.6cqi;
+      min-width: 0;
+    }
+
+    /* The export's sizes, capped so the longest word in any CMS title
+       ("Communications", 9.34em wide) still fits. Child combinator: on About
+       the `h1` is the eyebrow's, nested a level down. */
+    .hero-subpage_content > h1 {
+      font-size: min(var(--_title-size), var(--_title-fit));
+    }
+
     @media (width < 62rem) {
       .hero-subpage_wrap {
         margin-bottom: 7.5rem;
@@ -158,11 +180,31 @@ const content = await slotContent(Astro.slots);
         position: relative;
         width: 100%;
       }
+
+      /* The inner drops its padding here, so the title carries the page
+         gutter itself and lines up with the content below. */
+      .hero-subpage_content {
+        --_title-size: 6.5rem;
+        --_title-gutter: 3rem;
+        --_title-fit: calc((100cqi - 2 * var(--_title-gutter)) / 9.5);
+        padding-inline: var(--_title-gutter);
+      }
+    }
+
+    @media (width < 48rem) {
+      .hero-subpage_content {
+        --_title-size: 2.9rem;
+        --_title-gutter: 2.5rem;
+      }
     }
 
     @media (width < 30rem) {
       .hero-subpage_wrap {
         margin-bottom: 5rem;
+      }
+
+      .hero-subpage_content {
+        --_title-gutter: 1.5rem;
       }
     }
   }

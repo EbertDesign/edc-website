@@ -65,11 +65,21 @@
     inherits: true;
     initial-value: #161616;
   }
+  @property --accent-fill {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #ff5500;
+  }
+  @property --emphasis-fill {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #bfdd9e;
+  }
 
   @property --accent {
     syntax: "<color>";
     inherits: true;
-    initial-value: #ef4e1c;
+    initial-value: #161616;
   }
   @property --light-grey {
     syntax: "<color>";
@@ -103,6 +113,8 @@
         --ink-muted var(--_scroll-theme-transition),
         --rule var(--_scroll-theme-transition),
         --system var(--_scroll-theme-transition),
+        --accent-fill var(--_scroll-theme-transition),
+        --emphasis-fill var(--_scroll-theme-transition),
         --accent var(--_scroll-theme-transition),
         --light-grey var(--_scroll-theme-transition),
         --dark-grey var(--_scroll-theme-transition),
@@ -110,34 +122,19 @@
         --white var(--_scroll-theme-transition);
     }
 
-    /* The fill state, for everything still painted by the `webflow` layer.
-       Its own `--black` and `--white` are inverted with it: the page
-       background, links and hover states come from those two rather than
-       from the theme tokens, and would otherwise stay behind.
+    /* No per-theme tokens here. A scroll theme is a mode name — the homepage
+       scrolls to `field` — and `brand.css` lists `:root[data-scroll-theme=…]`
+       beside that mode, so its tokens and the export's aliases are defined in
+       one place. (The old `brand` value was a signal-green ground, retired
+       2026-11-18: green never appears as a ground on paper.) */
 
-       The 2026 tokens for this state are not here — `brand.css` lists
-       `:root[data-scroll-theme="brand"]` beside the signal-green fill, so
-       the fill is defined in one place and a migrated component picks it up
-       with no help from this file. This block shrinks to nothing when the
-       export does. */
-    :root[data-scroll-theme="brand"] {
-      --accent: var(--on-color);
-      --light-grey: color-mix(in lab, var(--on-color) 70%, transparent);
-      --dark-grey: color-mix(in lab, var(--on-color) 30%, transparent);
-      --black: var(--signal-green);
-      --white: var(--on-color);
-    }
-
-    /* The marker reads `--system`, which `brand.css` already resolves for
-       this state, so it no longer has to be turned over by hand — it only
-       needs to fade with everything else. */
-    .eyebrow_marker {
-      transition: background-color var(--_scroll-theme-transition);
-    }
+    /* The eyebrow marker needs no transition of its own: it reads
+       `--accent-fill`, which is registered above and fades on the root with
+       everything else. A second `background-color` transition on the marker
+       stacked on top of that one and left it trailing the page by a beat. */
 
     @media (prefers-reduced-motion: reduce) {
-      :root,
-      .eyebrow_marker {
+      :root {
         transition: none;
       }
     }

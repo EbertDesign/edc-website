@@ -84,11 +84,11 @@ const content = await slotContent(Astro.slots);
         flex: none;
         width: 0.5rem;
         height: 0.5rem;
-        /* An annotation mark, so it takes the system colour rather than the
-           accent: signal-green on a dark ground, `--ink` on a light one,
-           where green would be both illegal as anything but a fill and
-           invisible at 1.15:1. Orange stays reserved for the one CTA. */
-        background-color: var(--system);
+        /* A graphic mark, so it takes the mode's accent fill: signal-green
+           on black, safety-orange on paper. A fill, never text, so orange is
+           legal here. `--accent-fill` is `@property`-registered, so the
+           homepage's scroll change fades it from one to the other. */
+        background-color: var(--accent-fill);
         /* Square, to echo the pixel grid of Departure Mono beside it. */
         border-radius: 0;
       }

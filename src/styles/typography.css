@@ -56,3 +56,17 @@
 .text-7xl {
   --_margin-bottom: var(--space-6);
 }
+
+/* The label-and-value sidebar on /contact and /grants. Leading trim leaves
+   stacked paragraphs touching, so the rhythm is set here, once, for both. */
+.contact-info_wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.contact-info_item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

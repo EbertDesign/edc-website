@@ -113,9 +113,10 @@
     display: none;
   }
 
+  /* Fills with the mode's accent — orange on paper, green on black. */
   @media (hover: hover) {
     &:hover:not(:disabled) {
-      background-color: var(--safety-orange);
+      background-color: var(--accent-fill);
       color: var(--on-color);
     }
   }

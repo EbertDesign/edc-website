@@ -174,7 +174,7 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       top: 0;
       right: 0;
       overflow: hidden;
-      background-color: var(--ground-raised);
+      background-color: var(--ground);
     }
 
     .hero-art_canvas {
@@ -184,9 +184,12 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       width: 100vw;
       max-width: none;
       height: 100vh;
-      /* The face the atlas is built from: Departure at its 11px grid size. */
+      /* The face the atlas is built from. 9px is off Departure's 11px grid
+         and outside the three label sizes — a recorded exception for this
+         art alone (docs/brand.md), not a type size to reuse. */
+      --hero-art-font-size: 9px;
       font-family: var(--font-pixel);
-      font-size: var(--label);
+      font-size: var(--hero-art-font-size);
     }
 
     /* Sampled, never shown. Not `display: none`, which can stop frames
@@ -253,7 +256,7 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       width: 28px;
       height: 28px;
       /* The hero's one system mark — green on the Signal ground, `--ink` in
-         Field. Orange stays with the CTA. */
+         Field. */
       color: var(--system);
       margin-top: 0;
     }
@@ -278,12 +281,14 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
         transform var(--open-duration) var(--open-ease),
         color var(--hover-duration) var(--hover-ease);
     }
-    /* The square fills Signal green on hover, and the arrow goes dark with
-       it — it is `--system` at rest, which is the same green on the Signal
-       ground and would vanish into the fill. */
+    /* The square fills with the mode's accent on hover — green on black,
+       orange on paper — and the arrow goes dark with it. At rest it is
+       `--system`, which in Signal is the same green and would vanish into
+       the fill. This rule reaches every `.icon-button` on the page, so it
+       must not name a hue. */
     @media (hover: hover) {
       .icon-button:hover {
-        background-color: var(--signal-green);
+        background-color: var(--accent-fill);
       }
       .icon-button:hover .button-arrow {
         color: var(--on-color);
@@ -331,8 +336,19 @@ const arrow = `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/200
       .hero-section {
         height: auto;
       }
+      /* Stacked, the art, headline and columns are all in flow, so the two
+         halves size to their content. Left at 68vh and 32vh, the headline
+         spilled out of the top half and sat on the first column. */
+      .hero-home_top {
+        height: auto;
+      }
+      .hero-home_bottom {
+        height: auto;
+        padding-block: var(--space-6);
+      }
       .hero-image-container.hero-art {
         width: 100%;
+        height: 68vh;
         position: relative;
       }
       .hero-usp-container {
