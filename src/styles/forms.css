@@ -57,6 +57,13 @@
        thing marking the field, so it has to be the brighter of the two. */
     border-bottom-color: var(--system);
   }
+
+  /* The rule turning `--system` is the focus indicator here, so the global
+     `:focus-visible` outline would only box the field and cover it. */
+  &:focus,
+  &:focus-visible {
+    outline: 0;
+  }
 }
 
 /* The select sits on the same rule, and its own control wrapper must not
