@@ -64,10 +64,10 @@ const families = [
     name: "Departure Mono",
     token: "--font-pixel",
     source: "Self-hosted, SIL OFL 1.1",
-    use: "Uppercase labels only, at exactly 11px, 16px or 22px.",
+    use: "Uppercase labels only, at exactly 11px, 14px, 16px or 22px.",
     specimen: "label-lg",
     text: "label",
-    weights: [{ label: "Regular 400 · 11px only", token: "--primary-regular" }],
+    weights: [{ label: "Regular 400", token: "--primary-regular" }],
   },
   {
     name: "IBM Plex Mono",
@@ -99,6 +99,7 @@ const typeScale = [
   { name: "caption", utility: "caption", font: "Plex Mono", size: "12", weight: "400", lineHeight: "1.5", tracking: "0", sample: "Fig. 03 — Wayfinding system, Raleigh NC" },
   { name: "label-lg", utility: "label-lg", font: "Departure", size: "22", weight: "400", lineHeight: "24px", tracking: "0", sample: "Case study" },
   { name: "label-md", utility: "label-md", font: "Departure", size: "16", weight: "400", lineHeight: "20px", tracking: "0", sample: "Brand identity" },
+  { name: "label-ui", utility: "label-ui", font: "Departure", size: "14", weight: "400", lineHeight: "18px", tracking: "0", sample: "Buttons and eyebrows" },
   { name: "label", utility: "label", font: "Departure", size: "11", weight: "400", lineHeight: "16px", tracking: "0", sample: "Brand identity" },
 ];
 
@@ -109,6 +110,7 @@ const supportingType = [
   { token: "--primary-trim-top", value: "0.4em", note: "Leading trim above" },
   { token: "--primary-trim-bottom", value: "0.38em", note: "Leading trim below" },
   { token: "--label", value: "11px", note: "Departure, small" },
+  { token: "--label-ui", value: "14px", note: "Departure, buttons and eyebrows" },
   { token: "--label-md", value: "16px", note: "Departure, medium" },
   { token: "--label-lg", value: "22px", note: "Departure, large" },
   { token: "--letter-spacing-tight", value: "-0.05em", note: "Legacy" },
@@ -250,7 +252,7 @@ const motion = [
         <h3>Type rules</h3>
         <ul>
           <li>Headings are sentence case. Uppercase belongs to Departure labels alone.</li>
-          <li>Departure Mono is set at exactly 11px or 22px, with no letter spacing. Any other size blurs it.</li>
+          <li>Departure Mono is set at exactly 11px, 14px, 16px or 22px, with no letter spacing. 11px and 22px are pixel-sharp; 14px and 16px can look slightly soft on 1x screens.</li>
           <li>No more than three grotesk sizes per section, plus labels.</li>
           <li>Numbers in tables and stats use mono, with tabular figures.</li>
         </ul>

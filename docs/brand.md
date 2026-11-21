@@ -56,7 +56,7 @@ mode:
 | `--system` | `--ink` | `--signal-green` | data, annotations, states, links |
 | `--accent-fill` | `--safety-orange` | `--signal-green` | the mode's one accent, as a fill or graphic mark |
 | `--emphasis-fill` | `--canopy` | `--signal-green` | highlight behind emphasised words in a heading |
-| `--label` / `--label-md` / `--label-lg` | `11px` / `16px` / `22px` | same | the three Departure sizes |
+| `--label` / `--label-ui` / `--label-md` / `--label-lg` | `11px` / `14px` / `16px` / `22px` | same | the four Departure sizes |
 
 `--system` is the brief's own sentence made into a token: *"signal-green is the
 system: data, annotations, states and links on dark."* Green never appears on
@@ -137,18 +137,20 @@ Desktop / mobile.
 | caption | mono | 12 | 400 | 1.5 | 0 |
 | label-lg | pixel | 22 | 400 | 24px | 0, uppercase |
 | label-md | pixel | 16 | 400 | 20px | 0, uppercase |
+| label-ui | pixel | 14 | 400 | 18px | 0, uppercase |
 | label | pixel | 11 | 400 | 16px | 0, uppercase |
 
-- **Departure Mono is set at exactly 11px, 16px or 22px, with no
+- **Departure Mono is set at exactly 11px, 14px, 16px or 22px, with no
   letter-spacing.** The font is drawn on an 11px grid, so 11px and 22px are
   pixel-sharp. 16px (`label-md`) was added 2026-11-07 for labels that need
   more presence than 11px without the weight of 22px — first used for the
-  service name on case cards. It sits off the grid and renders slightly soft
+  service name on case cards. 14px (`label-ui`) was added 2026-11-21 for
+  buttons and eyebrows. Both sit off the grid and render slightly soft
   on 1x screens; that trade was accepted on purpose. Any other size is not.
   These are the one place `px` is correct — `LUMOS.md` otherwise forbids it,
   and this is the documented exception. Line heights for the label styles are
-  px for the same reason. Use the `--label` / `--label-md` / `--label-lg`
-  tokens rather than typing the numbers, and keep them in `px`: a `rem` would
+  px for the same reason. Use the `--label` / `--label-ui` / `--label-md` /
+  `--label-lg` tokens rather than typing the numbers, and keep them in `px`: a `rem` would
   let a browser text-zoom land the font on a size it was never approved at.
 - In Signal mode, **h1 to h3 drop to weight 400**. The display sizes and the
   extension levels below keep theirs — the brief names h1 to h3 only.
@@ -170,7 +172,7 @@ scale also had keep their token names, so the element rules, the
 scale up unchanged. The brief's names are available as utilities too —
 `.text-style-lead`, `.text-style-body`, `.text-style-display-xl`,
 `.text-style-tech`, `.text-style-caption`, `.text-style-label`,
-`.text-style-label-md`, `.text-style-label-lg`.
+`.text-style-label-ui`, `.text-style-label-md`, `.text-style-label-lg`.
 - Use no more than **three grotesk sizes per section**, plus labels.
 - **Numbers in tables and stats use a mono font.**
 
@@ -296,8 +298,8 @@ not a mistake.
 
 **Provisional, pending review:**
 
-- CTA button labels are Departure Mono in the `label` style (11px,
-  uppercase).
+- CTA button labels and eyebrows are Departure Mono in the `label-ui` style
+  (14px, uppercase).
 - In Field, link hover keeps `--ink` text and thickens its underline to
   `--safety-orange` — the underline is a graphic accent, so orange is legal
   there. Heading emphasis is a flat `--canopy` fill. In Signal both are

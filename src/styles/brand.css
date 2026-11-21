@@ -59,14 +59,16 @@
   --secondary: var(--sage);
 
   /* Departure Mono is drawn on an 11px grid, so 11px and 22px are pixel-
-     sharp. 16px is the one sanctioned size between them: a little soft on
-     1x screens, accepted for labels that need more presence than 11px. No
-     other size, and no letter-spacing. Tokens rather than literals so nobody
-     types 12px, and `px` rather than `rem` so a browser text-zoom cannot land
-     it on an unsanctioned size. This is the one exception to LUMOS.md's
-     no-px rule — see docs/brand.md. */
+     sharp. 14px (buttons and eyebrows) and 16px are the sanctioned sizes
+     between them: a little soft on 1x screens, accepted for labels that need
+     more presence than 11px. No other size, and no letter-spacing. Tokens
+     rather than literals so nobody types 12px, and `px` rather than `rem` so
+     a browser text-zoom cannot land it on an unsanctioned size. This is the
+     one exception to LUMOS.md's no-px rule — see docs/brand.md. */
   --label: 11px;
   --label-line-height: 16px;
+  --label-ui: 14px;
+  --label-ui-line-height: 18px;
   --label-md: 16px;
   --label-md-line-height: 20px;
   --label-lg: 22px;
