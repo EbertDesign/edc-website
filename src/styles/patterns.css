@@ -25,7 +25,8 @@
      margins and relies on them collapsing — through the container, through
      the section, into the gap between sections. A flex parent stops that
      dead, and every section grew by the margins that used to be absorbed.
-     Nothing here needs flex: `gap` is 0 on every section on this site. */
+     Nothing here needs flex: `gap` is 0 on almost every section, and the
+     container below rebuilds it as a margin where it is not. */
   display: block;
   position: relative;
 }
@@ -47,6 +48,16 @@
   & > [class] {
     margin-top: 0;
     margin-bottom: 0;
+  }
+  /* `gap` has no effect on a block, so Section's `gap` prop is rebuilt as a
+     top margin on every child after the first. `--_stack-gap` is resolved
+     here, on the container, because children such as `.grid` redefine
+     `--_gap-size` for their own columns. Sections passing `gap="0"` — nearly
+     all of them — are unchanged. */
+  --_gap-size: var(--space-8);
+  --_stack-gap: var(--_gap-size);
+  & > [class]:not(:first-child) {
+    margin-top: var(--_stack-gap);
   }
 }
 
@@ -219,7 +230,7 @@
   background-color: var(--ground-raised);
   color: inherit;
   border: var(--border-width) solid transparent;
-  border-radius: var(--radius-small);
+  border-radius: 0;
   transition:
     background-color var(--hover-duration) var(--hover-ease),
     border-color var(--hover-duration) var(--hover-ease);

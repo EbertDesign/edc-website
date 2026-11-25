@@ -157,14 +157,14 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
         appearance: none;
         width: var(--_handle);
         height: var(--_handle);
-        border-radius: var(--radius-round);
+        border-radius: 0;
         background: var(--_handle-face);
       }
       &::-moz-range-thumb {
         width: var(--_handle);
         height: var(--_handle);
         border: 0;
-        border-radius: var(--radius-round);
+        border-radius: 0;
         background: var(--_handle-face);
       }
       &:focus-visible ~ .form-range_handle {
@@ -178,7 +178,7 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
       position: absolute;
       inset-inline-start: 0;
       height: var(--_rail);
-      border-radius: var(--radius-round);
+      border-radius: 0;
       pointer-events: none;
     }
 
@@ -204,7 +204,7 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
       width: var(--_handle);
       height: var(--_handle);
       border: calc(var(--border-width) * 2) solid var(--ink);
-      border-radius: var(--radius-round);
+      border-radius: 0;
       background-color: var(--ground);
       pointer-events: none;
     }
@@ -218,7 +218,7 @@ const fieldId = id ?? `range-${label ? slug(label) : "field"}`;
       translate: -50% 0;
       padding: var(--space-1) var(--space-3);
       background-color: var(--ground-raised);
-      border-radius: var(--radius-small);
+      border-radius: 0;
       white-space: nowrap;
     }
   }

@@ -23,7 +23,7 @@ type Base = HTMLAttributes<"div"> & {
    * - `auto-width` — a row, each column only as wide as its content
    * - `columns` — two even columns from 64rem up
    * - `breakout` — full viewport width, the visual bleeding off one edge
-   * - `contain` — two columns on a filled, rounded surface
+   * - `contain` — two columns on a filled surface
    * - `sticky-content` — two columns; the content holds as the visual scrolls
    * - `sticky-visual` — two columns; the visual holds as the content scrolls
    * - `card` — the visual fills the surface, the content centered over it
@@ -194,7 +194,7 @@ const column2 = await slotContent(Astro.slots, "column2");
       /* visual ratio lock */
       & > :last-child:not(:has(> :not(.image, .video, .overlay))) {
         position: relative;
-        border-radius: var(--radius-small);
+        border-radius: 0;
         aspect-ratio: var(--_visual-ratio);
         & > :is(.image, .video, .overlay) {
           border-radius: inherit;
@@ -290,17 +290,9 @@ const column2 = await slotContent(Astro.slots, "column2");
           & > :first-child {
             max-width: calc(var(--max-width-main) / 2);
           }
-          & > :last-child {
-            border-top-left-radius: var(--radius-small);
-            border-bottom-left-radius: var(--radius-small);
-          }
           &.reversed {
             & > :last-child {
               order: -1;
-              border-top-left-radius: 0;
-              border-bottom-left-radius: 0;
-              border-top-right-radius: var(--radius-small);
-              border-bottom-right-radius: var(--radius-small);
             }
           }
         }
@@ -310,7 +302,7 @@ const column2 = await slotContent(Astro.slots, "column2");
         column-gap: 0;
         row-gap: 0;
         background-color: var(--ground-raised);
-        border-radius: var(--radius-main);
+        border-radius: 0;
         position: relative;
         overflow: clip;
         & > :first-child {
@@ -329,7 +321,7 @@ const column2 = await slotContent(Astro.slots, "column2");
         }
       }
       &.card-layout {
-        border-radius: var(--radius-main);
+        border-radius: 0;
         position: relative;
         overflow: clip;
         min-height: 26rem;

@@ -126,14 +126,14 @@ const {
       height: 1.5em;
       background-color: var(--_mark);
       border: var(--border-width) solid transparent;
-      border-radius: var(--radius-small);
+      border-radius: 0;
       transition:
         background-color var(--hover-duration) var(--hover-ease),
         border-color var(--hover-duration) var(--hover-ease);
     }
 
     .form-choice_mark:has(.form-choice_dot) {
-      border-radius: var(--radius-round);
+      border-radius: 0;
     }
 
     .form-choice_tick {
@@ -146,7 +146,7 @@ const {
       width: 1.1em;
       height: 1.1em;
       background-color: var(--_ink);
-      border-radius: var(--radius-round);
+      border-radius: 0;
       scale: 0;
       transition: scale var(--hover-duration) var(--hover-ease);
     }
@@ -179,7 +179,7 @@ const {
       & .form-choice_mark {
         width: 2.75em;
         height: 1.5em;
-        border-radius: var(--radius-round);
+        border-radius: 0;
         place-items: center start;
         padding: 0.15em;
       }
@@ -190,7 +190,7 @@ const {
         content: "";
         width: 1.1em;
         height: 1.1em;
-        border-radius: var(--radius-round);
+        border-radius: 0;
         background-color: var(--ink);
         transition:
           translate var(--hover-duration) var(--hover-ease),
@@ -207,7 +207,7 @@ const {
       padding: 0.75em 1.5em;
       background-color: var(--ground-raised);
       border: var(--border-width) solid transparent;
-      border-radius: var(--radius-round);
+      border-radius: 0;
       transition:
         background-color var(--hover-duration) var(--hover-ease),
         color var(--hover-duration) var(--hover-ease),

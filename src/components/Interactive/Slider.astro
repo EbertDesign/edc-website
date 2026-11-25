@@ -408,7 +408,7 @@ const slides = await slotContent(Astro.slots);
       /* `--ink-muted` rather than `--rule`: at 12px across, the marker is
          the control, and a 1.34:1 hairline would leave it invisible. */
       border: var(--border-width) solid var(--ink-muted);
-      border-radius: var(--radius-round);
+      border-radius: 0;
       background: none;
       transition: background-color var(--hover-duration) var(--hover-ease);
 
