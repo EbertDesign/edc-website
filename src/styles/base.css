@@ -151,6 +151,9 @@ body {
     --container-margin: 9.5vw;
     --section-space-medium: 12.5rem;
   }
+  .layout.sticky-visual {
+    font-size: var(--text-main);
+  }
 }
 
 /* 2. Page surface */

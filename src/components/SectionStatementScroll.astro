@@ -1,0 +1,305 @@
+---
+/**
+ * A statement told one word at a time: "Leave. It. Better."
+ *
+ * Each word has a block of four scattered photographs. The blocks scroll past
+ * in the ordinary way while the word holds at the bottom-left of the screen
+ * behind them, changing as each block arrives, and the page's colour turns
+ * with it — the mode it was authored in, then Field, then Signal again — so
+ * the nav, the word and the ground all move together (`Utility/ScrollTheme`).
+ *
+ * The photographs drift upward at three different rates as they cross the
+ * screen, which is the only part GSAP does; the hold is `position: sticky`,
+ * not a hijacked wheel, so the scrollbar, keyboard and find-in-page all keep
+ * working. Under `prefers-reduced-motion` the drift is left out. With no
+ * JavaScript the three words sit above the photographs as one heading.
+ *
+ * The photographs are placeholders, borrowed from elsewhere on the site.
+ * Swap the `photos` entries below when the real ones exist.
+ */
+import type { ComponentProps, HTMLAttributes } from "astro/types";
+import Section from "@/components/Wrapper/Section.astro";
+import ScrollTheme from "@/components/Utility/ScrollTheme.astro";
+
+type Props = Pick<ComponentProps<typeof Section>, "render"> &
+  HTMLAttributes<"section">;
+
+const { render = true, class: className, ...rest } = Astro.props;
+
+const photo = (name: string, ext = "jpg") => ({
+  src: `/images/${name}-p-1080.${ext}`,
+  srcset: [500, 800, 1080, 1600]
+    .map((w) => `/images/${name}-p-${w}.${ext} ${w}w`)
+    .join(", "),
+});
+
+const photos = [
+  photo("kaleidico-26MJGnCM0Wc-unsplash"),
+  photo("jason-goodman-vbxyFxlgpjM-unsplash"),
+  photo("jason-goodman-Oalh2MojUuk-unsplash"),
+  photo("sigmund-rJnx12RKrd4-unsplash-min", "jpeg"),
+];
+
+const blocks = [
+  { word: "Leave.", theme: undefined },
+  { word: "It.", theme: "field" },
+  { word: "Better.", theme: "signal" },
+];
+
+const sizes = "(min-width: 48rem) 31vw, 55vw";
+---
+
+<Section
+  render={render}
+  paddingTop="none"
+  paddingBottom="none"
+  gap="0"
+  class={["statement-scroll_wrap", className].filter(Boolean).join(" ")}
+  containerClass="statement-scroll_layout"
+  {...rest}
+>
+  <h2 class="statement-scroll_words text-style-display-statement">
+    {
+      blocks.map((block, index) => (
+        <span class:list={["statement-scroll_word", index === 0 && "is-active"]}>
+          {block.word}{" "}
+        </span>
+      ))
+    }
+  </h2>
+
+  <div class="statement-scroll_blocks">
+    {
+      blocks.map((block, index) => (
+        <div
+          class="statement-scroll_block"
+          data-scroll-theme-to={block.theme}
+          data-scroll-theme-offset="50"
+        >
+          {photos.map((_, n) => {
+            const image = photos[(n + index) % photos.length];
+            return (
+              <div class="statement-scroll_item">
+                <img
+                  class="statement-scroll_image"
+                  src={image.src}
+                  srcset={image.srcset}
+                  sizes={sizes}
+                  alt=""
+                  loading="lazy"
+                />
+              </div>
+            );
+          })}
+        </div>
+      ))
+    }
+  </div>
+</Section>
+
+<ScrollTheme />
+
+<style is:global>
+  @layer components {
+    .statement-scroll_layout {
+      display: grid;
+    }
+
+    .statement-scroll_words {
+      margin: 0;
+      padding-top: var(--space-8);
+      color: var(--ink);
+    }
+
+    .statement-scroll_blocks {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* The row is sixteen columns wide: four, three, two and five of them,
+       a column between each, every picture starting at a different height.
+       Below 48rem the same four sit two to a row. */
+    .statement-scroll_block {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      align-content: flex-start;
+      min-height: 110svh;
+      padding-top: var(--space-8);
+
+      &:last-child {
+        padding-bottom: 40vw;
+      }
+
+      @media (width >= 48rem) {
+        &:last-child {
+          padding-bottom: 24vw;
+        }
+      }
+    }
+
+    .statement-scroll_item {
+      aspect-ratio: 100 / 131;
+      overflow: hidden;
+      background-color: var(--ground-raised);
+      will-change: transform;
+
+      &:nth-child(4n + 1) {
+        width: 46%;
+        margin-right: 8%;
+      }
+      &:nth-child(4n + 2) {
+        width: 46%;
+        margin-top: 28%;
+      }
+      &:nth-child(4n + 3) {
+        width: 34%;
+        margin-top: 10%;
+        margin-left: 8%;
+        margin-right: 8%;
+      }
+      &:nth-child(4n + 4) {
+        width: 50%;
+        margin-top: 30%;
+      }
+
+      @media (width >= 48rem) {
+        &:nth-child(4n + 1) {
+          width: 25%;
+          margin-right: 6.25%;
+        }
+        &:nth-child(4n + 2) {
+          width: 18.75%;
+          margin-top: 20%;
+          margin-right: 6.25%;
+        }
+        &:nth-child(4n + 3) {
+          width: 12.5%;
+          margin-top: 4%;
+          margin-left: 0;
+          margin-right: 0;
+        }
+        &:nth-child(4n + 4) {
+          width: 31.25%;
+          margin-top: 24%;
+        }
+      }
+    }
+
+    .statement-scroll_image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Only once the script can swap the words: the heading leaves the flow,
+       holds to the bottom-left of the screen, and shows one word at a time. */
+    .statement-scroll_wrap.is-ready {
+      & .statement-scroll_words,
+      & .statement-scroll_blocks {
+        grid-area: 1 / 1;
+      }
+
+      & .statement-scroll_words {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        align-self: start;
+        display: grid;
+        align-content: end;
+        justify-items: start;
+        height: 100svh;
+        margin-top: -50svh;
+        padding-top: 0;
+        padding-bottom: var(--site-margin);
+        pointer-events: none;
+      }
+
+      & .statement-scroll_word {
+        grid-area: 1 / 1;
+        opacity: 0;
+        transition: opacity 200ms ease;
+
+        &.is-active {
+          opacity: 1;
+        }
+      }
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* How far each picture travels, as a share of its own height, and how
+     loosely it trails the scroll. Three rates, dealt out in turn. */
+  const DRIFT: [number, number][] = [
+    [-30, 1],
+    [-50, 2],
+    [-70, 1.5],
+  ];
+
+  document
+    .querySelectorAll<HTMLElement>(".statement-scroll_wrap")
+    .forEach((wrap) => {
+      const words = wrap.querySelectorAll(".statement-scroll_word");
+      const blocks = wrap.querySelectorAll<HTMLElement>(
+        ".statement-scroll_block",
+      );
+      const items = wrap.querySelectorAll<HTMLElement>(
+        ".statement-scroll_item",
+      );
+
+      const show = (index: number) =>
+        words.forEach((word, n) =>
+          word.classList.toggle("is-active", n === index),
+        );
+
+      wrap.classList.add("is-ready");
+
+      /* Half-way down the screen — the same line the blocks give
+         `ScrollTheme` to turn the colour on, so the word and the ground
+         change together, once the arriving block holds half the window. */
+      blocks.forEach((block, index) => {
+        ScrollTrigger.create({
+          trigger: block,
+          start: "top 50%",
+          end: "bottom 50%",
+          onEnter: () => show(index),
+          onEnterBack: () => show(index),
+        });
+      });
+
+      gsap.matchMedia().add(
+        {
+          motion: "(prefers-reduced-motion: no-preference)",
+          wide: "(width >= 48rem)",
+        },
+        (context) => {
+          const { motion, wide } = context.conditions as {
+            motion: boolean;
+            wide: boolean;
+          };
+          if (!motion) return;
+
+          items.forEach((item, n) => {
+            const [distance, scrub] = DRIFT[n % DRIFT.length];
+            gsap.to(item, {
+              yPercent: wide ? distance : distance / 2,
+              ease: "none",
+              scrollTrigger: {
+                trigger: item,
+                start: "top bottom",
+                end: "bottom top",
+                scrub,
+              },
+            });
+          });
+        },
+      );
+    });
+</script>

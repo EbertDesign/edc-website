@@ -1,0 +1,129 @@
+---
+/**
+ * A picture that opens: a square in the middle of the screen that grows,
+ * with the scroll, until it fills the window.
+ *
+ * The section is three screens tall and its stage holds to the window for
+ * the length of it (`position: sticky`). The picture is the full size of the
+ * window throughout and never scales — a `clip-path` cut around it widens
+ * from the square to nothing, so more of the same picture is uncovered.
+ * GSAP only moves one number, `--_progress`, from 0 to 1 with the scroll;
+ * the cut is worked out from it in CSS, so a resize needs no recalculation.
+ *
+ * With no JavaScript, or under `prefers-reduced-motion`, the section is one
+ * screen tall and the picture simply fills it.
+ */
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"section"> & {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** A path to a file in `public/`, or a URL. Nothing is output if it is missing. */
+  src: string;
+  /** Candidate files for the browser to choose between, by width. */
+  srcset?: string;
+  /** Leave unset on decorative images — renders `alt=""`. */
+  alt?: string;
+};
+
+const {
+  render = true,
+  src,
+  srcset,
+  alt = "",
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+{
+  render && src && (
+    <section class:list={["media-expand_wrap", className]} {...rest}>
+      <div class="media-expand_stage">
+        <img
+          class="media-expand_image"
+          src={src}
+          srcset={srcset}
+          sizes="100vw"
+          alt={alt}
+          loading="lazy"
+        />
+      </div>
+    </section>
+  )
+}
+
+<style is:global>
+  @property --_progress {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 1;
+  }
+
+  @layer components {
+    .media-expand_wrap {
+      --_progress: 1;
+      --_side: min(40vw, 40svh);
+      position: relative;
+      background-color: var(--ground);
+
+      @media (width >= 48rem) {
+        --_side: min(20vw, 40svh);
+      }
+
+      &.is-ready {
+        height: 300svh;
+      }
+    }
+
+    .media-expand_stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow: hidden;
+    }
+
+    .media-expand_image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      object-fit: cover;
+      clip-path: inset(
+        calc((50% - var(--_side) / 2) * (1 - var(--_progress)))
+      );
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
+    const wraps = gsap.utils.toArray<HTMLElement>(".media-expand_wrap");
+
+    wraps.forEach((wrap) => {
+      wrap.classList.add("is-ready");
+
+      gsap.fromTo(
+        wrap,
+        { "--_progress": 0 },
+        {
+          "--_progress": 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: wrap,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1,
+          },
+        },
+      );
+    });
+
+    return () => wraps.forEach((wrap) => wrap.classList.remove("is-ready"));
+  });
+</script>

@@ -166,6 +166,14 @@ steps at heading weight:
 | h5 | body — 16 | 500 |
 | h6 | small — 14 | 500 |
 
+**A second extension, 2026-11-25: display-statement.** The About page's
+"Leave. It. Better." sets one word at a time as the picture, far past
+display-xl's 120px. It has its own token rather than a hardcoded size:
+`--display-statement`, grotesk-ex 500, `clamp(4.5rem, 17vw, 22rem)`, line
+height 0.8, tracking -0.04em. It is for `SectionStatementScroll` only — a
+single word, never a sentence — and does not join the general scale. The
+utility is `.text-style-display-statement`, shown on `/style-guide`.
+
 Tokens live in [`src/styles/type.css`](../src/styles/type.css). Styles the old
 scale also had keep their token names, so the element rules, the
 `.text-style-*` utilities and the `Heading` / `Paragraph` variants pick the new

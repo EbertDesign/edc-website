@@ -17,6 +17,9 @@ import Eyebrow from "@/components/Typography/Eyebrow.astro";
 import Button from "@/components/Button.astro";
 import SanityImg from "@/components/Media/SanityImg.astro";
 import ServiceItem from "@/components/Item/ServiceItem.astro";
+import SectionStatementScroll from "@/components/SectionStatementScroll.astro";
+import ContentStatementSticky from "@/components/ContentStatementSticky.astro";
+import SectionMediaExpand from "@/components/SectionMediaExpand.astro";
 import { sanityClient, SERVICES_LIST_QUERY, TEAM_LIST_QUERY } from "@/utils/sanity.ts";
 const [services, team] = await Promise.all([
   sanityClient.fetch(SERVICES_LIST_QUERY),
@@ -71,7 +74,18 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
         </div>
   </Section>
 
-  <Section paddingTop="none" gap="0">
+  <SectionStatementScroll />
+
+  <Section paddingTop="large" paddingBottom="large">
+    <ContentStatementSticky />
+  </Section>
+
+  <SectionMediaExpand
+    src="/images/jason-goodman-vbxyFxlgpjM-unsplash-p-2000.jpg"
+    srcset="/images/jason-goodman-vbxyFxlgpjM-unsplash-p-800.jpg 800w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1080.jpg 1080w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1600.jpg 1600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2000.jpg 2000w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2600.jpg 2600w"
+  />
+
+  <Section gap="0">
         <div class="w-layout-grid _12-column-grid margin-bottom-80 fade-in-bottom">
           <p id="w-node-bba87639-05b8-8f05-0c3f-6e8815a617d3-08125e4f" class="text-4xl">Remote,<br />not distant.</p>
           <p id="w-node-_8b266af7-8918-9138-45bd-5d8958641925-08125e4f" class="text-medium light-grey-text">Our agency is comprised of a network of part-time, full-time and remote contractors who all share the same vision and values.</p>

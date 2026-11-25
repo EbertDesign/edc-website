@@ -26,6 +26,16 @@
   --display-xl-trim-top: var(--primary-trim-top);
   --display-xl-trim-bottom: var(--primary-trim-bottom);
 
+  /* display-statement — tracks the viewport, 72 at the floor. One step past
+     the scale, for a single word set as the picture: the About page's
+     "Leave. It. Better." (`SectionStatementScroll`). Flagged in
+     docs/brand.md. */
+  --display-statement: clamp(4.5rem, 17vw, 22rem);
+  --display-statement-font-family: var(--font-grotesk-ex);
+  --display-statement-font-weight: 500;
+  --display-statement-line-height: 0.8;
+  --display-statement-letter-spacing: -0.04em;
+
   /* display — 72 / 44. Takes the old `--display` slot. */
   --display: clamp(2.75rem, 2.25rem + 2.5vw, 4.5rem);
   --display-font-family: var(--font-grotesk-ex);

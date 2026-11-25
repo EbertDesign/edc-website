@@ -1,0 +1,93 @@
+---
+/**
+ * The company's history, told long-form: a picture that holds on one side
+ * while the text scrolls past on the other (`ContentWrapper`'s
+ * `sticky-visual`), closing on the statement itself, set large across the
+ * full width.
+ *
+ * The copy is lorem ipsum and the photograph a placeholder, both waiting on
+ * the real ones. The closing line fades up through `Utility/Reveal`.
+ */
+import type { HTMLAttributes } from "astro/types";
+import ContentWrapper from "@/components/Wrapper/ContentWrapper.astro";
+import Eyebrow from "@/components/Typography/Eyebrow.astro";
+import Heading from "@/components/Typography/Heading.astro";
+import Paragraph from "@/components/Typography/Paragraph.astro";
+import Img from "@/components/Media/Img.astro";
+
+type Props = HTMLAttributes<"div"> & {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+};
+
+const { render = true, class: className, ...rest } = Astro.props;
+
+const lorem = [
+  "Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas.",
+  "Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos. Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat.",
+];
+
+const paragraphs = Array.from({ length: 8 }, (_, index) => lorem[index % 2]);
+---
+
+{
+  render && (
+    <div class:list={["statement-sticky_wrap", className]} {...rest}>
+      <ContentWrapper
+        variant="sticky-visual"
+        column2Class="statement-sticky_visual"
+      >
+        <Eyebrow>Lorem ipsum</Eyebrow>
+        <Heading tag="h2" maxWidth={18}>
+          Lorem ipsum dolor sit amet consectetur adipiscing elit.
+        </Heading>
+        <div class="statement-sticky_text">
+          {paragraphs.map((text) => (
+            <Paragraph maxWidth={60}>{text}</Paragraph>
+          ))}
+        </div>
+        <Img
+          slot="column2"
+          src="/images/jason-goodman-Oalh2MojUuk-unsplash-p-1600.jpg"
+        />
+      </ContentWrapper>
+      <Paragraph
+        variant="display-xl"
+        class="statement-sticky_closing fade-in-bottom"
+      >
+        Leave it better.
+      </Paragraph>
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .statement-sticky_wrap {
+      display: grid;
+      row-gap: var(--space-8);
+    }
+
+    .statement-sticky_text {
+      display: grid;
+      row-gap: var(--space-6);
+      margin-top: var(--space-6);
+      color: var(--ink-muted);
+
+      & > * {
+        margin: 0;
+      }
+    }
+
+    /* Square, against `ContentWrapper`'s rounded visual: the photographs on
+       either side of this section are square-cornered. */
+    .statement-sticky_wrap .layout > .statement-sticky_visual:last-child {
+      border-radius: 0;
+    }
+
+    .statement-sticky_closing {
+      margin: 0;
+      color: var(--ink);
+    }
+  }
+</style>

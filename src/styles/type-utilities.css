@@ -3,6 +3,16 @@
    under their existing `.text-style-*` names, listed here where the two
    differ so either spelling resolves to the same tokens. */
 
+/* One word set as the picture — `SectionStatementScroll` only. Not part of
+   the general scale; see docs/brand.md. */
+.text-style-display-statement {
+  font-family: var(--display-statement-font-family);
+  font-size: var(--display-statement);
+  font-weight: var(--display-statement-font-weight);
+  line-height: var(--display-statement-line-height);
+  letter-spacing: var(--display-statement-letter-spacing);
+}
+
 .text-style-display-xl {
   font-family: var(--display-xl-font-family);
   font-size: var(--display-xl);
