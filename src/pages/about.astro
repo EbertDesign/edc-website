@@ -15,7 +15,7 @@ import Slider from "@/components/Interactive/Slider.astro";
 import Section from "@/components/Wrapper/Section.astro";
 import Eyebrow from "@/components/Typography/Eyebrow.astro";
 import Button from "@/components/Button.astro";
-import SanityImg from "@/components/Media/SanityImg.astro";
+import PortraitBitmap from "@/components/Media/PortraitBitmap.astro";
 import ServiceItem from "@/components/Item/ServiceItem.astro";
 import SectionStatementScroll from "@/components/SectionStatementScroll.astro";
 import ContentStatementSticky from "@/components/ContentStatementSticky.astro";
@@ -153,9 +153,7 @@ const [services, team] = await Promise.all([
               {team.map((m) => (
                 <div role="listitem" class="collection-item w-dyn-item">
                   <a href={`/team/${m.slug}`} class="team-member-container fade-in-bottom w-inline-block">
-                    <div class="team-member-image-container">
-                      <SanityImg image={m.photo} class="team-member-image" sizes="(min-width: 62rem) 30vw, 100vw" />
-                    </div>
+                    <PortraitBitmap image={m.photo} class="team-member-image-container" sizes="(min-width: 62rem) 30vw, 100vw" />
                     <p class="text-xl margin-bottom-1">{m.name}</p>
                     <p class="text-medium light-grey-text">{m.jobTitle}</p>
                     <Button element="span" variant="link">See profile</Button>

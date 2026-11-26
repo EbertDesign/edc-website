@@ -1,0 +1,495 @@
+---
+/**
+ * A cut-out portrait that breaks into a bitmap on hover: the photo becomes a
+ * greyscale halftone, its silhouette snaps to a grid of large pixels, and
+ * accent-filled pixels glitch in until they have taken the whole ground,
+ * leaving the portrait standing in a stepped ink outline. A few ink pixels
+ * stay loose in the accent, and a few accent ones sit on the body, below the
+ * face.
+ *
+ * The photo itself is a `SanityImg` and is never altered — a canvas is laid
+ * over it and painted cell by cell, so a cell that has not converted yet
+ * still shows the photograph underneath.
+ *
+ * The canvas cannot read the photo it covers: Sanity's image CDN refuses a
+ * cross-origin read from any origin not on the project's CORS list, which
+ * taints the canvas. So a 192px sample of the same crop is fetched here, at
+ * build time, and inlined as a data URI. The halftone is drawn from that,
+ * which is as much resolution as its dots can carry. If the fetch fails the
+ * portrait renders as a plain image.
+ *
+ * Hover comes from the nearest link around the portrait, or the portrait
+ * itself when there is none. Under `prefers-reduced-motion` the bitmap
+ * swaps in and out with no glitch frames.
+ */
+import type { ComponentProps } from "astro/types";
+import SanityImg from "@/components/Media/SanityImg.astro";
+import { urlFor } from "@/utils/sanity.ts";
+
+type Props = {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** The image as projected by the site's queries. Nothing is output without an asset. */
+  image: ComponentProps<typeof SanityImg>["image"];
+  /** How much of the viewport the image covers. Defaults to the full width. */
+  sizes?: string;
+  /** Defer loading until the image nears the viewport. Set `eager` for anything above the fold. */
+  loading?: "lazy" | "eager";
+  class?: string;
+};
+
+const { render = true, image, sizes, loading, class: className } = Astro.props;
+
+const SAMPLE_WIDTH = 192;
+
+let sample: string | undefined;
+if (render && image?.asset) {
+  try {
+    const res = await fetch(urlFor(image).width(SAMPLE_WIDTH).format("webp").quality(80).url());
+    if (res.ok) {
+      const type = res.headers.get("content-type") ?? "image/webp";
+      sample = `data:${type};base64,${Buffer.from(await res.arrayBuffer()).toString("base64")}`;
+    }
+  } catch {
+    sample = undefined;
+  }
+}
+---
+
+{
+  render && image?.asset && (
+    <div
+      class:list={["portrait-bitmap_wrap", className]}
+      data-portrait-bitmap={sample ? "" : undefined}
+      data-sample={sample}
+    >
+      <SanityImg image={image} sizes={sizes} loading={loading} class="portrait-bitmap_image" />
+      {sample && <canvas class="portrait-bitmap_canvas" aria-hidden="true" />}
+    </div>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .portrait-bitmap_wrap {
+      --_portrait-pixel: var(--accent-fill);
+      --_portrait-ink: var(--black);
+      --_portrait-ground: var(--ground-raised);
+
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      overflow: hidden;
+      background-color: var(--_portrait-ground);
+    }
+
+    .portrait-bitmap_image {
+      width: 100%;
+      margin-bottom: -0.0625rem;
+    }
+
+    .portrait-bitmap_canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+  }
+</style>
+
+<script>
+  const CONFIG = {
+    /** Large pixels across the portrait. Rows follow from the height. */
+    columns: 14,
+    /** Halftone samples across one large pixel. */
+    samplesPerCell: 12,
+    /** `true`: the halftone drops the photo's colour. `false`: colour dots. */
+    greyscale: true,
+    /** Greyscale only: the largest a dot grows, as a share of solid. Below 1, white areas keep their dots. */
+    greyCeiling: 0.72,
+    /** Milliseconds per glitch frame. Stepped on purpose, not eased. */
+    frame: 55,
+    enterFrames: 14,
+    leaveFrames: 5,
+    /** Ink pixels left loose in the accent ground. */
+    holes: 9,
+    /** Accent pixels on the portrait, and how far down it they start. */
+    inside: 6,
+    insideFrom: 0.42,
+    /** Chance a pixel grows into its neighbour, making a two-cell block. */
+    double: 0.3,
+    /** Pause between twitches while the cursor rests on the portrait, and their length in frames. */
+    idleMin: 700,
+    idleMax: 1600,
+    idleFrames: 3,
+    maxPixelRatio: 2,
+  };
+
+  type Pixel = { c: number; r: number; inside: boolean; at: number };
+
+  type Plate = {
+    width: number;
+    height: number;
+    cols: number;
+    rows: number;
+    xs: number[];
+    ys: number[];
+    on: Uint8Array;
+    order: Float32Array;
+    halftone: HTMLCanvasElement;
+    tinted: HTMLCanvasElement;
+    pixels: Pixel[];
+    ground: string;
+    ink: string;
+    pixel: string;
+  };
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function mulberry(seed: number) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function setup(wrap: HTMLElement, index: number) {
+    const canvas = wrap.querySelector<HTMLCanvasElement>(".portrait-bitmap_canvas");
+    const img = wrap.querySelector<HTMLImageElement>(".portrait-bitmap_image");
+    const ctx = canvas?.getContext("2d");
+    const source = wrap.dataset.sample;
+    if (!canvas || !img || !ctx || !source) return;
+
+    const sample = new Image();
+    sample.src = source;
+
+    const trigger = wrap.closest<HTMLElement>("a") ?? wrap;
+    const noise = mulberry(index * 7919 + 13);
+
+    let plate: Plate | null = null;
+    let progress = 0;
+    let target = 0;
+    let timer = 0;
+
+    function build(): Plate | null {
+      if (!sample.complete || !sample.naturalWidth || !img!.complete) return null;
+
+      const box = wrap.getBoundingClientRect();
+      const pic = img!.getBoundingClientRect();
+      if (box.width < 1 || box.height < 1) return null;
+
+      const ratio = Math.min(window.devicePixelRatio || 1, CONFIG.maxPixelRatio);
+      const width = Math.round(box.width * ratio);
+      const height = Math.round(box.height * ratio);
+      canvas!.width = width;
+      canvas!.height = height;
+
+      const cols = CONFIG.columns;
+      const cell = width / cols;
+      const rows = Math.ceil(height / cell);
+      const xs = Array.from({ length: cols + 1 }, (_, i) => Math.round(i * cell));
+      const ys = Array.from({ length: rows + 1 }, (_, i) => Math.round(i * cell));
+
+      /* One sample per halftone lattice point, drawn where the photo sits. */
+      const n = CONFIG.samplesPerCell;
+      const step = cell / n;
+      const sw = cols * n;
+      const sh = rows * n;
+      const reader = document.createElement("canvas");
+      reader.width = sw;
+      reader.height = sh;
+      const rctx = reader.getContext("2d", { willReadFrequently: true });
+      if (!rctx) return null;
+      rctx.imageSmoothingQuality = "high";
+      const k = ratio / step;
+      rctx.drawImage(
+        sample,
+        (pic.left - box.left) * k,
+        (pic.top - box.top) * k,
+        pic.width * k,
+        pic.height * k,
+      );
+      const data = rctx.getImageData(0, 0, sw, sh).data;
+
+      /* A cell belongs to the silhouette when the photo covers most of it. */
+      const on = new Uint8Array(cols * rows);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          let alpha = 0;
+          for (let y = 0; y < n; y++) {
+            for (let x = 0; x < n; x++) {
+              alpha += data[((r * n + y) * sw + c * n + x) * 4 + 3];
+            }
+          }
+          on[r * cols + c] = alpha / (n * n) > 115 ? 1 : 0;
+        }
+      }
+
+      const styles = getComputedStyle(wrap);
+      const ink = styles.getPropertyValue("--_portrait-ink").trim() || "#000";
+      const pixel = styles.getPropertyValue("--_portrait-pixel").trim() || "#fff";
+      const ground = styles.backgroundColor;
+
+      /* Two plates on a 45° screen: colour dots on ink, sized by how light
+         the photo is, and ink dots on the accent, sized by how dark. */
+      const halftone = document.createElement("canvas");
+      const tinted = document.createElement("canvas");
+      halftone.width = tinted.width = width;
+      halftone.height = tinted.height = height;
+      const hctx = halftone.getContext("2d")!;
+      const tctx = tinted.getContext("2d")!;
+      hctx.fillStyle = ink;
+      hctx.fillRect(0, 0, width, height);
+      tctx.fillStyle = pixel;
+      tctx.fillRect(0, 0, width, height);
+      tctx.fillStyle = ink;
+      tctx.beginPath();
+
+      const full = step * Math.SQRT2 * 0.72;
+      for (let y = 0; y < sh; y++) {
+        for (let x = y % 2; x < sw; x += 2) {
+          const i = (y * sw + x) * 4;
+          if (data[i + 3] < 128) continue;
+          const red = data[i];
+          const green = data[i + 1];
+          const blue = data[i + 2];
+          const raw = (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255;
+          const tone = Math.min(1, Math.max(0, (raw - 0.5) * 1.3 + (CONFIG.greyscale ? 0.5 : 0.56)));
+          const light = CONFIG.greyscale ? CONFIG.greyCeiling * Math.pow(tone, 1.2) : tone;
+          const cx = (x + 0.5) * step;
+          const cy = (y + 0.5) * step;
+
+          const peak = CONFIG.greyscale ? 170 + 85 * tone : 150 + 105 * light;
+          const lift = peak / Math.max(red, green, blue, 1);
+          hctx.fillStyle = CONFIG.greyscale
+            ? `rgb(${peak} ${peak} ${peak})`
+            : `rgb(${Math.min(255, red * lift)} ${Math.min(255, green * lift)} ${Math.min(255, blue * lift)})`;
+          hctx.beginPath();
+          hctx.arc(cx, cy, full * Math.sqrt(light), 0, Math.PI * 2);
+          hctx.fill();
+
+          const dark = full * 0.92 * Math.sqrt(1 - tone);
+          tctx.moveTo(cx + dark, cy);
+          tctx.arc(cx, cy, dark, 0, Math.PI * 2);
+        }
+      }
+      tctx.fill();
+
+      /* The same portrait always breaks the same way. */
+      const rand = mulberry(index * 2654435761 + cols * 97 + rows);
+      const rowBias = Array.from({ length: rows }, () => rand());
+      const order = new Float32Array(cols * rows);
+      /* The portrait converts first; the ground keeps filling to the end. */
+      for (let i = 0; i < order.length; i++) {
+        const bias = 0.2 * rowBias[Math.floor(i / cols)];
+        order[i] = on[i] ? 0.4 * rand() + bias : 0.12 + 0.63 * rand() + bias;
+      }
+
+      const holes: number[] = [];
+      const inside: number[] = [];
+      /* A last row cut short by the frame would hold slivers, not pixels. */
+      const whole = height - ys[rows - 1] < cell * 0.6 ? rows - 1 : rows;
+      for (let r = 0; r < whole; r++) {
+        for (let c = 0; c < cols; c++) {
+          const i = r * cols + c;
+          if (!on[i]) holes.push(i);
+          else if (r >= rows * CONFIG.insideFrom) inside.push(i);
+        }
+      }
+
+      const taken = new Set<number>();
+      const pixels: Pixel[] = [];
+      const take = (pool: number[], count: number, isInside: boolean) => {
+        for (let k = 0; k < count && pool.length; k++) {
+          const i = pool.splice(Math.floor(rand() * pool.length), 1)[0];
+          if (taken.has(i)) continue;
+          const at = isInside ? 0.3 + 0.6 * rand() : 0;
+          taken.add(i);
+          pixels.push({ c: i % cols, r: Math.floor(i / cols), inside: isInside, at });
+          if (rand() < CONFIG.double) {
+            const j = rand() < 0.5 ? i + 1 : i + cols;
+            const sameRow = j === i + cols || Math.floor(j / cols) === Math.floor(i / cols);
+            if (sameRow && j < on.length && !!on[j] === isInside && !taken.has(j)) {
+              taken.add(j);
+              pixels.push({ c: j % cols, r: Math.floor(j / cols), inside: isInside, at });
+            }
+          }
+        }
+      };
+      take(holes, CONFIG.holes, false);
+      take(inside, CONFIG.inside, true);
+
+      return { width, height, cols, rows, xs, ys, on, order, halftone, tinted, pixels, ground, ink, pixel };
+    }
+
+    function stamp(p: Plate, c: number, r: number, inside: boolean) {
+      const x = p.xs[c];
+      const y = p.ys[r];
+      const w = p.xs[c + 1] - x;
+      const h = Math.min(p.ys[r + 1], p.height) - y;
+      if (w <= 0 || h <= 0) return;
+      if (inside) {
+        ctx!.drawImage(p.tinted, x, y, w, h, x, y, w, h);
+      } else {
+        ctx!.fillStyle = p.ink;
+        ctx!.fillRect(x, y, w, h);
+      }
+    }
+
+    function draw(p: Plate, amount: number, glitch: boolean) {
+      ctx!.clearRect(0, 0, p.width, p.height);
+      if (amount <= 0) return;
+
+      ctx!.fillStyle = p.pixel;
+      for (let r = 0; r < p.rows; r++) {
+        for (let c = 0; c < p.cols; c++) {
+          const i = r * p.cols + c;
+          if (amount < 1 && p.order[i] > amount) continue;
+          const x = p.xs[c];
+          const y = p.ys[r];
+          const w = p.xs[c + 1] - x;
+          const h = Math.min(p.ys[r + 1], p.height) - y;
+          if (h <= 0) continue;
+          if (p.on[i]) ctx!.drawImage(p.halftone, x, y, w, h, x, y, w, h);
+          else ctx!.fillRect(x, y, w, h);
+        }
+      }
+
+      for (const px of p.pixels) {
+        const i = px.r * p.cols + px.c;
+        if (px.inside ? px.at > amount : amount < 1 && p.order[i] > amount) continue;
+        if (glitch && px.inside && amount - px.at < 0.25 && noise() < 0.3) continue;
+        stamp(p, px.c, px.r, px.inside);
+      }
+
+      if (!glitch) return;
+
+      /* Stray cells: accent, ink, or punched back through to the photo. */
+      const strays = 2 + Math.round((1 - amount) * 10);
+      for (let k = 0; k < strays; k++) {
+        const c = Math.floor(noise() * p.cols);
+        const r = Math.floor(noise() * p.rows);
+        const x = p.xs[c];
+        const y = p.ys[r];
+        const w = p.xs[c + 1] - x;
+        const h = p.ys[r + 1] - y;
+        const roll = noise();
+        if (roll < 0.2) {
+          ctx!.clearRect(x, y, w, h);
+        } else {
+          ctx!.fillStyle = roll < 0.45 ? p.ink : p.pixel;
+          ctx!.fillRect(x, y, w, h);
+        }
+      }
+
+      /* Tear bands of rows sideways by up to three cells. */
+      for (let k = 0; k < 2; k++) {
+        if (noise() > 0.8) continue;
+        const r = Math.floor(noise() * (p.rows - 1));
+        const span = 1 + Math.floor(noise() * 3);
+        const y = p.ys[r];
+        const h = Math.min(p.ys[Math.min(r + span, p.rows)], p.height) - y;
+        const shift = (noise() < 0.5 ? -1 : 1) * (1 + Math.floor(noise() * 3)) * (p.xs[1] - p.xs[0]);
+        if (h > 0) ctx!.drawImage(canvas!, 0, y, p.width, h, shift, y, p.width, h);
+      }
+    }
+
+    function twitch(p: Plate) {
+      const loose = p.pixels.filter((px) => !px.inside);
+      const px = loose[Math.floor(noise() * loose.length)];
+      if (px) {
+        for (let tries = 0; tries < 12; tries++) {
+          const c = Math.floor(noise() * p.cols);
+          const r = Math.floor(noise() * p.rows);
+          const free = !p.on[r * p.cols + c] && !p.pixels.some((o) => o.c === c && o.r === r);
+          if (free) {
+            px.c = c;
+            px.r = r;
+            break;
+          }
+        }
+      }
+      let left = CONFIG.idleFrames;
+      const frame = () => {
+        draw(p, 1, left > 0);
+        if (left-- > 0) timer = window.setTimeout(frame, CONFIG.frame);
+        else rest(p);
+      };
+      frame();
+    }
+
+    function rest(p: Plate) {
+      const wait = CONFIG.idleMin + noise() * (CONFIG.idleMax - CONFIG.idleMin);
+      timer = window.setTimeout(() => twitch(p), wait);
+    }
+
+    function tick() {
+      const p = plate;
+      if (!p) return;
+      const rising = target > progress;
+      progress = rising
+        ? Math.min(1, progress + 1 / CONFIG.enterFrames)
+        : Math.max(0, progress - 1 / CONFIG.leaveFrames);
+      const settled = progress === target;
+      draw(p, progress, !settled);
+      if (!settled) timer = window.setTimeout(tick, CONFIG.frame);
+      else if (target === 1) rest(p);
+    }
+
+    function go(to: 0 | 1) {
+      if (to === target && (plate || to === 0)) return;
+      target = to;
+      window.clearTimeout(timer);
+      if (to === 1 && !plate) plate = build();
+      if (!plate) return;
+      if (reduced.matches) {
+        progress = to;
+        draw(plate, to, false);
+        return;
+      }
+      tick();
+    }
+
+    trigger.addEventListener("pointerenter", (event) => {
+      if (event.pointerType !== "touch") go(1);
+    });
+    trigger.addEventListener("pointerleave", () => go(0));
+    trigger.addEventListener("focus", () => {
+      if (trigger.matches(":focus-visible")) go(1);
+    });
+    trigger.addEventListener("blur", () => go(0));
+
+    /* The plate is cut for one size; a new size means a new plate. */
+    let known = 0;
+    new ResizeObserver(([entry]) => {
+      const size = Math.round(entry.contentRect.width);
+      if (size === known) return;
+      const first = known === 0;
+      known = size;
+      if (first || !plate) return;
+      window.clearTimeout(timer);
+      plate = null;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (target === 1) {
+        plate = build();
+        progress = plate ? 1 : 0;
+        if (plate) {
+          draw(plate, 1, false);
+          if (!reduced.matches) rest(plate);
+        }
+      } else {
+        progress = 0;
+      }
+    }).observe(wrap);
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-portrait-bitmap]")
+    .forEach((wrap, index) => setup(wrap, index));
+</script>
