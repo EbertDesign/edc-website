@@ -35,9 +35,10 @@ const cases = await sanityClient.fetch(CASES_LIST_QUERY);
         <Eyebrow tag="h2">See all our cases</Eyebrow>
         <div class="w-layout-grid _12-column-grid">
           <div class="projects w-dyn-list cases-cell">
-            <div role="list" class="projects-list w-dyn-items">
+            <div role="list" class="projects-list w-dyn-items" data-batch-list data-batch-size="6">
               {cases.map((c) => <CaseCard case={c} variant="subpage" />)}
             </div>
+            <div data-batch-sentinel aria-hidden="true"></div>
           </div>
         </div>
   </Section>
@@ -57,4 +58,58 @@ const cases = await sanityClient.fetch(CASES_LIST_QUERY);
   .work-hero-title {
     margin-bottom: var(--space-6);
   }
+
+  /* A card waiting for its batch. `.case` sets its own `display`, which
+     outranks the browser's `[hidden]` rule, so it is restated here. */
+  .projects-list :global(.case[hidden]) {
+    display: none;
+  }
 </style>
+
+<script>
+  /* Load on scroll. Every case is in the HTML — the page is static, and the
+     cards' hover scripts bind once at load — so nothing is fetched: cards past
+     the first batch are hidden, and the next batch is shown when the sentinel
+     under the list comes within a viewport of the screen, early enough that
+     the reader never reaches the end of the list. Each card still fades up
+     through `Utility/Reveal` and its image is still `loading="lazy"`, so a
+     batch costs nothing until it is shown.
+
+     With no JavaScript nothing is hidden and the whole list is there. */
+  const list = document.querySelector<HTMLElement>("[data-batch-list]");
+  const sentinel = document.querySelector<HTMLElement>("[data-batch-sentinel]");
+
+  if (list && sentinel && "IntersectionObserver" in window) {
+    const size = Number(list.dataset.batchSize) || 6;
+    const cards = Array.from(list.querySelectorAll<HTMLElement>(":scope > .case"));
+
+    /* Coming back from a case, the browser restores the scroll position — so
+       restore the number of cards that were showing first, or there is no
+       page that far down to return to. */
+    let shown = Math.min(cards.length, Math.max(size, Number(history.state?.casesShown) || 0));
+
+    const apply = () => cards.forEach((card, i) => (card.hidden = i >= shown));
+    apply();
+
+    if (shown < cards.length) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          shown = Math.min(cards.length, shown + size);
+          apply();
+          history.replaceState({ ...history.state, casesShown: shown }, "");
+
+          /* Re-observing reports the sentinel afresh, so a batch too short
+             to push it out of range is followed by the next one. */
+          observer.unobserve(sentinel);
+          if (shown < cards.length) observer.observe(sentinel);
+        },
+        /* A viewport of lead below, and no limit above: jumping to the end of
+           the page (End key, dragging the scrollbar) passes the sentinel
+           without ever crossing the screen, and must still count. */
+        { rootMargin: "1000000px 0px 100% 0px" },
+      );
+      observer.observe(sentinel);
+    }
+  }
+</script>
