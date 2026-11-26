@@ -24,6 +24,18 @@ type Tag =
       href?: string;
       type?: never;
       disabled?: never;
+    })
+  | (HTMLAttributes<"span"> & {
+      /**
+       * `span` draws the button without making it a control, for use inside
+       * something that is already a link or button, such as a card whose
+       * whole surface is an `<a>`. It plays its hover when that link or
+       * button is hovered, not only when the pointer is over the button.
+       */
+      element: "span";
+      href?: never;
+      type?: never;
+      disabled?: never;
     });
 
 type Kind =
@@ -32,7 +44,7 @@ type Kind =
        * What kind of button it is.
        *
        * - `main` — a labelled button (default)
-       * - `link` — text on a rule that travels across on hover
+       * - `link` — text and an arrow on a rule that travels across on hover
        * - `play`, `close`, `arrow` — a mark on its own, with a label for
        *   anyone who cannot see it
        */
@@ -97,7 +109,7 @@ type AllProps = HTMLAttributes<"button"> &
     label?: string;
     pressed?: boolean;
     direction?: "forward" | "back";
-    element?: "button" | "link";
+    element?: "button" | "link" | "span";
     href?: string;
     type?: "button" | "submit" | "reset";
   };
@@ -117,10 +129,13 @@ const {
 } = Astro.props as AllProps;
 
 const isLink = element === "link";
-const Tag = isLink ? "a" : "button";
+const isSpan = element === "span";
+const Tag = isLink ? "a" : isSpan ? "span" : "button";
 const tagAttrs = isLink
   ? { href: href || "#" }
-  : { type: type === "submit" ? undefined : type };
+  : isSpan
+    ? {}
+    : { type: type === "submit" ? undefined : type };
 
 const marks = { play, close, arrow };
 /* main and link are written, the rest are marks with a label. */
@@ -163,7 +178,7 @@ const named = {
       {variant === "close" && (
         <Icon class="button_mark" src={marks.close} variant="small" />
       )}
-      {(variant === "arrow" || variant === "main") && (
+      {(variant === "arrow" || isWritten) && (
         <Icon class="button_mark" src={marks.arrow} variant="small" />
       )}
     </Tag>
@@ -177,7 +192,7 @@ const named = {
          behind the arrow and grows across the label on hover. The pill is a
          pseudo-element, so the component keeps its own markup — the export
          used a spare `.button-background` div. Every labelled button on this
-         site carries the arrow, so `main` renders one. */
+         site carries the arrow, so `main` and `link` both render one. */
       position: relative;
       z-index: 0;
       display: inline-flex;
@@ -243,8 +258,12 @@ const named = {
         text-transform: uppercase;
       }
 
+      /* Every hover below also fires for a `span` button when the link or
+         button around it is hovered, so a card that links as a whole plays
+         its button's hover from anywhere on the card. */
       @media (hover: hover) {
-        &:hover:not(:disabled) {
+        &:hover:not(:disabled),
+        :is(a, button):hover span& {
           &::before {
             width: 100%;
             background-color: var(--accent-fill);
@@ -291,7 +310,8 @@ const named = {
           color var(--hover-duration) var(--hover-ease),
           border-color var(--hover-duration) var(--hover-ease);
         @media (hover: hover) {
-          &:hover:not(:disabled) {
+          &:hover:not(:disabled),
+          :is(a, button):hover span& {
             background-color: var(--ink);
             color: var(--ground);
             border-color: var(--ink);
@@ -316,11 +336,24 @@ const named = {
           background-size calc(var(--hover-duration) * 2) var(--hover-ease),
           color var(--hover-duration) var(--hover-ease),
           border-color var(--hover-duration) var(--hover-ease);
+        .button_mark {
+          transition:
+            color var(--hover-duration) var(--hover-ease),
+            translate calc(var(--hover-duration) * 2) var(--hover-ease);
+        }
         @media (hover: hover) {
-          &:hover:not(:disabled) {
+          &:hover:not(:disabled),
+          :is(a, button):hover span& {
             color: var(--system);
             background-position: 0 100%;
             background-size: 100% var(--border-width);
+            /* The labelled hover above sends the arrow to `--on-color` for
+               the accent pill; a link has no pill, so it follows the label,
+               and nudges forward to point the way. */
+            .button_mark {
+              color: currentcolor;
+              translate: 0.25rem 0;
+            }
           }
         }
       }
@@ -353,7 +386,8 @@ const named = {
           color: currentcolor;
         }
         @media (hover: hover) {
-          &:hover:not(:disabled) {
+          &:hover:not(:disabled),
+          :is(a, button):hover span& {
             background-color: var(--ink);
             color: var(--ground);
             border-color: var(--ink);

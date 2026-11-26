@@ -25,10 +25,6 @@ const [services, team] = await Promise.all([
   sanityClient.fetch(SERVICES_LIST_QUERY),
   sanityClient.fetch(TEAM_LIST_QUERY),
 ]);
-const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M18.666 25.332L27.9993 15.9987L18.666 6.66536" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-  <path d="M27.9993 16L2.66602 16" stroke="currentcolor" stroke-width="1.5" stroke-miterlimit="10"></path>
-</svg>`;
 ---
 
 <BaseLayout
@@ -162,10 +158,7 @@ const arrow = `<svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" x
                     </div>
                     <p class="text-xl margin-bottom-1">{m.name}</p>
                     <p class="text-medium light-grey-text">{m.jobTitle}</p>
-                    <div class="team-member-link">
-                      <p class="margin-right-8">See profile</p>
-                      <div class="button-arrow w-embed" set:html={arrow} />
-                    </div>
+                    <Button element="span" variant="link">See profile</Button>
                   </a>
                 </div>
               ))}

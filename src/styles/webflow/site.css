@@ -723,20 +723,9 @@ figcaption {
   width: 100%;
   margin-bottom: 0;
 }
-.team-member-link {
-  color: var(--white);
-  cursor: pointer;
-  align-items: center;
-  margin-top: 40px;
-  text-decoration: none;
-  display: flex;
-}
 .team-member-image {
   width: 100%;
   margin-bottom: -1px;
-}
-.margin-right-8 {
-  margin-right: 8px;
 }
 .team-member-container {
   cursor: pointer;
