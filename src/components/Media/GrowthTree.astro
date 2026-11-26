@@ -1,0 +1,970 @@
+---
+/**
+ * A tree that grows as it is told to: a detailed silhouette revealed along
+ * its own limbs, from the collar out — down through the roots and up
+ * through the trunk into the crown at once. The growing edge is pixelated:
+ * new growth arrives as coarse blocks in the mode's accent, which break
+ * down into finer blocks, turning to ink as they go, and then into the
+ * drawing itself.
+ *
+ * With `tracking`, the growing edge is also read out the way a vision
+ * system reads a moving thing: thin accent boxes lock onto the patches of
+ * new growth and follow them outward, each with a Departure label giving
+ * its number and where it is, and hairlines join each box to its nearest
+ * neighbours so the set reads as one network. They are elements laid over the canvas, not
+ * drawn into it, so the rule stays a hairline and the label stays at its
+ * one size however the canvas is scaled. They go when the growth stops.
+ *
+ * The picture is a baked growth map (`tools/growth-tree`): an image whose
+ * alpha is the ink and whose red and green hold, for every inked pixel, the
+ * moment in the growth at which it appears. It is fetched the first time
+ * the canvas nears the screen.
+ *
+ * It is driven by one number, `stage`: the whole part is which of the
+ * `stageRanges` it is in and the fraction is how far through it, so `2.5`
+ * is half-way through the third. Set it from the section that owns the
+ * scroll —
+ *
+ *   document.querySelector("growth-tree").stage = 2.5;
+ *
+ * — or pass `track`, and the tree reads its own progress from that element's
+ * passage across the middle of the screen.
+ *
+ * It repaints only what changed, only while something is changing — the
+ * growth easing towards its target, the edge resolving, or the theme's
+ * colours fading — and not at all off screen. Under `prefers-reduced-motion`
+ * it is the whole tree, still. Decorative, so hidden from assistive tech.
+ */
+import type { HTMLAttributes } from "astro/types";
+
+type StageRanges = [number, number][];
+
+type Props = {
+  /** Set to `false` to skip rendering this component and its children. */
+  render?: boolean;
+  /** The growth map to reveal. Defaults to the tree baked by `tools/growth-tree`. */
+  src?: string;
+  /** The span of the tree's growth, from 0 to 1, covered by each stage — one per step of whatever drives it. Defaults to four equal quarters. */
+  stageRanges?: StageRanges;
+  /** Custom property the settled tree is coloured from. Defaults to `--ink`. */
+  inkColor?: `--${string}`;
+  /** Custom property the newest growth is coloured from. Defaults to `--accent-fill`. */
+  accentColor?: `--${string}`;
+  /** Selector for an ancestor whose scroll past the middle of the screen grows the tree. Leave unset to drive it through `stage`. */
+  track?: string;
+  /** Boxes and labels that follow the new growth while the tree is growing. Defaults to `true`. */
+  tracking?: boolean;
+  class?: string;
+} & Omit<HTMLAttributes<"div">, "class">;
+
+const {
+  render = true,
+  src = "/images/growth-tree.webp",
+  stageRanges = [
+    [0, 0.25],
+    [0.25, 0.5],
+    [0.5, 0.75],
+    [0.75, 1],
+  ],
+  inkColor = "--ink",
+  accentColor = "--accent-fill",
+  track,
+  tracking = true,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+{
+  render && (
+    <growth-tree
+      class:list={["growth-tree_wrap", className]}
+      aria-hidden="true"
+      data-src={src}
+      data-stages={JSON.stringify(stageRanges)}
+      data-ink={inkColor}
+      data-accent={accentColor}
+      data-track={track}
+      style={`--_growth-tree-ink: var(${inkColor}); --_growth-tree-accent: var(${accentColor});`}
+      {...rest}
+    >
+      <canvas class="growth-tree_canvas" />
+      {tracking && <div class="growth-tree_marks" />}
+    </growth-tree>
+  )
+}
+
+<style is:global>
+  @layer components {
+    .growth-tree_wrap {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* The canvas is the size of the map; the box fits it whole. */
+    .growth-tree_canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      /* Where the tree sits in a box of another shape. */
+      object-position: var(--growth-tree-position, center);
+    }
+
+    /* The tracking boxes. Placed and sized by the script, in the canvas's
+       own box. The accent is the rule only: the label is ink, since the
+       accent is never text. */
+    .growth-tree_marks {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .growth-tree_mark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: 0.0625rem solid var(--_growth-tree-accent);
+      will-change: transform, opacity;
+    }
+
+    .growth-tree_mark-label {
+      position: absolute;
+      bottom: 100%;
+      left: -0.0625rem;
+      margin: 0 0 0.25rem;
+      color: var(--_growth-tree-ink);
+      white-space: nowrap;
+    }
+
+    .growth-tree_marks.is-compact .growth-tree_mark-label {
+      display: none;
+    }
+
+    /* The lines joining the boxes: one SVG the size of the element. */
+    .growth-tree_links {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      fill: none;
+      stroke: var(--_growth-tree-accent);
+      stroke-width: 0.0625rem;
+    }
+  }
+</style>
+
+<script>
+  /* ------------------------------------------------------------------ */
+  /* The motion. Per-instance settings are the component's props.        */
+  /* ------------------------------------------------------------------ */
+  const MOTION = {
+    /** How quickly the growth catches up with the scroll, as a time
+        constant in ms. Lower follows the scroll more tightly. */
+    ease: 140,
+    /** The growing edge, coarsest first: each entry is a size of pixel
+        block, in map pixels, and how it gives way to the next size down.
+        `ease` is how quickly it resolves once the growth has moved on, as
+        a time constant in ms; `max` is the most of the tree's growth it
+        may cover, so a fast scroll does not turn the whole tree to blocks.
+        `cover` is the share of a block that must be tree for it to show —
+        raise it and stray twigs stop throwing up whole blocks. `tone` is
+        its colour, from `0`, the accent, to `1`, ink. Behind the finest
+        size is the drawing itself, in ink. */
+    blocks: [
+      { size: 16, ease: 130, max: 0.02, cover: 0.12, tone: 0 },
+      { size: 8, ease: 300, max: 0.05, cover: 0.1, tone: 0.55 },
+      { size: 4, ease: 520, max: 0.09, cover: 0, tone: 1 },
+    ],
+  };
+
+  /* ------------------------------------------------------------------ */
+  /* The tracking boxes. Lengths are in map pixels unless they say CSS.  */
+  /* ------------------------------------------------------------------ */
+  const MARKS = {
+    /** How far from its middle a box will claim new growth. Smaller makes
+        more, tighter boxes. */
+    reach: 120,
+    /** Space between the growth a box holds and its rule. */
+    pad: 10,
+    /** The fewest coarse blocks of new growth worth a box. */
+    least: 3,
+    /** One box for every this many CSS px of the tree's width, between
+        `min` and `max`. */
+    every: 70,
+    min: 2,
+    max: 7,
+    /** How quickly a box follows its growth, and comes and goes, as time
+        constants in ms; and how long it outlives its growth. */
+    follow: 110,
+    fade: 160,
+    linger: 240,
+    /** Below this width in CSS px the boxes go unlabelled. */
+    labelsFrom: 280,
+    /** Whether the boxes are joined by lines, and how quickly a line comes
+        and goes as the joins change, as a time constant in ms. */
+    links: true,
+    linkFade: 140,
+  };
+
+  /** Growth levels in the map: red is the high byte, green the low. */
+  const LEVELS = 1024;
+  const SHADES = 24;
+
+  type Rgb = [number, number, number];
+
+  /** One tracking box: the growth it is holding this frame, the box it is
+      heading for, and the box as drawn. All in map pixels. */
+  type Tracker = {
+    id: number;
+    x: number;
+    y: number;
+    held: number;
+    sumX: number;
+    sumY: number;
+    goal: [number, number, number, number];
+    box: [number, number, number, number];
+    seen: number;
+    opacity: number;
+    element: HTMLElement;
+    label: HTMLElement;
+    /** The box as placed, in CSS px: left, top, right, bottom. */
+    placed: [number, number, number, number];
+  };
+
+  /** A line between two boxes. */
+  type Link = {
+    a: Tracker;
+    b: Tracker;
+    opacity: number;
+    line: SVGLineElement;
+  };
+  type StageRanges = [number, number][];
+
+  class GrowthTree extends HTMLElement {
+    #canvas!: HTMLCanvasElement;
+    #ctx!: CanvasRenderingContext2D;
+    #probe = document.createElement("canvas").getContext("2d", {
+      willReadFrequently: true,
+    })!;
+
+    #stages: StageRanges = [[0, 1]];
+
+    /* The map, unpacked: every inked pixel's index into the canvas, sorted
+       by growth, and where each growth level starts in that list. What is
+       shown is always a prefix of it. */
+    #loading = false;
+    #width = 0;
+    #order = new Uint32Array(0);
+    #starts = new Uint32Array(LEVELS + 1);
+    #image: ImageData | null = null;
+    #pixels = new Uint32Array(0);
+    /* The same for each size of block: where the blocks are, sorted by the
+       growth at which each first has tree in it. */
+    #blocks: { size: number; x: Uint16Array; y: Uint16Array; starts: Uint32Array }[] = [];
+    /* What the blocks covered last frame, to be put back before the next. */
+    #blockBox: [number, number, number, number] | null = null;
+
+    #stage = 0;
+    #target = 0;
+    /* Growth shown; how far each size of block has resolved behind it,
+       coarsest first; and how far the drawing itself has come in. Each
+       trails the one before. */
+    #current = 0;
+    #resolved = MOTION.blocks.map(() => 0);
+    #settled = 0;
+    /* The drawing as painted last, in growth levels: how much of it shows
+       and how much of that is ink. */
+    #paintedShown = 0;
+    #paintedSettled = 0;
+    #synced = false;
+
+    #visible = false;
+    #frame = 0;
+    #last = 0;
+    #reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    #inkValue = "";
+    #accentValue = "";
+    #ink = 0;
+    #tones: string[] = [];
+    #ramp = new Uint32Array(SHADES);
+    #watchColoursUntil = 0;
+
+    #track: Element | null = null;
+    #cleanup: (() => void)[] = [];
+
+    #marks: HTMLElement | null = null;
+    #trackers: Tracker[] = [];
+    #links = new Map<string, Link>();
+    #linkLayer: SVGSVGElement | null = null;
+    #nextMark = 1;
+    #elapsed = 0;
+
+    /** Which stage the growth is in, and how far through it: `0` to the
+        number of stages. */
+    get stage() {
+      return this.#stage;
+    }
+
+    set stage(value: number) {
+      if (!Number.isFinite(value) || value === this.#stage) return;
+      this.#stage = value;
+      this.#retarget();
+    }
+
+    connectedCallback() {
+      const canvas = this.querySelector("canvas");
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) return;
+      this.#canvas = canvas;
+      this.#marks = this.querySelector(".growth-tree_marks");
+      if (this.#marks && MARKS.links) {
+        this.#linkLayer = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "svg",
+        );
+        this.#linkLayer.classList.add("growth-tree_links");
+        this.#marks.prepend(this.#linkLayer);
+      }
+      this.#ctx = ctx;
+
+      try {
+        const stages = JSON.parse(this.dataset.stages ?? "");
+        if (Array.isArray(stages) && stages.length) this.#stages = stages;
+      } catch {}
+
+      /* A `stage` set before the element was defined landed on the plain
+         element and would hide the setter. */
+      if (Object.hasOwn(this, "stage")) {
+        const early = (this as unknown as { stage: number }).stage;
+        delete (this as unknown as { stage?: number }).stage;
+        this.stage = early;
+      }
+
+      const seen = new IntersectionObserver(
+        ([entry]) => {
+          this.#visible = entry.isIntersecting;
+          if (!this.#visible) return;
+          void this.#load();
+          /* Whatever the scroll did while this was off screen is not
+             replayed: it comes back at the growth it should have. */
+          this.#synced = false;
+          this.#readTrack();
+          this.#kick();
+        },
+        { rootMargin: "100% 0px" },
+      );
+      seen.observe(this);
+
+      /* The theme's tokens fade when the page changes mode; the tree
+         follows them for as long as they keep moving. */
+      const themed = new MutationObserver(() => {
+        this.#watchColoursUntil = performance.now() + 1500;
+        if (this.#visible) this.#kick();
+      });
+      themed.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-theme", "data-scroll-theme", "class"],
+      });
+
+      const onMotion = () => {
+        this.#synced = false;
+        this.#retarget();
+      };
+      this.#reduced.addEventListener("change", onMotion);
+
+      this.#cleanup = [
+        () => seen.disconnect(),
+        () => themed.disconnect(),
+        () => this.#reduced.removeEventListener("change", onMotion),
+      ];
+
+      const selector = this.dataset.track;
+      this.#track = selector ? this.closest(selector) : null;
+      if (this.#track) {
+        const onScroll = () => this.#visible && this.#readTrack();
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        this.#cleanup.push(
+          () => window.removeEventListener("scroll", onScroll),
+          () => window.removeEventListener("resize", onScroll),
+        );
+      }
+    }
+
+    disconnectedCallback() {
+      cancelAnimationFrame(this.#frame);
+      this.#frame = 0;
+      this.#cleanup.forEach((fn) => fn());
+      this.#cleanup = [];
+    }
+
+    /** Fetches the map and unpacks it. Read without colour management or
+        premultiplying, so the numbers come back as they were baked. */
+    async #load() {
+      if (this.#loading || !this.dataset.src) return;
+      this.#loading = true;
+
+      try {
+        const response = await fetch(this.dataset.src);
+        if (!response.ok) throw new Error(String(response.status));
+        const bitmap = await createImageBitmap(await response.blob(), {
+          premultiplyAlpha: "none",
+          colorSpaceConversion: "none",
+        });
+
+        const { width, height } = bitmap;
+        const reader = new OffscreenCanvas(width, height).getContext("2d", {
+          willReadFrequently: true,
+        })!;
+        reader.drawImage(bitmap, 0, 0);
+        bitmap.close();
+        const map = reader.getImageData(0, 0, width, height).data;
+
+        /* A counting sort by growth level. */
+        const level = (at: number) =>
+          Math.min(LEVELS - 1, map[at * 4] * 256 + map[at * 4 + 1]);
+        const starts = new Uint32Array(LEVELS + 1);
+        for (let at = 0; at < width * height; at++) {
+          if (map[at * 4 + 3] > 127) starts[level(at) + 1]++;
+        }
+        for (let l = 0; l < LEVELS; l++) starts[l + 1] += starts[l];
+
+        const order = new Uint32Array(starts[LEVELS]);
+        const next = starts.slice(0, LEVELS);
+        for (let at = 0; at < width * height; at++) {
+          if (map[at * 4 + 3] > 127) order[next[level(at)]++] = at;
+        }
+
+        /* Blocks, by the same sort: a block's level is that of the first
+           of its pixels to grow, and it counts only if enough of it is
+           tree. */
+        this.#blocks = MOTION.blocks.map(({ size, cover }) => {
+          const cols = Math.ceil(width / size);
+          const rows = Math.ceil(height / size);
+          const first = new Uint16Array(cols * rows).fill(LEVELS);
+          const filled = new Uint16Array(cols * rows);
+          for (let y = 0; y < height; y++) {
+            const row = Math.floor(y / size) * cols;
+            for (let x = 0; x < width; x++) {
+              const at = y * width + x;
+              if (map[at * 4 + 3] <= 127) continue;
+              const block = row + Math.floor(x / size);
+              const l = level(at);
+              if (l < first[block]) first[block] = l;
+              filled[block]++;
+            }
+          }
+
+          const needed = Math.max(1, cover * size * size);
+          const blockStarts = new Uint32Array(LEVELS + 1);
+          for (let block = 0; block < first.length; block++) {
+            if (filled[block] >= needed) blockStarts[first[block] + 1]++;
+          }
+          for (let l = 0; l < LEVELS; l++) blockStarts[l + 1] += blockStarts[l];
+
+          const x = new Uint16Array(blockStarts[LEVELS]);
+          const y = new Uint16Array(blockStarts[LEVELS]);
+          const slot = blockStarts.slice(0, LEVELS);
+          for (let block = 0; block < first.length; block++) {
+            if (filled[block] < needed) continue;
+            const i = slot[first[block]]++;
+            x[i] = (block % cols) * size;
+            y[i] = Math.floor(block / cols) * size;
+          }
+          return { size, x, y, starts: blockStarts };
+        });
+
+        this.#canvas.width = width;
+        this.#canvas.height = height;
+        this.#width = width;
+        this.#order = order;
+        this.#starts = starts;
+        this.#image = this.#ctx.createImageData(width, height);
+        this.#pixels = new Uint32Array(this.#image.data.buffer);
+        this.#paintedShown = 0;
+        this.#paintedSettled = 0;
+        this.#synced = false;
+        if (this.#visible) this.#kick();
+      } catch {
+        /* No map, no tree: it is decorative. */
+      }
+    }
+
+    /** Progress read from the `track` element: 0 as its top reaches the
+        middle of the screen, the last stage as its bottom does. */
+    #readTrack() {
+      if (!this.#track) return;
+      const box = this.#track.getBoundingClientRect();
+      const through = (window.innerHeight / 2 - box.top) / (box.height || 1);
+      this.stage = Math.min(1, Math.max(0, through)) * this.#stages.length;
+    }
+
+    #retarget() {
+      const last = this.#stages.length - 1;
+      const stage = Math.min(this.#stages.length, Math.max(0, this.#stage));
+      const part = Math.min(last, Math.floor(stage));
+      const [from, to] = this.#stages[part];
+
+      this.#target = this.#reduced.matches
+        ? 1
+        : from + (to - from) * (stage - part);
+      if (this.#visible) this.#kick();
+    }
+
+    /** Reads the two tokens; returns whether either has moved. */
+    #readColours() {
+      const style = getComputedStyle(this);
+      const ink = style.getPropertyValue(this.dataset.ink || "--ink").trim();
+      const accent = style
+        .getPropertyValue(this.dataset.accent || "--accent-fill")
+        .trim();
+
+      if (ink === this.#inkValue && accent === this.#accentValue) return false;
+      this.#inkValue = ink;
+      this.#accentValue = accent;
+
+      /* Packed the way a little-endian `Uint32Array` over RGBA reads. */
+      const pack = ([r, g, b]: Rgb) =>
+        ((255 << 24) | (b << 16) | (g << 8) | r) >>> 0;
+      const from = this.#rgb(accent);
+      const to = this.#rgb(ink);
+      this.#ink = pack(to);
+      this.#tones = MOTION.blocks.map(
+        ({ tone }) =>
+          `rgb(${from.map((c, i) => Math.round(c + (to[i] - c) * tone)).join(" ")})`,
+      );
+      for (let shade = 0; shade < SHADES; shade++) {
+        const mix = shade / (SHADES - 1);
+        this.#ramp[shade] = pack(
+          from.map((c, i) => Math.round(c + (to[i] - c) * mix)) as Rgb,
+        );
+      }
+      return true;
+    }
+
+    /** Any CSS colour, as the browser resolves it. */
+    #rgb(value: string): Rgb {
+      const probe = this.#probe;
+      probe.clearRect(0, 0, 1, 1);
+      probe.fillStyle = "#000";
+      probe.fillStyle = value;
+      probe.fillRect(0, 0, 1, 1);
+      const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
+      return [r, g, b];
+    }
+
+    #kick() {
+      if (this.#frame) return;
+      this.#last = performance.now();
+      this.#frame = requestAnimationFrame(this.#tick);
+    }
+
+    #tick = (now: number) => {
+      this.#frame = 0;
+      if (!this.#image || !this.#visible) return;
+
+      const elapsed = Math.min(64, Math.max(0, now - this.#last));
+      this.#elapsed = elapsed;
+      this.#last = now;
+
+      if (!this.#synced || this.#reduced.matches) {
+        this.#current = this.#target;
+        this.#resolved.fill(this.#target);
+        this.#settled = this.#target;
+        this.#synced = true;
+      } else {
+        this.#current +=
+          (this.#target - this.#current) *
+          (1 - Math.exp(-elapsed / MOTION.ease));
+        if (Math.abs(this.#target - this.#current) < 0.0004) {
+          this.#current = this.#target;
+        }
+
+        /* Each stage follows the growth at its own pace: never ahead of
+           the stage before it, never further behind the growth than it is
+           allowed. */
+        const follow = (value: number, ahead: number, ease: number, max: number) => {
+          value += (this.#current - value) * (1 - Math.exp(-elapsed / ease));
+          value = Math.min(ahead, Math.max(value, this.#current - max));
+          return this.#current - value < 0.0008 ? Math.min(ahead, this.#current) : value;
+        };
+
+        let ahead = this.#current;
+        MOTION.blocks.forEach(({ ease, max }, i) => {
+          ahead = this.#resolved[i] = follow(this.#resolved[i], ahead, ease, max);
+        });
+        this.#settled = ahead;
+      }
+
+      const recoloured = this.#readColours();
+      if (recoloured) {
+        this.#watchColoursUntil = Math.max(this.#watchColoursUntil, now + 300);
+      }
+
+      this.#paint(recoloured);
+      this.#follow(now);
+
+      if (
+        this.#current !== this.#target ||
+        this.#settled !== this.#current ||
+        now < this.#watchColoursUntil ||
+        this.#trackers.length
+      ) {
+        this.#frame = requestAnimationFrame(this.#tick);
+      }
+    };
+
+    /** Repaints what changed since the last frame — everything, if the
+        colours themselves did. The drawing goes into the image, level by
+        level: ink as far as the finest blocks have resolved, nothing
+        beyond that. The blocks of the
+        growing edge are drawn over it, and what they covered is put back
+        from the image on the next frame. */
+    #paint(everything: boolean) {
+      const image = this.#image!;
+      const pixels = this.#pixels;
+      const order = this.#order;
+      const starts = this.#starts;
+      const width = this.#width;
+      const toLevel = (growth: number) =>
+        Math.min(LEVELS, Math.max(0, Math.floor(growth * LEVELS)));
+
+      const edge = toLevel(this.#current);
+      const shown = Math.min(edge, toLevel(this.#resolved.at(-1) ?? this.#current));
+      const settled = Math.min(shown, toLevel(this.#settled));
+
+      let minX = width;
+      let maxX = -1;
+      let minY = image.height;
+      let maxY = -1;
+
+      const from = everything ? 0 : Math.min(settled, this.#paintedSettled);
+      const to = Math.max(shown, this.#paintedShown);
+      this.#paintedShown = shown;
+      this.#paintedSettled = settled;
+
+      const trail = Math.max(1, shown - settled);
+      for (let level = from; level < to; level++) {
+        let colour = 0;
+        if (level < settled) {
+          colour = this.#ink;
+        } else if (level < shown) {
+          const age = (shown - 1 - level) / trail;
+          colour = this.#ramp[Math.min(SHADES - 1, Math.floor(age * SHADES))];
+        }
+
+        for (let i = starts[level]; i < starts[level + 1]; i++) {
+          const at = order[i];
+          pixels[at] = colour;
+          const x = at % width;
+          const y = (at - x) / width;
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+
+      if (this.#blockBox) {
+        const [x0, y0, x1, y1] = this.#blockBox;
+        if (x0 < minX) minX = x0;
+        if (x1 > maxX) maxX = x1;
+        if (y0 < minY) minY = y0;
+        if (y1 > maxY) maxY = y1;
+        this.#blockBox = null;
+      }
+
+      if (maxX >= 0) {
+        maxX = Math.min(maxX, width - 1);
+        maxY = Math.min(maxY, image.height - 1);
+        this.#ctx.putImageData(
+          image,
+          0,
+          0,
+          minX,
+          minY,
+          maxX - minX + 1,
+          maxY - minY + 1,
+        );
+      }
+
+      /* The growing edge. Each size covers everything it has not yet
+         resolved, finest first, so a finer size is always there under a
+         coarser one and the coarsest — the newest growth — sits on top. */
+      if (shown >= edge) return;
+
+      const ctx = this.#ctx;
+      let x0 = width;
+      let y0 = image.height;
+      let x1 = -1;
+      let y1 = -1;
+
+      for (let size = this.#blocks.length - 1; size >= 0; size--) {
+        const blocks = this.#blocks[size];
+        const since = Math.min(edge, toLevel(this.#resolved[size]));
+        const side = blocks.size;
+        ctx.fillStyle = this.#tones[size];
+        for (let i = blocks.starts[since]; i < blocks.starts[edge]; i++) {
+          const x = blocks.x[i];
+          const y = blocks.y[i];
+          ctx.fillRect(x, y, side, side);
+          if (x < x0) x0 = x;
+          if (y < y0) y0 = y;
+          if (x + side - 1 > x1) x1 = x + side - 1;
+          if (y + side - 1 > y1) y1 = y + side - 1;
+        }
+      }
+
+      if (x1 >= 0) this.#blockBox = [x0, y0, x1, y1];
+    }
+
+    /** Moves the tracking boxes. The coarse blocks of the growing edge are
+        shared out among the boxes — each to the nearest box in reach, or
+        to a new one — and every box heads for the bounds of what it was
+        given. A box with nothing left lingers a moment and fades. */
+    #follow(now: number) {
+      const host = this.#marks;
+      const coarse = this.#blocks[0];
+      if (!host || !coarse || !this.#image) return;
+
+      /* Where the map sits in the element, for turning map pixels to CSS. */
+      const width = this.#width;
+      const height = this.#image.height;
+      const boxWidth = this.#canvas.clientWidth;
+      const boxHeight = this.#canvas.clientHeight;
+      const scale = Math.min(boxWidth / width, boxHeight / height);
+      const [posX, posY] = getComputedStyle(this.#canvas)
+        .objectPosition.split(" ")
+        .map((part) => (Number.parseFloat(part) || 0) / 100);
+      const left = (boxWidth - width * scale) * posX;
+      const top = (boxHeight - height * scale) * (posY ?? 0.5);
+
+      const shownWidth = width * scale;
+      const most = this.#reduced.matches
+        ? 0
+        : Math.round(
+            Math.min(MARKS.max, Math.max(MARKS.min, shownWidth / MARKS.every)),
+          );
+      host.classList.toggle("is-compact", shownWidth < MARKS.labelsFrom);
+
+      const trackers = this.#trackers;
+      for (const tracker of trackers) {
+        tracker.held = 0;
+        tracker.sumX = 0;
+        tracker.sumY = 0;
+        tracker.goal = [Infinity, Infinity, -Infinity, -Infinity];
+      }
+
+      /* The new growth: every coarse block the middle size has yet to
+         resolve, which is a little more than the coarse blocks on show
+         and so a little steadier. */
+      const toLevel = (growth: number) =>
+        Math.min(LEVELS, Math.max(0, Math.floor(growth * LEVELS)));
+      const edge = toLevel(this.#current);
+      const since = Math.min(edge, toLevel(this.#resolved[1] ?? this.#current));
+      const side = coarse.size;
+      const reach2 = MARKS.reach * MARKS.reach;
+
+      for (let i = coarse.starts[since]; i < coarse.starts[edge]; i++) {
+        const x = coarse.x[i] + side / 2;
+        const y = coarse.y[i] + side / 2;
+
+        let nearest: Tracker | null = null;
+        let nearestD2 = reach2;
+        for (const tracker of trackers) {
+          const d2 = (tracker.x - x) ** 2 + (tracker.y - y) ** 2;
+          if (d2 < nearestD2) {
+            nearest = tracker;
+            nearestD2 = d2;
+          }
+        }
+
+        if (!nearest) {
+          if (trackers.length >= most) continue;
+          const element = document.createElement("div");
+          element.className = "growth-tree_mark";
+          const label = document.createElement("p");
+          label.className = "growth-tree_mark-label text-style-label";
+          element.append(label);
+          host.append(element);
+
+          nearest = {
+            id: this.#nextMark,
+            x,
+            y,
+            held: 0,
+            sumX: 0,
+            sumY: 0,
+            goal: [Infinity, Infinity, -Infinity, -Infinity],
+            box: [x, y, x, y],
+            seen: now,
+            opacity: 0,
+            element,
+            label,
+            placed: [0, 0, 0, 0],
+          };
+          this.#nextMark = (this.#nextMark % 99) + 1;
+          trackers.push(nearest);
+        }
+
+        nearest.held++;
+        nearest.sumX += x;
+        nearest.sumY += y;
+        const goal = nearest.goal;
+        if (x - side / 2 < goal[0]) goal[0] = x - side / 2;
+        if (y - side / 2 < goal[1]) goal[1] = y - side / 2;
+        if (x + side / 2 > goal[2]) goal[2] = x + side / 2;
+        if (y + side / 2 > goal[3]) goal[3] = y + side / 2;
+      }
+
+      const ease = (ms: number) => 1 - Math.exp(-this.#elapsed / ms);
+
+      this.#trackers = trackers.filter((tracker) => {
+        const holding = tracker.held >= MARKS.least;
+        if (holding) {
+          tracker.seen = now;
+          tracker.x += (tracker.sumX / tracker.held - tracker.x) * ease(MARKS.follow);
+          tracker.y += (tracker.sumY / tracker.held - tracker.y) * ease(MARKS.follow);
+          for (let k = 0; k < 4; k++) {
+            const goal = tracker.goal[k] + (k < 2 ? -MARKS.pad : MARKS.pad);
+            tracker.box[k] += (goal - tracker.box[k]) * ease(MARKS.follow);
+          }
+        }
+
+        const wanted = now - tracker.seen < MARKS.linger ? 1 : 0;
+        tracker.opacity += (wanted - tracker.opacity) * ease(MARKS.fade);
+
+        if (!wanted && tracker.opacity < 0.03) {
+          tracker.element.remove();
+          return false;
+        }
+
+        const [x0, y0, x1, y1] = tracker.box;
+        const placedLeft = Math.round(left + x0 * scale);
+        const placedTop = Math.round(top + y0 * scale);
+        const placedWidth = Math.max(1, Math.round((x1 - x0) * scale));
+        const placedHeight = Math.max(1, Math.round((y1 - y0) * scale));
+        tracker.placed = [
+          placedLeft,
+          placedTop,
+          placedLeft + placedWidth,
+          placedTop + placedHeight,
+        ];
+
+        const style = tracker.element.style;
+        style.transform = `translate(${placedLeft}px, ${placedTop}px)`;
+        style.width = `${placedWidth}px`;
+        style.height = `${placedHeight}px`;
+        style.opacity = tracker.opacity.toFixed(2);
+        tracker.label.textContent =
+          `${String(tracker.id).padStart(2, "0")} ` +
+          `${Math.round((x0 + x1) / 2)}·${Math.round((y0 + y1) / 2)}`;
+        return true;
+      });
+
+      this.#join(ease(MARKS.linkFade));
+    }
+
+    /** Joins the boxes with the shortest set of lines that reaches them
+        all — a minimum spanning tree over their middles — so each is tied
+        to its nearest neighbours and nothing crosses the whole tree. Each
+        line runs from the edge of one box to the edge of the other. As
+        the boxes move the joins change; a line no longer wanted fades. */
+    #join(step: number) {
+      const layer = this.#linkLayer;
+      if (!layer) return;
+
+      const trackers = this.#trackers.filter((tracker) => tracker.opacity > 0.05);
+      const middle = (tracker: Tracker) => [
+        (tracker.placed[0] + tracker.placed[2]) / 2,
+        (tracker.placed[1] + tracker.placed[3]) / 2,
+      ];
+
+      /* Prim's algorithm: grow the tree by the shortest line out of it. */
+      const wanted = new Set<string>();
+      if (trackers.length > 1) {
+        const joined = [trackers[0]];
+        const loose = trackers.slice(1);
+        while (loose.length) {
+          let best = Infinity;
+          let from = joined[0];
+          let pick = 0;
+          for (const a of joined) {
+            const [ax, ay] = middle(a);
+            loose.forEach((b, i) => {
+              const [bx, by] = middle(b);
+              const d2 = (ax - bx) ** 2 + (ay - by) ** 2;
+              if (d2 < best) {
+                best = d2;
+                from = a;
+                pick = i;
+              }
+            });
+          }
+          const to = loose.splice(pick, 1)[0];
+          joined.push(to);
+
+          const [a, b] = from.id < to.id ? [from, to] : [to, from];
+          const key = `${a.id}-${b.id}`;
+          wanted.add(key);
+          if (!this.#links.has(key)) {
+            const line = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "line",
+            );
+            layer.append(line);
+            this.#links.set(key, { a, b, opacity: 0, line });
+          }
+        }
+      }
+
+      /* Where the line between two middles leaves a box. */
+      const leave = (tracker: Tracker, towards: number[]) => {
+        const [cx, cy] = middle(tracker);
+        const dx = towards[0] - cx;
+        const dy = towards[1] - cy;
+        const halfWidth = (tracker.placed[2] - tracker.placed[0]) / 2;
+        const halfHeight = (tracker.placed[3] - tracker.placed[1]) / 2;
+        const reach = Math.min(
+          dx ? halfWidth / Math.abs(dx) : Infinity,
+          dy ? halfHeight / Math.abs(dy) : Infinity,
+          1,
+        );
+        return [cx + dx * reach, cy + dy * reach];
+      };
+
+      for (const [key, link] of this.#links) {
+        const alive =
+          this.#trackers.includes(link.a) && this.#trackers.includes(link.b);
+        const target = alive && wanted.has(key) ? 1 : 0;
+        link.opacity += (target - link.opacity) * step;
+
+        if (!alive || (!target && link.opacity < 0.03)) {
+          link.line.remove();
+          this.#links.delete(key);
+          continue;
+        }
+
+        const [x1, y1] = leave(link.a, middle(link.b));
+        const [x2, y2] = leave(link.b, middle(link.a));
+        link.line.setAttribute("x1", x1.toFixed(1));
+        link.line.setAttribute("y1", y1.toFixed(1));
+        link.line.setAttribute("x2", x2.toFixed(1));
+        link.line.setAttribute("y2", y2.toFixed(1));
+        link.line.style.opacity = (
+          link.opacity * Math.min(link.a.opacity, link.b.opacity)
+        ).toFixed(2);
+      }
+    }
+  }
+
+  if (!customElements.get("growth-tree")) {
+    customElements.define("growth-tree", GrowthTree);
+  }
+</script>
