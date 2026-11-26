@@ -3,39 +3,45 @@
  * The homepage's Approach, as a pinned sequence rather than a grid.
  *
  * The four steps used to sit in a 12-column grid, all four readable at once.
- * Here the image column pins to the screen and the steps scroll past it one
- * at a time: whichever step is crossing the middle of the viewport is the
- * live one, the others dim back, and the image behind swaps to match. With
- * each step a screen tall, the section takes four screens of scroll to get
- * through — the "lock" is the sticky column, not a hijacked wheel, so the
- * scrollbar, keyboard, trackpad and find-in-page all keep working.
+ * Here the picture column pins to the screen and the steps scroll past it
+ * one at a time: whichever step is crossing the middle of the viewport is
+ * the live one, the others dim back, and the tree beside them grows. With
+ * each step most of a screen tall, the section takes about four screens of
+ * scroll to get through — the "lock" is the sticky column, not a hijacked
+ * wheel, so the scrollbar, keyboard, trackpad and find-in-page all keep
+ * working.
  *
- * The photographs are placeholders, borrowed from elsewhere on the site.
- * Swap the `image` entries below when the real ones exist; nothing else has
- * to change.
+ * The picture is one tree (`Media/GrowthTree`), grown by the scroll: roots
+ * down and stem up together, a sapling at the first step and a full crown
+ * over deep roots by the last. `GROWS_AT` in the script below sets where in
+ * the scroll each quarter of that growth happens.
  *
  * The step that is live is read from position on every frame rather than
  * remembered from an event, the same way `Utility/ScrollTheme` does it, so
  * it is right after a resize, a reload part-way down, or a jump to an
- * anchor. With no JavaScript the steps all stay at full strength and the
- * first image shows — the dimming only applies once the script has said it
- * can undo it.
+ * anchor. With no JavaScript the steps all stay at full strength and only
+ * the tree is missing — the dimming only applies once the script has said
+ * it can undo it.
  */
 import type { ComponentProps, HTMLAttributes } from "astro/types";
 import Section from "@/components/Wrapper/Section.astro";
 import Eyebrow from "@/components/Typography/Eyebrow.astro";
+import GrowthTree from "@/components/Media/GrowthTree.astro";
 
 type Props = Pick<
   ComponentProps<typeof Section>,
   "render" | "theme" | "paddingTop" | "paddingBottom"
-> &
-  HTMLAttributes<"section">;
+> & {
+  /** Mode the page scrolls to once the tree has left the screen — a `Utility/ScrollTheme` name. Unset, the page keeps the mode it arrived in. */
+  scrollThemeAfter?: string;
+} & HTMLAttributes<"section">;
 
 const {
   render = true,
   theme = "inherit",
   paddingTop = "large",
   paddingBottom = "large",
+  scrollThemeAfter,
   class: className,
   ...rest
 } = Astro.props;
@@ -44,34 +50,20 @@ const steps = [
   {
     title: "Finding Your Organization's Unique Purpose.",
     text: "Discover your brand's essence through our collaborative process. We explore your mission, values, and goals to uncover your unique purpose, laying the foundation for an authentic and inspiring brand identity.",
-    image: "/images/kaleidico-26MJGnCM0Wc-unsplash.jpg",
-    srcset:
-      "/images/kaleidico-26MJGnCM0Wc-unsplash-p-500.jpg 500w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-800.jpg 800w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-1080.jpg 1080w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-1600.jpg 1600w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-2000.jpg 2000w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-2600.jpg 2600w, /images/kaleidico-26MJGnCM0Wc-unsplash-p-3200.jpg 3200w, /images/kaleidico-26MJGnCM0Wc-unsplash.jpg 5029w",
   },
   {
     title: "Designing a Purpose-Driven Identity.",
     text: "We specialize in crafting a purpose-driven brand identity that captivates your audience, from logos to visuals. We ensure your brand communicates its core values, leaving a lasting impression on all who encounter it.",
-    image: "/images/jason-goodman-vbxyFxlgpjM-unsplash.jpg",
-    srcset:
-      "/images/jason-goodman-vbxyFxlgpjM-unsplash-p-500.jpg 500w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-800.jpg 800w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1080.jpg 1080w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-1600.jpg 1600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2000.jpg 2000w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-2600.jpg 2600w, /images/jason-goodman-vbxyFxlgpjM-unsplash-p-3200.jpg 3200w, /images/jason-goodman-vbxyFxlgpjM-unsplash.jpg 3600w",
   },
   {
     title: "Creating Internal and External Alignment.",
     text: "Experience the strength of a united purpose as we align your brand's narrative with its visual representation. Through seamless integration of messaging and design, we ensure your internal team and external audience share a cohesive understanding of your organization's impact.",
-    image: "/images/jason-goodman-Oalh2MojUuk-unsplash.jpg",
-    srcset:
-      "/images/jason-goodman-Oalh2MojUuk-unsplash-p-500.jpg 500w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-800.jpg 800w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-1080.jpg 1080w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-1600.jpg 1600w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-2000.jpg 2000w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-2600.jpg 2600w, /images/jason-goodman-Oalh2MojUuk-unsplash-p-3200.jpg 3200w, /images/jason-goodman-Oalh2MojUuk-unsplash.jpg 3600w",
   },
   {
     title: "Developing a Brand You're Proud Of.",
     text: "Achieve a brand that reflects your passion and purpose, embodying everything you stand for. With Ebert Design, you'll have a purpose-driven brand you can proudly showcase to the world, empowering you to make a meaningful difference with every interaction.",
-    image: "/images/sigmund-rJnx12RKrd4-unsplash-min.jpg",
-    srcset:
-      "/images/sigmund-rJnx12RKrd4-unsplash-min-p-500.jpeg 500w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-800.jpeg 800w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1080.jpeg 1080w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1600.jpeg 1600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2000.jpeg 2000w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2600.jpeg 2600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-3200.jpeg 3200w, /images/sigmund-rJnx12RKrd4-unsplash-min.jpg 3314w",
   },
 ];
-
-const sizes = "(min-width: 62rem) 45vw, 92vw";
 ---
 
 <Section
@@ -83,21 +75,15 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
   containerClass="approach_layout"
   {...rest}
 >
-  <div class="approach_media">
+  <div
+    class="approach_media"
+    data-scroll-theme-to={scrollThemeAfter}
+    data-scroll-theme-edge={scrollThemeAfter && "bottom"}
+    data-scroll-theme-offset={scrollThemeAfter && "0"}
+  >
     <div class="approach_frame">
       <div class="approach_figure">
-        {
-          steps.map((step, index) => (
-            <img
-              class:list={["approach_image", index === 0 && "is-active"]}
-              src={step.image}
-              srcset={step.srcset}
-              sizes={sizes}
-              alt=""
-              loading={index === 0 ? "eager" : "lazy"}
-            />
-          ))
-        }
+        <GrowthTree class="approach_tree" />
       </div>
     </div>
   </div>
@@ -129,8 +115,7 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
        is stacked, and hands it to the frame inside once there are two
        columns to pin between. */
     .approach_layout {
-      /* How long the picture takes to cross to the next one. The text is
-         not eased with it: its strength is read straight off the scroll. */
+      /* How long a step takes to come up to full strength or dim back. */
       --_approach-fade: 600ms ease;
       --_step-height: 62svh;
       display: grid;
@@ -150,14 +135,14 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
     }
 
     .approach_media {
-      /* Stacked, the image holds the top of the screen and the steps run
+      /* Stacked, the picture holds the top of the screen and the steps run
          beneath it, so it needs the page's own colour behind it — the theme
          token, which the scroll recolouring moves with the rest of the page. */
       position: sticky;
       top: 0;
       z-index: 1;
       background-color: var(--ground);
-      padding-bottom: var(--space-5);
+      padding-bottom: var(--space-3);
 
       @media (width >= 62rem) {
         position: static;
@@ -174,41 +159,29 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
         position: sticky;
         top: 0;
         height: 100svh;
-        justify-content: center;
-        padding-block: var(--space-7);
+        /* The tree is taller than the screen, so the frame crops it. */
+        overflow: clip;
       }
     }
 
+    /* No panel behind the tree: it sits on the page's own ground.
+       Stacked, it takes as much of the screen as the step's text, read on
+       a line 72% of the way down, leaves above it. Side by side it is
+       hung from the top of the pinned frame and runs taller than the
+       screen by `--_tree-bleed`, which buys a bigger crown for the price
+       of the deepest root tips running off the bottom. Where the column
+       is too narrow for that height the tree is fitted to its width, and
+       shows whole. */
     .approach_figure {
+      --_tree-bleed: 10svh;
+      --growth-tree-position: 50% 0;
       position: relative;
-      overflow: hidden;
-      height: 38svh;
-      border-radius: var(--radius-main);
-      background-color: var(--ground-raised);
+      height: 46svh;
 
       @media (width >= 62rem) {
-        /* A ratio off the framework's own scale — the `ratio-4-5` step —
-           rather than filling whatever the label leaves of the pinned
-           frame, which ran the card to nearly the height of the screen.
-           `max-height` holds it inside the frame on a short one, where the
-           picture crops a little further rather than overflowing. */
-        aspect-ratio: 4 / 5;
-        max-height: 100%;
-        height: auto;
-      }
-    }
-
-    .approach_image {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity var(--_approach-fade);
-
-      &.is-active {
-        opacity: 1;
+        flex: none;
+        height: calc(100svh + var(--_tree-bleed) - var(--space-2));
+        margin-top: var(--space-2);
       }
     }
 
@@ -280,8 +253,7 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
       color: var(--accent-fill);
     }
 
-    /* The text fades on the same timing as the picture, and on the same
-       crossing, so the two change as one. Timed rather than tied to the
+    /* The text fades on a timing of its own rather than tied to the
        scroll: a value read straight off the scroll snaps when the scroll
        does, and a flick of the wheel showed no fade at all.
 
@@ -296,7 +268,6 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .approach_image,
       .approach_step {
         transition: none;
       }
@@ -317,13 +288,24 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
      ends of the fade run well inside the screen rather than off the edge. */
   const LIT_BELOW = 0.5;
 
+  /* Where each quarter of the tree's growth happens, in steps past the
+     reading line: `0` is the first step's middle on the line, `3` the
+     fourth's. Five marks bound the four quarters.
+
+     Not the steps' own lit windows (-0.5 to 3.5), because the picture is
+     only pinned from 0 to 3: before that its foot is still below the
+     screen, and after it the crown is on its way off the top. So the
+     growth starts as the tree comes into place and is whole as the last
+     step reaches the line. */
+  const GROWS_AT = [-0.25, 0.45, 1.3, 2.15, 3];
+
+  type Tree = HTMLElement & { stage: number };
+
   for (const section of document.querySelectorAll<HTMLElement>(
     ".approach_wrap",
   )) {
     const steps = [...section.querySelectorAll<HTMLElement>(".approach_step")];
-    const images = [
-      ...section.querySelectorAll<HTMLElement>(".approach_image"),
-    ];
+    const tree = section.querySelector<Tree>("growth-tree");
 
     if (steps.length < 2) continue;
 
@@ -341,9 +323,6 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
       steps.forEach((step, i) =>
         step.classList.toggle("is-active", i === index),
       );
-      images.forEach((img, i) =>
-        img.classList.toggle("is-active", i === index),
-      );
     };
 
     /* The last step whose middle has come up past the line — the middle of
@@ -360,14 +339,33 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
       const line = window.innerHeight * (wide.matches ? 0.5 : 0.72);
       let index = 0;
 
-      steps.forEach((step, i) => {
+      const middles = steps.map((step, i) => {
         const box = step.getBoundingClientRect();
         const middle = box.top + box.height / 2;
 
         if (middle - line < box.height * LIT_BELOW) index = i;
+        return middle;
       });
 
       activate(index);
+
+      if (!tree) return;
+
+      /* How many steps the line is past the first one's middle, measured
+         between whichever two middles it lies between — steps are only as
+         tall as each other while their text fits. */
+      const last = middles.length - 2;
+      let from = 0;
+      while (from < last && middles[from + 1] <= line) from++;
+      const past =
+        from + (line - middles[from]) / (middles[from + 1] - middles[from]);
+
+      let part = 0;
+      while (part < GROWS_AT.length - 2 && past >= GROWS_AT[part + 1]) part++;
+      const through =
+        (past - GROWS_AT[part]) / (GROWS_AT[part + 1] - GROWS_AT[part]);
+
+      tree.stage = part + Math.min(1, Math.max(0, through));
     };
 
     const schedule = () => {
@@ -376,7 +374,7 @@ const sizes = "(min-width: 62rem) 45vw, 92vw";
 
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
-    /* The steps move as the images and fonts land, and a page restored
+    /* The steps move as the fonts land, and a page restored
        part-way down gets no scroll event to notice with. */
     window.addEventListener("load", schedule);
     update();
