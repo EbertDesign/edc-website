@@ -64,4 +64,117 @@ const posts = await sanityClient.fetch(POSTS_LIST_QUERY);
   .journal-hero-title {
     margin-bottom: var(--space-6);
   }
+
+  /* The post's image stays out of sight until its row is hovered or focused,
+     then glitches in; it glitches back out when the pointer leaves. Stepped on
+     purpose, not eased: each keyframe holds, cutting the image into bands and
+     knocking it sideways until it settles. Under `prefers-reduced-motion`
+     `base.css` collapses the duration, so it swaps in and out with no frames.
+     `data-glitched` is set by the script below on first hover, so the leave
+     animation cannot play on page load. */
+  .journal-post-image {
+    opacity: 0;
+  }
+
+  .journal-post-container:is(:hover, :focus-visible) .journal-post-image {
+    opacity: 1;
+    animation: journal-glitch-in 440ms steps(1, end) both;
+  }
+
+  .journal-post-container[data-glitched]:not(:hover, :focus-visible) .journal-post-image {
+    animation: journal-glitch-out 280ms steps(1, end) both;
+  }
+
+  @keyframes journal-glitch-in {
+    0% {
+      opacity: 1;
+      clip-path: inset(62% 0 30% 0);
+      transform: translateX(-6%);
+    }
+    12% {
+      opacity: 1;
+      clip-path: inset(10% 0 76% 0);
+      transform: translateX(4%);
+    }
+    24% {
+      opacity: 1;
+      clip-path: polygon(0 28%, 100% 28%, 100% 41%, 0 41%, 0 70%, 100% 70%, 100% 88%, 0 88%);
+      transform: translateX(-3%);
+    }
+    36% {
+      opacity: 0;
+      clip-path: inset(0);
+      transform: none;
+    }
+    46% {
+      opacity: 1;
+      clip-path: polygon(0 0, 100% 0, 100% 34%, 0 34%, 0 55%, 100% 55%, 100% 64%, 0 64%);
+      transform: translateX(2.5%);
+    }
+    58% {
+      opacity: 1;
+      clip-path: inset(0 0 22% 0);
+      transform: translateX(-1.5%);
+    }
+    70% {
+      opacity: 1;
+      clip-path: polygon(0 0, 100% 0, 100% 57%, 0 57%, 0 66%, 100% 66%, 100% 100%, 0 100%);
+      transform: translateX(1%);
+    }
+    82% {
+      opacity: 1;
+      clip-path: inset(0);
+      transform: translateX(-0.5%);
+    }
+    100% {
+      opacity: 1;
+      clip-path: inset(0);
+      transform: none;
+    }
+  }
+
+  @keyframes journal-glitch-out {
+    0% {
+      opacity: 1;
+      clip-path: polygon(0 0, 100% 0, 100% 48%, 0 48%, 0 60%, 100% 60%, 100% 100%, 0 100%);
+      transform: translateX(1.5%);
+    }
+    20% {
+      opacity: 1;
+      clip-path: polygon(0 8%, 100% 8%, 100% 30%, 0 30%, 0 52%, 100% 52%, 100% 79%, 0 79%);
+      transform: translateX(-3%);
+    }
+    40% {
+      opacity: 0;
+      clip-path: inset(0);
+      transform: none;
+    }
+    55% {
+      opacity: 1;
+      clip-path: inset(36% 0 44% 0);
+      transform: translateX(5%);
+    }
+    75% {
+      opacity: 1;
+      clip-path: inset(80% 0 9% 0);
+      transform: translateX(-6%);
+    }
+    100% {
+      opacity: 0;
+      clip-path: inset(0);
+      transform: none;
+    }
+  }
 </style>
+
+<script>
+  // Marks a journal row the first time it is hovered or focused, which is
+  // what lets its image glitch out afterwards (see the styles above).
+  // Delegated, so it holds for rows swapped in by a page transition.
+  const mark = (event: Event) => {
+    const row = (event.target as Element | null)?.closest?.<HTMLElement>(".journal-post-container");
+    if (row) row.dataset.glitched = "";
+  };
+  document.addEventListener("pointerover", mark, { passive: true });
+  document.addEventListener("focusin", mark);
+</script>
