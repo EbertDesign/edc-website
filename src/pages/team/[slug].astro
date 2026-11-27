@@ -24,6 +24,7 @@ if (!m) throw new Error(`No document for /${Astro.url.pathname}`);
 <BaseLayout title={m.name} description={m.bio ?? undefined}>
   <Section paddingTop="none" paddingBottom="none" class="subpage-hero-section margin-top-48" gap="0">
       <div class="w-layout-grid _12-column-grid">
+        <a href="/about#team" class="subtle-text-link cell-team-back">Back to team</a>
         <div class="team-member-text-container cell-team-text">
           <Eyebrow class="margin-bottom-16">Team member</Eyebrow>
           <h1>{m.name}</h1>

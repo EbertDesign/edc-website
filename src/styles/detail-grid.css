@@ -70,18 +70,24 @@
     grid-area: 1 / 2 / 2 / 13;
   }
 
-  /* A team member: portrait on the left, name and role to its right. */
+  /* A team member: the back link on a row of its own, so the eyebrow, name
+     and role keep their stack; then portrait on the left, name and role to
+     its right. */
+  .cell-team-back {
+    grid-area: 1 / 2 / 2 / 6;
+  }
+
   .cell-team-text {
-    grid-area: 1 / 5 / 2 / 13;
+    grid-area: 2 / 5 / 3 / 13;
     align-self: center;
   }
 
   .cell-team-image {
-    grid-area: 1 / 2 / 2 / 6;
+    grid-area: 2 / 2 / 3 / 6;
   }
 
   .cell-team-bio {
-    grid-area: 2 / 4 / 2 / 10;
+    grid-area: 3 / 4 / 4 / 10;
   }
 }
 
@@ -91,6 +97,11 @@
   .cell-next-label,
   .cell-team-image {
     order: -9999;
+  }
+
+  /* The back link stays above the lifted portrait. */
+  .cell-team-back {
+    order: -10000;
   }
 
   .cell-next-label {
