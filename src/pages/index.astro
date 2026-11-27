@@ -19,7 +19,38 @@ import ServiceItem from "@/components/Item/ServiceItem.astro";
 import CtaContact from "@/components/ContentCtaContact.astro";
 import Section from "@/components/Wrapper/Section.astro";
 import ScrollTheme from "@/components/Utility/ScrollTheme.astro";
+import Marquee from "@/components/Interactive/Marquee.astro";
+import Paragraph from "@/components/Typography/Paragraph.astro";
+import Heading from "@/components/Typography/Heading.astro";
+import Icon from "@/components/Media/Icon.astro";
+import Img from "@/components/Media/Img.astro";
+import logo_icon from "@/assets/logo/logo-icon.svg";
 import { sanityClient, CASES_LIST_QUERY, SERVICES_LIST_QUERY } from "@/utils/sanity.ts";
+
+/**
+ * Client logos for the "Trusted by" marquee: every image in
+ * `src/assets/clients`, in filename order. The filename is the alt text, less
+ * any leading number used for ordering — `01-b-lab.svg` reads as "B Lab".
+ * Until that folder holds a logo the marquee falls back to its text items.
+ */
+const clientLogos = Object.entries(
+  import.meta.glob<{ default: ImageMetadata }>(
+    "../assets/clients/*.{svg,png,webp,jpg,jpeg,avif}",
+    { eager: true },
+  ),
+)
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([path, mod]) => ({
+    src: mod.default,
+    name: path
+      .split("/")
+      .pop()!
+      .replace(/\.[^.]+$/, "")
+      .replace(/^\d+[-_ ]*/, "")
+      .split(/[-_ ]+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
+  }));
 
 const [cases, services] = await Promise.all([
   sanityClient.fetch(CASES_LIST_QUERY),
@@ -56,6 +87,30 @@ const [cases, services] = await Promise.all([
       </div>
       <img class="lead-image" src="/images/sigmund-rJnx12RKrd4-unsplash-min.jpg" alt="" sizes="(max-width: 3314px) 100vw, 3314px" id="w-node-_19665838-910f-3f74-f4c9-831752420cf2-08125e4c" loading="lazy" srcset="/images/sigmund-rJnx12RKrd4-unsplash-min-p-500.jpeg 500w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-800.jpeg 800w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1080.jpeg 1080w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-1600.jpeg 1600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2000.jpeg 2000w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-2600.jpeg 2600w, /images/sigmund-rJnx12RKrd4-unsplash-min-p-3200.jpeg 3200w, /images/sigmund-rJnx12RKrd4-unsplash-min.jpg 3314w" />
     </div>
+  </Section>
+
+  <Section paddingTop="none" gap="6">
+    <Heading tag="h2" class="alignment-center">Trusted by these organizations</Heading>
+    <Marquee label="Client logos" class="client-logos">
+      {
+        clientLogos.length > 0 ? (
+          clientLogos.map((logo) => (
+            <Img src={logo.src} alt={logo.name} transparent loading="eager" />
+          ))
+        ) : (
+          <Fragment>
+            <Paragraph variant="large">Nonprofits</Paragraph>
+            <Icon src={logo_icon} variant="large" />
+            <Paragraph variant="large">B Corps</Paragraph>
+            <Icon src={logo_icon} variant="large" />
+            <Paragraph variant="large">Purpose-Driven Brands</Paragraph>
+            <Icon src={logo_icon} variant="large" />
+            <Paragraph variant="large">Foundations</Paragraph>
+            <Icon src={logo_icon} variant="large" />
+          </Fragment>
+        )
+      }
+    </Marquee>
   </Section>
 
   <Section paddingTop="none" gap="0">
@@ -95,3 +150,29 @@ const [cases, services] = await Promise.all([
 
   <ScrollTheme />
 </BaseLayout>
+
+<style is:global>
+  /* The client logos are single-colour artwork drawn in black, which is right
+     on Field's paper. On Signal's dark ground they are flipped to white, and
+     the homepage's scroll change back to Field undoes that. */
+  /* One step up the spacing scale from the marquee's default, so the logos
+     have a little more room between them, and a little shorter than its
+     default 3rem. */
+  .client-logos {
+    --_gap-size: var(--space-7);
+    --_item-height: 2.5rem;
+  }
+
+  .client-logos .marquee_panel > .image {
+    filter: brightness(0);
+  }
+
+  :is(.theme-dark, [data-theme="signal"]) .client-logos .marquee_panel > .image {
+    filter: brightness(0) invert(1);
+  }
+
+  :root[data-scroll-theme="field"] .client-logos .marquee_panel > .image,
+  [data-theme="field"] .client-logos .marquee_panel > .image {
+    filter: brightness(0);
+  }
+</style>
