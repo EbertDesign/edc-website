@@ -24,6 +24,8 @@ type Props = HTMLAttributes<"section"> & {
   srcset?: string;
   /** Leave unset on decorative images — renders `alt=""`. */
   alt?: string;
+  /** `object-position`, for keeping a subject in frame when the picture is cropped. Defaults to the centre. */
+  position?: string;
 };
 
 const {
@@ -31,6 +33,7 @@ const {
   src,
   srcset,
   alt = "",
+  position,
   class: className,
   ...rest
 } = Astro.props;
@@ -46,6 +49,7 @@ const {
           srcset={srcset}
           sizes="100vw"
           alt={alt}
+          style={position && `object-position: ${position}`}
           loading="lazy"
         />
       </div>
