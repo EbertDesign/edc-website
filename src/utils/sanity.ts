@@ -103,7 +103,7 @@ export const DELIVERABLE_DETAIL_QUERY = defineQuery(/* groq */ `
 `);
 
 export const TEAM_LIST_QUERY = defineQuery(/* groq */ `
-  *[_type == "teamMember" && defined(slug.current)] | order(_createdAt asc) {
+  *[_type == "teamMember" && defined(slug.current)] | order(orderRank asc, _createdAt asc) {
     _id,
     name,
     "slug": slug.current,

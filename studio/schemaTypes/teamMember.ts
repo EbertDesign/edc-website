@@ -1,5 +1,6 @@
 import {defineType, defineField} from 'sanity'
 import {UserIcon} from '@sanity/icons/User'
+import {orderRankField, orderRankOrdering} from '@sanity/orderable-document-list'
 
 /** A person on the About page. Webflow collection "Team Members". */
 export const teamMember = defineType({
@@ -7,13 +8,16 @@ export const teamMember = defineType({
   title: 'Team member',
   type: 'document',
   icon: UserIcon,
-  /* "Site order" is creation order, which is what TEAM_LIST_QUERY sorts by, so
-     the Studio list and the About page agree. */
+  /* "Site order" is `orderRank`, set by dragging rows in the Studio's Team
+     list (see structure.ts) and what TEAM_LIST_QUERY sorts by, so the Studio
+     list and the About page agree. */
   orderings: [
-    {title: 'Site order', name: 'createdAsc', by: [{field: '_createdAt', direction: 'asc'}]},
+    {...orderRankOrdering, title: 'Site order'},
     {title: 'Name A–Z', name: 'nameAsc', by: [{field: 'name', direction: 'asc'}]},
   ],
   fields: [
+    /* Hidden. Written by the drag-and-drop Team list; a new member lands last. */
+    orderRankField({type: 'teamMember'}),
     defineField({name: 'name', type: 'string', validation: (rule) => rule.required()}),
     defineField({
       name: 'slug',

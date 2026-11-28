@@ -9,6 +9,7 @@ import {StackIcon} from '@sanity/icons/Stack'
 import {StarIcon} from '@sanity/icons/Star'
 import {TagIcon} from '@sanity/icons/Tag'
 import {UsersIcon} from '@sanity/icons/Users'
+import {orderableDocumentListDeskItem} from '@sanity/orderable-document-list'
 import {POST_TOPICS} from './schemaTypes/post'
 
 /**
@@ -43,8 +44,6 @@ const NEWEST_FIRST: Ordering = [{field: 'publishedAt', direction: 'desc'}]
 const SITE_ORDER: Ordering = [{field: 'sortOrder', direction: 'asc'}]
 /** Deliverables: 35 of them, so alphabetical is the only findable order. */
 const ALPHABETICAL: Ordering = [{field: 'title', direction: 'asc'}]
-/** Team: oldest first, matching TEAM_LIST_QUERY's `order(_createdAt asc)`. */
-const JOINED_FIRST: Ordering = [{field: '_createdAt', direction: 'asc'}]
 
 /** A filtered list of one type. Wraps the `.apiVersion()` requirement. */
 const filtered = (
@@ -244,7 +243,7 @@ const journal = (S: StructureBuilder) =>
         ]),
     )
 
-export const structure: StructureResolver = (S) =>
+export const structure: StructureResolver = (S, context) =>
   S.list()
     .id('root')
     .title('Ebert Design')
@@ -258,9 +257,15 @@ export const structure: StructureResolver = (S) =>
       deliverables(S),
       journal(S),
       S.divider(),
-      S.listItem()
-        .id('team')
-        .title('Team')
-        .icon(UsersIcon)
-        .child(S.documentTypeList('teamMember').title('Team').defaultOrdering(JOINED_FIRST)),
+      /* Drag rows to reorder. The order is stored in each member's hidden
+         `orderRank`, which TEAM_LIST_QUERY sorts by, so this list is the
+         order the About page shows. */
+      orderableDocumentListDeskItem({
+        type: 'teamMember',
+        id: 'team',
+        title: 'Team',
+        icon: UsersIcon,
+        S,
+        context,
+      }),
     ])
