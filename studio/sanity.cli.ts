@@ -16,6 +16,11 @@ export default defineCliConfig({
     generates: '../sanity.types.ts',
     overloadClientMethods: true,
   },
+  /* `lexorank`, a dependency of @sanity/orderable-document-list, ships
+     CommonJS. The CLI's schema worker (`sanity schema extract`, so `npm run
+     typegen`, and `sanity deploy`) runs everything through Vite and fails on
+     it with "exports is not defined"; left external, Node loads it itself. */
+  vite: {ssr: {external: ['lexorank']}},
   deployment: {
     /* The deployed application, so `sanity deploy` never prompts for it. */
     appId: 'szwveao4wccftyoaaegpo5gt',
