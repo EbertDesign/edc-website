@@ -14,8 +14,7 @@
  * working. Under `prefers-reduced-motion` the drift is left out. With no
  * JavaScript the three words sit above the photographs as one heading.
  *
- * The photographs are placeholders, borrowed from elsewhere on the site.
- * Swap the `photos` entries below when the real ones exist.
+ * The photographs run oldest to newest across the three blocks, four each.
  */
 import type { ComponentProps, HTMLAttributes } from "astro/types";
 import Section from "@/components/Wrapper/Section.astro";
@@ -26,19 +25,85 @@ type Props = Pick<ComponentProps<typeof Section>, "render"> &
 
 const { render = true, class: className, ...rest } = Astro.props;
 
-const photo = (name: string, ext = "jpg") => ({
-  src: `/images/${name}-p-1080.${ext}`,
+type Photo = {
+  /** File name in `public/images/about/`, without the extension. */
+  name: string;
+  alt: string;
+  /** The source's own width — no candidate is listed at or above it. */
+  width?: number;
+  /** `object-position`, for a landscape picture whose subject is off-centre. */
+  position?: string;
+};
+
+const photo = ({ name, alt, width = 2000, position }: Photo) => ({
+  src: `/images/about/${name}-p-${width > 1080 ? 1080 : 800}.jpg`,
   srcset: [500, 800, 1080, 1600]
-    .map((w) => `/images/${name}-p-${w}.${ext} ${w}w`)
+    .filter((w) => w < width)
+    .map((w) => `/images/about/${name}-p-${w}.jpg ${w}w`)
     .join(", "),
+  alt,
+  position,
 });
 
+/* Twelve, four to a word, oldest first: Ebert Tree Service from the 1970s
+   on, then Harold, then Zach growing up, then the River Region United Way. */
 const photos = [
-  photo("kaleidico-26MJGnCM0Wc-unsplash"),
-  photo("jason-goodman-vbxyFxlgpjM-unsplash"),
-  photo("jason-goodman-Oalh2MojUuk-unsplash"),
-  photo("sigmund-rJnx12RKrd4-unsplash-min", "jpeg"),
-];
+  {
+    name: "ebert-tree-bucket-truck-1970s",
+    alt: "An Ebert Tree Service bucket truck in the 1970s, a climber in the bucket among bare trees",
+    width: 1333,
+  },
+  {
+    name: "ebert-tree-truck-logs-1970s",
+    alt: "The Ebert Tree Service truck parked beside a yard of cut logs and brush, 1970s",
+    position: "62% 50%",
+  },
+  {
+    name: "ebert-tree-bucket-truck-pines",
+    alt: "The bucket truck's boom raised to the top of a stand of pines",
+    width: 1333,
+  },
+  {
+    name: "ebert-tree-trunk-removal",
+    alt: "A worker in the bucket taking down a limbed trunk piece by piece",
+    width: 1333,
+  },
+  {
+    name: "ebert-tree-skid-loader-2003",
+    alt: "A skid loader lifting a section of trunk into the Ebert Tree Service truck, October 2003",
+  },
+  {
+    name: "ebert-tree-stump-grinder",
+    alt: "The crew working a stump grinder across a lawn",
+  },
+  {
+    name: "ebert-tree-truck-loading",
+    alt: "A worker loading the Ebert Tree Service dump truck under the trees",
+    position: "38% 50%",
+  },
+  {
+    name: "harold-ebert-flagpole",
+    alt: "Harold Ebert standing at the foot of a tall flagpole, the flag flying above him",
+    width: 1187,
+  },
+  {
+    name: "zach-harold-christmas",
+    alt: "Zach as a small child playing on the living-room floor with Harold Ebert at Christmas",
+  },
+  {
+    name: "zach-birthday-pinata",
+    alt: "Zach as a child sitting cross-legged in front of a dinosaur piñata and balloons",
+  },
+  {
+    name: "rruw-golf-table",
+    alt: "Zach at a River Region United Way table at an outdoor event",
+    position: "58% 50%",
+  },
+  {
+    name: "rruw-imagination-library-table",
+    alt: "Zach and a colleague at a River Region United Way table for the Imagination Library",
+  },
+].map(photo);
 
 const blocks = [
   { word: "Leave.", theme: undefined },
@@ -76,21 +141,19 @@ const sizes = "(min-width: 48rem) 31vw, 55vw";
           data-scroll-theme-to={block.theme}
           data-scroll-theme-offset="50"
         >
-          {photos.map((_, n) => {
-            const image = photos[(n + index) % photos.length];
-            return (
-              <div class="statement-scroll_item">
-                <img
-                  class="statement-scroll_image"
-                  src={image.src}
-                  srcset={image.srcset}
-                  sizes={sizes}
-                  alt=""
-                  loading="lazy"
-                />
-              </div>
-            );
-          })}
+          {photos.slice(index * 4, index * 4 + 4).map((image) => (
+            <div class="statement-scroll_item">
+              <img
+                class="statement-scroll_image"
+                src={image.src}
+                srcset={image.srcset}
+                sizes={sizes}
+                alt={image.alt}
+                style={image.position && `object-position: ${image.position}`}
+                loading="lazy"
+              />
+            </div>
+          ))}
         </div>
       ))
     }

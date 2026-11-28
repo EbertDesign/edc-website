@@ -5,8 +5,8 @@
  * `sticky-visual`), closing on the statement itself, set large across the
  * full width.
  *
- * The copy is lorem ipsum and the photograph a placeholder, both waiting on
- * the real ones. The closing line fades up through `Utility/Reveal`.
+ * The copy is lorem ipsum, waiting on the real thing; the photograph is from
+ * Ebert Tree Service. The closing line fades up through `Utility/Reveal`.
  */
 import type { HTMLAttributes } from "astro/types";
 import ContentWrapper from "@/components/Wrapper/ContentWrapper.astro";
@@ -48,7 +48,8 @@ const paragraphs = Array.from({ length: 8 }, (_, index) => lorem[index % 2]);
         </div>
         <Img
           slot="column2"
-          src="/images/jason-goodman-Oalh2MojUuk-unsplash-p-1600.jpg"
+          src="/images/about/ebert-tree-storm-cleanup-p-1600.jpg"
+          alt="An Ebert Tree Service worker in a hard hat and chaps, chainsaw resting on a storm-felled tree"
         />
       </ContentWrapper>
       <Paragraph
